@@ -1,0 +1,68 @@
+{% extends "base.html" %}
+
+{% block content %}
+
+<div class="content-wrapper">
+    <section class="content-header">
+        <div class="container-fluid">
+          <div class="row mb-2">
+            <div class="col-sm-6">
+              <h1> Moliendas Registradas</h1>
+            </div>
+            <div class="col-sm-6">
+              <ol class="breadcrumb float-sm-right">
+                <li class="breadcrumb-item"><a href="#">Inicio</a></li>
+                <li class="breadcrumb-item active">Moliendas registradas</li>
+              </ol>
+            </div>
+          </div>
+        </div><!-- /.container-fluid -->
+      </section>
+
+      <section><div class="card">
+        <div class="card-header">
+          <h3 class="card-title">Listado de todas las moliendas registradas</h3>
+        </div>
+        <!-- /.card-header -->
+        <div class="card-body">
+          <table id="example1" class="table table-bordered table-striped">
+            <thead>
+            <tr>
+              <th>Fecha Molienda</th>
+              <th>Lote</th>
+              <th>Varietal</th>
+              <th>Agregados</th>
+              <th>Rendimiento</th>
+              
+            </tr>
+            </thead>
+            <tbody>
+                {% for molienda in moliendas %} <tr>
+              <td>{{ molienda.fecha_molienda }}</td>
+              <td>{{ molienda.cargamento.lote }}</td>
+              <td>{{ molienda.cargamento.varietal }}</td>
+              <td>{{ molienda.agregados }}</td>
+              <td> {{ molienda.rendimiento }} </td>
+                
+                
+            </tr>{% endfor %}
+           
+            
+            </tbody>
+            
+          </table>
+        </div>
+        <!-- /.card-body -->
+      </div>
+
+
+</div></section>
+
+    
+
+
+{% endblock content %}
+
+
+
+

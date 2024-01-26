@@ -1,0 +1,461 @@
+{% extends "base.html" %}
+{% load static %}
+
+
+{% block content %}
+<div class="content-wrapper">
+  <section class="content-header">
+    <div class="container-fluid">
+      <div class="row mb-2">
+        <div class="col-sm-6">
+          <h1>Detalle de tanque</h1>
+        </div>
+        <div class="col-sm-6">
+          <ol class="breadcrumb float-sm-right">
+            <li class="breadcrumb-item"><a href="#">Inicio</a></li>
+            <li class="breadcrumb-item active">Tanque N° <strong> {{ tanque_detalle.numero }}</strong></li>
+          </ol>
+        </div>
+      </div>
+    </div><!-- /.container-fluid -->
+  </section>
+
+  <section class="content">
+    <div class="container-fluid">
+      <div class="row">
+        <div class="col-md-3">
+
+          <!-- Profile Image -->
+          <div class="card card-primary card-outline">
+            <div class="card-body box-profile">
+              <div class="text-center">
+                <img class="profile-user-img img-fluid "
+                     src="{% static "img\qr tanque 1.png" %}"
+                     alt="Tanque numero">
+              </div>
+
+              <h3 class="profile-username text-center">Tanque N° <strong>{{ tanque_detalle.numero }}</strong></h3>
+
+              {% comment %} <p class="text-muted text-center">Software Engineer</p> {% endcomment %}
+
+              <ul class="list-group list-group-unbordered mb-3">
+                <li class="list-group-item">
+                  <b>Material</b> <a class="float-right">{{ tanque_detalle.material }}</a>
+                </li>
+                <li class="list-group-item">
+                  <b>Volumen</b> <a class="float-right">{{ tanque_detalle.volumen }} lts</a>
+                </li>
+                <li class="list-group-item">
+                 <b>Contenido</b> <a class="float-right">
+                    {% if contenido %}
+                    <p> {{ contenido.molienda.cargamento.varietal }}</p>
+                {% else %}
+                    <p>Vacio.</p>
+                {% endif %}</a>
+                </li>
+                <li class="list-group-item">
+                  <b>Lote</b> <a class="float-right">{{ contenido.molienda.cargamento.lote }} </a>
+                </li>
+                <li class="list-group-item">
+                  <b>cantidad</b> <a class="float-right">
+                    {% if contenido.molienda %}
+                    <a class="float-right">{{ contenido.cantidad }} lts</a>
+                    {% else %}
+                    <a class="float-right"> 0 lts
+                {% endif %}</a>
+                </li>
+                
+
+
+              </ul>
+
+              
+            </div>
+            <!-- /.card-body -->
+          </div>
+          <!-- /.card -->
+
+          
+        </div>
+        <!-- /.col -->
+        <div class="col-md-9">
+          <div class="card">
+            <div class="card-header p-3">
+              <ul class="nav nav-pills">
+                <li class="nav-item"><a class="nav-link active" href="#tareas" data-toggle="tab">Tareas</a></li>
+                <li class="nav-item"><a class="nav-link" href="#notas" data-toggle="tab">Notas</a></li>
+                <li class="nav-item"><a class="nav-link" href="#lineatiempo" data-toggle="tab">Historial contenido</a></li>
+                <li class="nav-item"><a class="nav-link" href="#cargacontenido" data-toggle="tab">Cargar contenido</a></li>
+                <li class="nav-item"><a class="nav-link" href="#nuevatarea" data-toggle="tab">Registrar nueva tarea</a></li>
+              </ul>
+            </div><!-- /.card-header -->
+            <div class="card-body">
+              <div class="tab-content">
+                <div class="active tab-pane" id="tareas">
+                  
+
+                  <!-- Post -->
+                  
+                  {% for t in tarea %}
+                    {% if not t.realizada %}
+                    <div class="post clearfix">
+                      <div class="user-block">
+                        <span class="">
+                          <strong>{{ t.titulo }}</strong>
+                        </span>
+                        <span class="description">Agendado el {{ t.fecha }}</span>
+                      </div>
+                      <!-- /.user-block -->
+                      <p>
+                        <strong>Tarea:</strong>
+                        {{ t.titulo }}
+                      </p>
+                      <p>
+                        <strong>Notas:</strong>
+                        {{ t.nota }}
+                      </p>
+                      <a href="{% url "editar_nota_tarea" t.id %}" class="btn btn-warning">Registrar tarea completa</a>
+                    </div>
+                    {% endif %}
+                  {% endfor %}
+                  
+                  <!-- /.post -->
+                  
+                  <!-- Post -->
+                  
+                    <!-- /.row -->
+
+                    
+
+                   
+                  <!-- /.post -->
+                </div>
+                <!-- /.tab-pane -->
+                <div class="tab-pane" id="notas">
+                  <form class="form-horizontal" method="post" enctype="multipart/form-data">
+                    {% csrf_token %}
+
+                    <div class="form-group row" {% comment %} style="display:none" {% endcomment %}>
+                      <label for="inputEmail" class="col-sm-2 col-form-label">Tanque</label>
+                      <div class="col-sm-10">
+                          <input name="tanque" type="text" class="form-control" value="{{ tanque_detalle.id }}">
+                      </div>
+                    </div>
+                    <div class="form-group row" {% comment %} style="display:none" {% endcomment %}>
+                      <label for="inputEmail" class="col-sm-2 col-form-label">Fecha</label>
+                      <div class="col-sm-10">
+                        <input name="fecha_ingreso" type="text" class="form-control" value="{{ fecha }}">
+                      </div>
+                    </div>
+                    <div class="form-group row">
+                      <label for="inputEmail" class="col-sm-2 col-form-label">Notas de cata</label>
+                      <div class="col-sm-10">
+                        <textarea name="notas_cata" class="form-control" rows="3" placeholder="Notas de cata"></textarea>
+                      </div>
+                    </div>
+                    <div class="form-group row">
+                      <label for="inputName2" class="col-sm-2 col-form-label">Correcciones</label>
+                      <div class="col-sm-10">
+                        <textarea name="correcciones" class="form-control" rows="3" placeholder="Ingrese correcciones"></textarea>
+                      </div>
+                    </div>
+                    <div class="form-group row">
+                      <label for="inputExperience" class="col-sm-2 col-form-label">Observaciones</label>
+                      <div class="col-sm-10">
+                        <textarea name="observaciones" class="form-control" rows="3" placeholder="Ingrese observaciones"></textarea>
+                      </div>
+                    </div>
+                    <div class="form-group row">
+                      <label for="inputSkills" class="col-sm-2 col-form-label">Adjuntar Analisis</label>
+                      <div class="col-sm-10">
+                        <input name="analisis" type="file" class="custom-file-input" id="customFile">
+                        <label class="custom-file-label" for="customFile">Elija un archivo</label>
+                      </div>
+                    </div>
+                    <div class="form-group row">
+                        <label for="inputEmail" class="col-sm-2 col-form-label">Insumos consumidos</label>
+                        <div class="col-sm-10">
+                            <input name="insumos" type="text" class="form-control" placeholder="Enter ...">
+                        </div>
+                      </div>
+
+                    <div class="form-group row">
+                      <div class="offset-sm-2 col-sm-10">
+                        <button type="submit" class="btn btn-block btn-danger btn-lg">Registrar notas</button>
+                      </div>
+                    </div>
+                  </form>
+                </div>
+
+                <div class="tab-pane" id="lineatiempo">
+                  <!-- The timeline -->
+                  <div class="timeline timeline-inverse">
+                    <!-- timeline time label -->
+                    <div class="time-label">
+                      <span class="bg-danger">
+                        10 Feb. 2014
+                      </span>
+                    </div>
+                    <!-- /.timeline-label -->
+                    <!-- timeline item -->
+                    <div>
+                      <i class="fas fa-envelope bg-primary"></i>
+
+                      <div class="timeline-item">
+                        <span class="time"><i class="far fa-clock"></i> 12:05</span>
+
+                        <h3 class="timeline-header"><a href="#">Support Team</a> sent you an email</h3>
+
+                        <div class="timeline-body">
+                          Etsy doostang zoodles disqus groupon greplin oooj voxy zoodles,
+                          weebly ning heekya handango imeem plugg dopplr jibjab, movity
+                          jajah plickers sifteo edmodo ifttt zimbra. Babblely odeo kaboodle
+                          quora plaxo ideeli hulu weebly balihoo...
+                        </div>
+                        <div class="timeline-footer">
+                          <a href="#" class="btn btn-primary btn-sm">Read more</a>
+                          <a href="#" class="btn btn-danger btn-sm">Delete</a>
+                        </div>
+                      </div>
+                    </div>
+                    <!-- END timeline item -->
+                    <!-- timeline item -->
+                    <div>
+                      <i class="fas fa-user bg-info"></i>
+
+                      <div class="timeline-item">
+                        <span class="time"><i class="far fa-clock"></i> 5 mins ago</span>
+
+                        <h3 class="timeline-header border-0"><a href="#">Sarah Young</a> accepted your friend request
+                        </h3>
+                      </div>
+                    </div>
+                    <!-- END timeline item -->
+                    <!-- timeline item -->
+                    <div>
+                      <i class="fas fa-comments bg-warning"></i>
+
+                      <div class="timeline-item">
+                        <span class="time"><i class="far fa-clock"></i> 27 mins ago</span>
+
+                        <h3 class="timeline-header"><a href="#">Jay White</a> commented on your post</h3>
+
+                        <div class="timeline-body">
+                          Take me to your leader!
+                          Switzerland is small and neutral!
+                          We are more like Germany, ambitious and misunderstood!
+                        </div>
+                        <div class="timeline-footer">
+                          <a href="#" class="btn btn-warning btn-flat btn-sm">View comment</a>
+                        </div>
+                      </div>
+                    </div>
+                    <!-- END timeline item -->
+                    <!-- timeline time label -->
+                    <div class="time-label">
+                      <span class="bg-success">
+                        3 Jan. 2014
+                      </span>
+                    </div>
+                    <!-- /.timeline-label -->
+                    <!-- timeline item -->
+                    <div>
+                      <i class="fas fa-camera bg-purple"></i>
+
+                      <div class="timeline-item">
+                        <span class="time"><i class="far fa-clock"></i> 2 days ago</span>
+
+                        <h3 class="timeline-header"><a href="#">Mina Lee</a> uploaded new photos</h3>
+
+                        <div class="timeline-body">
+                          <img src="http://placehold.it/150x100" alt="...">
+                          <img src="http://placehold.it/150x100" alt="...">
+                          <img src="http://placehold.it/150x100" alt="...">
+                          <img src="http://placehold.it/150x100" alt="...">
+                        </div>
+                      </div>
+                    </div>
+                    <!-- END timeline item -->
+                    <div>
+                      <i class="far fa-clock bg-gray"></i>
+                    </div>
+                  </div>
+                </div>
+                <!-- /.tab-pane -->
+
+                <div class="tab-pane" id="cargacontenido">
+                  <form class="form-horizontal" method="post" enctype="multipart/form-data">
+                    {% csrf_token %}
+                    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+                    <script>
+                      $(document).ready(function() {
+                          $('#id_mover_contenido').change(function() {
+                              if ($(this).is(':checked')) {
+                                  var selectedMoliendaId = $('select[name="molienda"]').val(); // Obtener el valor seleccionado del select de molienda
+                                  
+                                  $.ajax({
+                                      url: '/obtener_contenidos_tanques/' + selectedMoliendaId + '/',
+                                      headers: { 'Accept': 'application/json' },
+                                      data: {
+                                          mover_contenido: true,
+                                          molienda: selectedMoliendaId  // Pasar el ID de molienda en la solicitud AJAX
+                                      },
+                                      success: function(data) {
+                                          // Imprimir los datos para verificar su estructura
+                                          var selectOptions = '';
+                                          for (var i = 0; i < data.length; i++) {
+                                              selectOptions += '<option>' + data[i].contenido + ' (Tanque ' + data[i].tanque + ', Cantidad: ' + data[i].cantidad + ' litros)</option>';
+                                          }
+                                          $('#contenido-select').html('<select class="custom-select" name="contenido_trasladado">' + selectOptions + '</select>');
+                  
+                                          // Recupera el contenido_id de la primera opción (asumiendo que solo hay una)
+                                          var contenidoId = data[0].contenido_id;
+                  
+                                          // Agrega un campo oculto con el valor de contenido_id
+                                          $('#contenido-id').append('<input type="number" name="contenido_origen" value="' + contenidoId + '" readonly>');
+                  
+                                          // Actualiza el campo "Cantidad (lts)" con el valor de contenido.cantidad
+                                          var cantidad = data[0].cantidad;
+                                          $('input[name="cantidad"]').val(cantidad);
+                                      }
+                                  });
+                              } else {
+                                  $('#contenido-select').html('');
+                              }
+                          });
+                      });
+                  </script>
+
+
+                    <input type="hidden" name="form_type" value="form1">
+
+                    <div class="form-group row" >
+                      <label for="inputEmail" class="col-sm-2 col-form-label">Tanque</label>
+                      <div class="col-sm-10">
+                          <input name="tanque" type="text" class="form-control" value="{{ tanque_detalle.id }}" readonly>
+                      </div>
+                    </div>
+
+
+                    <div class="form-group row">
+                      <label for="inputName" class="col-sm-2 col-form-label" >Molienda</label>
+                      <div class="col-sm-10">
+                        <div class="form-group">
+                            
+                            <select class="custom-select" name="molienda" onchange="obtenerCantidadDisponible(this.value)" >
+                              
+                              {% for i in molienda %}
+                                <option value="{{ i.id }}">Lote:{{ i.cargamento.lote }},  Varietal: {{ i.cargamento.varietal }}, Rendimiento: {{ i.rendimiento }} lts</option>
+                              {% endfor %}
+                              
+                              
+                            </select>
+                          </div>
+                      </div>
+                    </div>
+
+                    <div class="form-group row">
+                      <label for="inputEmail" class="col-sm-2 col-form-label">Mover contenido</label>
+                      <div class="col-sm-10">
+                        <input type="checkbox" id="id_mover_contenido" name="mover_contenido">
+                        <label for="id_mover_contenido">Mover contenido</label>
+                      </div>
+                    </div>
+                    
+                    <div id="contenido-select"></div>
+                    
+                    <div id="contenido-id" ></div>
+                    
+
+                    <div class="form-group row" >
+                        <label for="inputEmail" class="col-sm-2 col-form-label">Cantidad (lts)</label>
+                        <div class="col-sm-10">
+                            <input name="cantidad" type="text" class="form-control" value="">
+                        </div>
+                      </div>
+
+                      
+                    
+                      
+                      <div class="form-group row" style="" >
+                        <label for="inputEmail" class="col-sm-2 col-form-label">Fecha ingreso</label>
+                        <div class="col-sm-10">
+                          <input name="fecha_ingreso" type="text" class="form-control" value="{{ fecha }}" readonly>
+                        </div>
+                      </div>
+
+                    
+                    <div class="form-group row">
+                      <div class="offset-sm-2 col-sm-10">
+                        <button type="submit" class="btn btn-block btn-danger btn-lg">Registrar contenido</button>
+                      </div>
+                    </div>
+                  </form>
+                </div>
+
+                <div class="tab-pane" id="nuevatarea">
+                  <form class="form-horizontal" method="post" enctype="multipart/form-data">
+                    {% csrf_token %}
+                    <input type="hidden" name="form_type" value="form3">
+                      <div class="form-group row" style="">
+                        <label for="inputEmail" class="col-sm-2 col-form-label">Tanque</label>
+                        <div class="col-sm-10">
+                            <input name="tanque" type="text" class="form-control" value="{{ tanque_detalle.id }}">
+                        </div>
+                      </div>
+                      <div class="form-group row" >
+                        <label for="inputEmail" class="col-sm-2 col-form-label">Fecha de creación</label>
+                        <div class="col-sm-10">
+                          <input name="fecha" type="text" class="form-control" value="{{ fecha }}">
+                        </div>
+                      </div>
+
+                      <div class="form-group row">
+                        <label for="inputEmail" class="col-sm-2 col-form-label">Titulo tarea</label>
+                        <div class="col-sm-10">
+                          <input name="titulo" type="text" class="form-control" value="" placeholder="Ingrese un titulo para la nueva tarea">
+                        </div>
+                      </div>
+
+                      <div class="form-group row">
+                        <label for="inputEmail" class="col-sm-2 col-form-label">Notas</label>
+                        <div class="col-sm-10">
+                          <textarea name="nota" class="form-control" rows="3" placeholder="Notas para el operario"></textarea>
+                        </div>
+                      </div>
+
+                      <div class="form-check" style="margin-bottom:15px !important">
+                        <input type="checkbox" class="form-check-input" name="realizada" id="exampleCheck1">
+                        <label class="form-check-label" for="exampleCheck1">Tarea realizada</label>
+                      </div>
+
+                    
+                    <div class="form-group row">
+                      <div class="offset-sm-2 col-sm-10">
+                        <button type="submit" class="btn btn-block btn-danger btn-lg">Registrar nueva tarea</button>
+                      </div>
+                    </div>
+                  </form>
+                </div>
+                <!-- /.tab-pane -->
+              </div>
+              <!-- /.tab-content -->
+            </div><!-- /.card-body -->
+          </div>
+          <!-- /.nav-tabs-custom -->
+        </div>
+        <!-- /.col -->
+      </div>
+      <!-- /.row -->
+    </div><!-- /.container-fluid -->
+  </section>
+</div>
+
+
+
+
+{% endblock content %}
+
+
+
+

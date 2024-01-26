@@ -1,0 +1,94 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="content-wrapper">
+    <!-- Content Header (Page header) -->
+    <section class="content-header">
+      <div class="container-fluid">
+        <div class="row mb-2">
+          <div class="col-sm-6">
+            <h1>Lista depósitos</h1>
+          </div>
+          <div class="col-sm-6">
+            <ol class="breadcrumb float-sm-right">
+              
+              <a type="button"  href="{% url "crear_deposito" %}" class="btn btn-block btn-outline-primary">Crear depósito</a>
+            </ol>
+          </div>
+        </div>
+      </div><!-- /.container-fluid -->
+    </section>
+    <section class="content">
+        <div class="container-fluid">
+          
+            <div class="row">
+              
+                <div class="col-md-12">
+                  
+                    <div class="card card-warning">
+                        <div class="card-header">
+                          <h3 class="card-title">Lista de todos los Depósitos activos</h3>
+                        </div>
+                        <!-- /.card-header -->
+                        <div class="card">
+                            
+                            <!-- /.card-header -->
+                            <div class="card-body">
+                              <table id="example1" class="table table-bordered table-striped">
+                                <thead>
+                                <tr>
+                                  <th># ID</th>
+                                  <th>Nombre</th>
+                                  <th>Ubicacion</th>
+                                  <th>agregar stock</th>
+                                  <th>ver mas detalles</th>
+                                  <th>Editar</th>
+                                  <th>Eliminar</th>
+                                  
+                                </tr>
+                                </thead>
+                                <tbody>
+                                    {% for deposito in depositos %}
+                                    <tr>
+                                        <td>{{deposito.id}}</td>
+                                        <td>{{deposito.nombre}}</td>
+                                        <td>{{deposito.ubicacion}}</td>
+                                        <td><a href="{% url 'mover_stock' pk=deposito.id %}" class="btn btn-primary"><i class="fa-solid fa-check"></i> agregar stock</a></td>
+                                        <td><a href="">ver mas detalles</a></td>
+                                        <td><a href="{% url 'editar_deposito' pk=deposito.id %}" class="btn btn-warning"><i class="fa-regular fa-pen-to-square"> </i>Editar deposito</a></td>
+                                        <td > <a href="{% url 'eliminar_deposito' pk=deposito.id %}" class="btn btn-danger"><i class="fa-solid fa-trash"> </i>Eliminar deposito</a></td>
+                                        
+                                      </tr>
+                                    
+                                    
+                                    {% endfor %}
+                                
+                                
+                              </table>
+                            </div>
+                            <!-- /.card-body -->
+                          </div>
+                        
+                        <!-- /.card-body -->
+                      </div>
+
+
+
+                </div>
+                <!-- /.col -->
+            </div>
+            <!-- /.row -->
+        </div><!-- /.container-fluid -->
+    </section>
+
+
+
+
+
+
+{% endblock content %}
+
+
+
+
+

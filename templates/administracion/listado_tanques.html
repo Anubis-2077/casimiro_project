@@ -1,0 +1,76 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="content-wrapper">
+  <section class="content-header">
+    <div class="container-fluid">
+      <div class="row mb-2">
+        <div class="col-sm-6">
+          <h1>Listado de Tanques</h1>
+        </div>
+        <div class="col-sm-6">
+          <ol class="breadcrumb float-sm-right">
+            <li class="breadcrumb-item"><a href="#">Inicio</a></li>
+            <li class="breadcrumb-item active">Listado de tanques de vino</li>
+          </ol>
+        </div>
+      </div>
+    </div><!-- /.container-fluid -->
+  </section>
+    <div class="col-md-12">
+        <!-- general form elements disabled -->
+        <div class="card card-warning">
+        <div class="card-header">
+            <h3 class="card-title">Listado de tanques de vino</h3>
+        </div>
+        <!-- /.card-header -->
+            <div class="card-body">
+                
+                    
+                    <!-- /.card-header -->
+                    <div class="card-body">
+                      <table id="example1" class="table table-bordered table-striped">
+                        <thead>
+                        <tr>
+                          <th>N°</th>
+                          <th>Volumen</th>
+                          <th>Material</th>
+                          <th>Contenido</th>
+                          <th>+ Detalles</th>
+                          
+                        </tr>
+                        </thead>
+                        <tbody>
+                          {% for tanque in tanques %}
+                            <tr>
+                                <td>{{ tanque.numero }}</td>
+                                <td>{{ tanque.volumen }} Lts</td>
+                                <td>{{ tanque.material }}</td>
+                                <td>
+                                  {% if tanque.ultimo_contenido.molienda.id == 30 %}
+                                      Vacio
+                                  {% elif tanque.ultimo_contenido == None %}
+                                      Vacio
+                                  {% else %}
+                                      {{ tanque.ultimo_contenido }}
+                                  {% endif %}
+                                </td>
+                                <td><a href="{% url "detalle_tanque" tanque.numero %}">detalles del tanque</a></td>
+                            </tr>
+                          {% endfor %}
+                        
+                        
+                        </tbody>
+                        
+                      </table>
+                    </div>
+                    <!-- /.card-body -->
+                  </div>
+            </div>
+        </div>
+    </div>
+  </div>
+
+    
+
+{% endblock content %}

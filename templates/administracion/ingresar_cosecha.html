@@ -1,0 +1,162 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="content-wrapper">
+<section class="content-header">
+    <div class="container-fluid">
+      <div class="row mb-2">
+        <div class="col-sm-6">
+          <h1>INGRESAR NUEVO CARGAMENTO</h1>
+        </div>
+        <div class="col-sm-6">
+          <ol class="breadcrumb float-sm-right">
+            <li class="breadcrumb-item"><a href="#">Inicio</a></li>
+            <li class="breadcrumb-item active">Ingresar nuevo cargamento</li>
+          </ol>
+        </div>
+      </div>
+    </div><!-- /.container-fluid -->
+  </section>
+  <div class="col-md-12">
+    <!-- general form elements disabled -->
+    <div class="card card-warning">
+      <div class="card-header">
+        <h3 class="card-title">General Elements</h3>
+      </div>
+      <!-- /.card-header -->
+      <div class="card-body">
+        <form role="form" method="post" enctype="multipart/form-data">
+          {% csrf_token %}
+          <div class="row">
+            <div class="col-sm-12">
+              <!-- text input -->
+              <div class="form-group">
+                <label>Lote</label>
+                <input type="text" class="form-control" name="lote" value="{{ lote }}">
+              </div>
+            </div>
+          </div>
+          <div class="row">
+            <div class="col-sm-12">
+              <!-- text input -->
+              <div class="form-group">
+                <label>Peso Bruto</label>
+                <input type="number" class="form-control" name="peso_bruto" placeholder="ingrese el peso bruto">
+              </div>
+            </div>
+            <div class="col-sm-12">
+              <!-- text input -->
+              <div class="form-group">
+                <label>Peso Neto</label>
+                <input type="number" class="form-control" name="peso_neto" placeholder="ingrese el peso neto">
+              </div>
+            </div>
+            <div class="col-sm-12">
+              <!-- text input -->
+              <div class="form-group">
+                <label>Tara</label>
+                <input type="number" class="form-control" name="tara" placeholder="ingrese la tara ">
+              </div>
+            </div>
+            <div class="col-sm-12">
+              <!-- text input -->
+              <div class="form-group">
+                <label>Camión</label>
+                <input type="text" class="form-control" name="camion" placeholder="ingrese el modelo del camión">
+              </div>
+            </div>
+            <div class="col-sm-12">
+              <!-- text input -->
+              <div class="form-group">
+                <label>Dominio</label>
+                <input type="text" class="form-control" name="dominio" placeholder="ingrese la pantente del camión">
+              </div>
+            </div>
+            <div class="col-sm-12">
+              <!-- text input -->
+              <div class="form-group">
+                <label>Camionero</label>
+                <input type="text" class="form-control" name="camionero" placeholder="Nombre y apellido del camionero">
+              </div>
+            </div>
+            <div class="col-sm-12">
+              <!-- text input -->
+              <div class="form-group">
+                <label>Razon Social Camionero</label>
+                <input type="text" class="form-control" name="camionero_razon_social" placeholder="Si el camionero tiene razon social ingrese, de lo contrario deje en blanco.">
+              </div>
+            </div>
+            <div class="col-sm-12">
+              <!-- text input -->
+              <div class="form-group">
+                <label>Camionero CUIT / CUIL</label>
+                <input type="number" class="form-control" name="camionero_cuit" placeholder="Ingrese el CUIT del camionero.">
+              </div>
+            </div>
+            <div class="col-sm-12">
+              <!-- select -->
+              <div class="form-group">
+                <label for="proveedor">Proveedor</label>
+                <select class="form-control" id="proveedor" name="proveedor">
+                  <option value="" disabled selected>Elige un proveedor</option>
+                  {% for proveedor in proveedores %}
+                  <option value="{{ proveedor.id }}">{{ proveedor.razon_social }}</option>
+                  {% endfor %}
+                </select>
+              </div>
+            </div>
+            <div class="col-sm-12">
+              <!-- text input -->
+              <div class="form-group">
+                <label>Varietal</label>
+                <input type="text" class="form-control" name="varietal" placeholder="Ingrese el varietal de uva.">
+              </div>
+            </div>
+            <div class="col-sm-12">
+              <!-- text input -->
+              <div class="form-group">
+                <label>Origen</label>
+                <input type="text" class="form-control" name="origen" placeholder="Ingrese el lugar de origen de la carga.">
+              </div>
+            </div>
+            <div class="col-sm-12">
+              <!-- text input -->
+              <div class="form-group">
+                <label>Parral</label>
+                <input type="text" class="form-control" name="parral" placeholder="Ingrese el parral de origen.">
+              </div>
+            </div>
+            <div class="col-sm-12">
+              <!-- text input -->
+              <div class="form-group">
+                <label>Cuartel</label>
+                <input type="text" class="form-control" name="cuartel" placeholder="Ingrese el cuartel al que pertenece la carga.">
+              </div>
+            </div>
+            <div class="col-sm-12">
+              <!-- text input -->
+              <div class="form-group">
+                <label>Azucar gr/l</label>
+                <input type="text" class="form-control" name="azucar" placeholder="Ingrese la cantidad de azucar por litro.">
+              </div>
+            </div>
+            <div class="form-check">
+              <input class="form-check-input" type="checkbox">
+              <label class="form-check-label">El cargamento esta declarado?</label>
+            </div>
+            
+          </div>
+
+         <button style="margin-top:30px" type="submit" class="btn btn-block btn-warning btn-lg">ingresar Cargamento</button>
+        </form>
+      </div>
+      <!-- /.card-body -->
+    </div>
+    <!-- /.card -->
+  </div>
+
+
+{% endblock content %}
+
+
+

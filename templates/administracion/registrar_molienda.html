@@ -1,0 +1,149 @@
+{% extends "base.html" %}
+{% load static %}
+
+
+
+{% block content %}
+<div class="content-wrapper">
+<section class="content-header">
+    <div class="container-fluid">
+      <div class="row mb-2">
+        <div class="col-sm-6">
+          <h1> REGISTRAR NUEVA MOLIENDA</h1>
+        </div>
+        <div class="col-sm-6">
+          <ol class="breadcrumb float-sm-right">
+            <li class="breadcrumb-item"><a href="#">Inicio</a></li>
+            <li class="breadcrumb-item active">Registrar nueva molienda</li>
+          </ol>
+        </div>
+      </div>
+    </div><!-- /.container-fluid -->
+  </section>
+  <section class="content">
+    <div class="container-fluid">
+        <div class="row">
+            <div class="col-md-12">
+                <!-- general form elements disabled -->
+                <div class="card card-warning">
+                  <div class="card-header">
+                    <h3 class="card-title">Complete el formulario para registrar una nueva molienda.</h3>
+                  </div>
+
+                          <!-- /.card-header -->
+                          <div class="card-body">
+                            <form role="form" method="post" enctype="multipart/form-data">
+                                {% csrf_token %}
+                                <div class="col-sm-12">
+                                    <!-- select -->
+                                    <div class="form-group">
+                                      <label for="cargamento">Cargamento</label>
+                                      <select class="form-control" id="cargamento" name="cargamento">
+                                        <option value="" disabled selected>Elige una Cosecha</option>
+                                        {% for cargamento in cargamentos %}
+                                        <option value="{{ cargamento.id }}">Lote : {{ cargamento.lote }},  Varietal: {{ cargamento.varietal }},  Fecha: {{ cargamento.fecha }} </option>
+                                        {% endfor %}
+                                      </select>
+                                    </div>
+                                  </div>
+
+                                  <div class="form-group">
+                                    <label>Fecha Molienda</label>
+                  
+                                    <div class="input-group">
+                                      <div class="input-group-prepend">
+                                        <span class="input-group-text"><i class="far fa-calendar-alt"></i></span>
+                                      </div>
+                                      <input type="date"  name="fecha_molienda" class="form-control" data-inputmask-alias="datetime" data-inputmask-inputformat="dd/mm/yyyy" data-mask>
+                                    </div>
+                                    <!-- /.input group -->
+                                  </div>
+
+                              <div class="row">
+                                <div class="col-sm-12">
+                                  <!-- text input -->
+                                  <div class="form-group">
+                                    <label>Agregados</label>
+                                    <input name="agregados" type="text" class="form-control" placeholder="Ingrese los agregados utilizados">
+                                  </div>
+                                </div>
+                              </div>
+                              <div class="row">
+                                <div class="col-sm-12">
+                                  <!-- textarea -->
+                                  <div class="form-group">
+                                    <label>Observaciones</label>
+                                    <textarea class="form-control" name="observaciones" rows="3" placeholder="Ingrese Observaciones"></textarea>
+                                  </div>
+                                </div>
+                              </div>
+                              <div class="row">
+                                <div class="col-sm-12">
+                                  <!-- text input -->
+                                  <div class="form-group">
+                                    <label>Responsables</label>
+                                    <input name="responsables" type="text" class="form-control" placeholder="Ingrese nombre y apellido de los operarios responsables del proceso">
+                                  </div>
+                                </div>
+                              </div>
+                              <div class="row">
+                                <div class="col-sm-12">
+                                  <!-- text input -->
+                                  <div class="form-group">
+                                    <label>Cantidad de operarios</label>
+                                    <input name="cantidad_operarios" type="text" class="form-control" placeholder="Ingrese la cantidad de operarios relacionados al proceso">
+                                  </div>
+                                </div>
+                              </div>
+                              <div class="row">
+                                <div class="col-sm-12">
+                                  <!-- text input -->
+                                  <div class="form-group">
+                                    <label>Rendimiento</label>
+                                    <input name="rendimiento" type="number" class="form-control" placeholder="Ingrese el rendimiento de la molienda (litros)">
+                                  </div>
+                                </div>
+                              </div>
+                              <div class="row">
+                                <div class="col-sm-12">
+                                    <div class="form-group">
+                                        <label>Analisis de laboratorio</label>
+                                       <div class="custom-file">
+                                        
+                                            <input type="file" class="custom-file-input" id="customFile">
+                                            <label class="custom-file-label" for="customFile">Analisis de laboratorio</label>
+                                        </div> 
+                                    </div>
+                                    
+                                </div>
+                              </div>
+
+
+                              <button type="submit" class="btn btn-block btn-warning btn-lg">Guardar Registro</button>
+                              
+                            </form>
+                         
+                  </div>
+                  <!-- /.card-body -->
+                </div>
+                <!-- /.card -->
+              </div>
+        </div>
+    </div>
+</section>
+
+
+
+{% endblock content %}
+
+
+    
+
+
+
+
+
+
+
+
+

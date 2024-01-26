@@ -1,0 +1,115 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="content-wrapper">
+    <!-- Content Header (Page header) -->
+    <section class="content-header">
+      <div class="container-fluid">
+        <div class="row mb-2">
+          <div class="col-sm-6">
+            <h1>Agregar/Editar Cliente</h1>
+          </div>
+          <div class="col-sm-6">
+            <ol class="breadcrumb float-sm-right">
+              
+             
+            </ol>
+          </div>
+        </div>
+      </div><!-- /.container-fluid -->
+    </section>
+
+    <section>
+        <div class="col-md-12">
+            <!-- general form elements disabled -->
+            <div class="card card-warning">
+              <div class="card-header">
+                <h3 class="card-title">Complete el formulario para agregar un nuevo cliente</h3>
+              </div>
+              <!-- /.card-header -->
+              <div class="card-body">
+                <form role="form" method="post" enctype="multipart/form-data">
+                    {% csrf_token %}
+                  <div class="row">
+                    <div class="col-sm-12">
+                      <!-- text input -->
+                      <div class="form-group">
+                        <label>Nombre</label>
+                        <input type="text" class="form-control" placeholder="Nombre" name="nombre" value="{{ form.instance.nombre }}">
+                      </div>
+                    </div>
+                    <div class="col-sm-12">
+                        <!-- text input -->
+                        <div class="form-group">
+                          <label>Apellido</label>
+                          <input type="text" class="form-control" placeholder="apellido" name="apellido" value="{{ form.instance.apellido }}">
+                        </div>
+                      </div>
+                      <div class="col-sm-12">
+                        <!-- text input -->
+                        <div class="form-group">
+                          <label>CUIT - CUIL</label>
+                          <input type="number" class="form-control" placeholder="Sin guiones ni puntos " name="cuit_cuil" value="{{ form.instance.cuit_cuil }}">
+                        </div>
+                      </div>
+
+                      <div class="col-sm-12">
+                        <!-- text input -->
+                        <div class="form-group">
+                          <label>Dirección</label>
+                          <input type="text" class="form-control" placeholder="Dirección" name="direccion" value="{{ form.instance.direccion }}">
+                        </div>
+                      </div>
+
+                      <div class="col-sm-12">
+                        <!-- text input -->
+                        <div class="form-group">
+                          <label>Teléfono</label>
+                          <input type="number" class="form-control" placeholder="Sin guiones ni puntos" name="telefono" value="{{ form.instance.telefono }}">
+                        </div>
+                      </div>
+
+                      <div class="col-sm-12">
+                        <!-- text input -->
+                        <div class="form-group">
+                          <label>E-mail</label>
+                          <input type="email" class="form-control" placeholder="ejemplo@mail.com" name="email" value="{{ form.instance.email }}">
+                        </div>
+                      </div>
+                    
+                  </div>
+                  <div class="row">
+                    <div class="col-sm-12">
+                        <!-- textarea -->
+                        <div class="form-group">
+                            <label>Observaciones</label>
+                            <textarea class="form-control" rows="3" placeholder="Ingrese sus observaciones" name="observaciones">{{ form.instance.observaciones|default_if_none:'' }}</textarea>
+                        </div>
+                    </div>
+                </div>
+
+                  
+                  <div class="col-sm-12">
+                    <div class="form-group">
+                        <label>Tipo</label>
+                        <select name="tipo" class="form-control">
+                            {% for value, label in form.tipo.field.choices %}
+                                <option value="{{ value }}" {% if form.instance.tipo == value %}selected{% endif %}>{{ label }}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                </div>
+                <button type="submit" class="btn btn-block btn-outline-primary btn-lg">Guardar cambios</button>
+                </div>
+                
+
+                </form>
+              </div>
+              <!-- /.card-body -->
+            </div>
+            <!-- /.card -->
+            
+          </div>
+    </section>
+
+{% endblock content %}

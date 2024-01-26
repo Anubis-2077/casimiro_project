@@ -1,0 +1,59 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="content-wrapper">
+<section class="content-header">
+    <div class="container-fluid">
+      <div class="row mb-2">
+        <div class="col-sm-6">
+          <h1>PROVEEDORES REGISTRADOS</h1>
+        </div>
+        <div class="col-sm-6">
+          <ol class="breadcrumb float-sm-right">
+            <li class="breadcrumb-item"><a href="#">Inicio</a></li>
+            <li class="breadcrumb-item active">Lista de proveedores de transporte registrados</li>
+          </ol>
+        </div>
+      </div>
+    </div><!-- /.container-fluid -->
+  </section>
+<div class="card">
+    <div class="card card-warning">
+        <div class="card-header">
+          <h3 class="card-title">Listado de proveedores registrados</h3>
+        </div>
+    <!-- /.card-header -->
+    <div class="card-body">
+      <table id="example1" class="table table-bordered table-striped">
+        <thead>
+        <tr>
+          <th>Razon Social</th>
+          <th>CUIT / CUIL</th>
+          <th>Telefono</th>
+          
+        </tr>
+        </thead>
+        <tbody>
+            {% for proveedor in proveedores %}
+            <tr>
+              <td>{{ proveedor.razon_social }}</td>
+              <td>{{ proveedor.cuit_cuil }}</td>
+              <td>{{ proveedor.telefono }}</td>
+            </tr>
+        {% endfor %}
+        </tbody>
+        
+      </table>
+    </div>
+    <!-- /.card-body -->
+  </div>
+
+
+
+
+{% endblock content %}
+
+
+
+
+

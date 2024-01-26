@@ -1,0 +1,158 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="content-wrapper">
+    <section class="content-header">
+      <div class="container-fluid">
+        <div class="row mb-2">
+          <div class="col-sm-6">
+            <h1>Embotellamiento</h1>
+          </div>
+          <div class="col-sm-6">
+            <ol class="breadcrumb float-sm-right">
+              <li class="breadcrumb-item"><a href="#">Inicio</a></li>
+              <li class="breadcrumb-item active">Embotellamiento</li>
+            </ol>
+          </div>
+        </div>
+      </div><!-- /.container-fluid -->
+    </section>
+  
+    <section class="content">
+        <div class="container-fluid">
+            <div class="row">
+                <div class="col-md-12">
+                    <div class="card card-warning">
+                        <div class="card-header">
+                          <h3 class="card-title">Complete el formulario para registrar un embotellamiento</h3>
+                        </div>
+                        <!-- /.card-header -->
+                        <div class="card-body">
+                          <form role="form" method="post" enctype="multipart/form-data">
+                            {% csrf_token %}
+                            <div class="row">
+                                <div class="col-sm-12">
+                                    <!-- select -->
+                                    <div class="form-group">
+                                      <label>Contenido </label>
+                                      <select class="form-control" name="contenido">
+                                        <option selected disabled>Seleccione un contenido</option>
+                                        {% for contenido in contenidos %}
+                                            <option value="{{ contenido.id }}">id: {{ contenido.id }} Lote {{ contenido.molienda.cargamento.lote }} Varietal: {{ contenido.molienda.cargamento.varietal }} Tanque: {{ contenido.tanque.numero }}</option>
+                                        {% endfor %}
+
+                                      </select>
+                                    </div>
+                                  </div>
+
+                              <div class="col-sm-12">
+                                <!-- text input -->
+                                <div class="form-group">
+                                  
+                                  <input type="hidden" name="fecha_envasado" class="form-control" value="{{ fecha_hoy }}">
+                                </div>
+                              </div>
+
+                              <div class="col-sm-12">
+                                <!-- text input -->
+                                <div class="form-group">
+                                  <label>Cantidad de botellas</label>
+                                        <input type="number" name="cantidad_botellas" class="form-control" placeholder="Ingerse la cantidad de botellas" min="0" oninput="validity.valid||(value='');">
+
+                                        <style>
+                                        input[type="number"]::-webkit-inner-spin-button, 
+                                        input[type="number"]::-webkit-outer-spin-button { 
+                                          -webkit-appearance: none; 
+                                          margin: 0; 
+                                        }
+                                        </style>
+                                </div>
+                              </div>
+
+                              <div class="col-sm-12">
+                                <!-- select -->
+                                <div class="form-group">
+                                  <label>Tipo de botella</label>
+                                  <select class="form-control" name="tipo_botella">
+                                    <option selected disabled>Seleccione un tipo de botella</option>
+                                    <option>Regular Oscura</option>
+                                    <option>Regular Clara</option>
+                                    <option>Premium Oscura</option>
+                                    <option>Champagne</option>
+                                    <option>Gran Reserva</option>
+                                  </select>
+                                </div>
+                              </div>
+                              
+                              <div class="col-sm-12">
+                                <!-- text input -->
+                                <div class="form-group">
+                                  <label>Cantidad de Corchos</label>
+                                        <input type="number" name="cantidad_corchos" class="form-control" placeholder="Ingerse la cantidad de botellas" min="0" oninput="validity.valid||(value='');">
+
+                                        <style>
+                                        input[type="number"]::-webkit-inner-spin-button, 
+                                        input[type="number"]::-webkit-outer-spin-button { 
+                                          -webkit-appearance: none; 
+                                          margin: 0; 
+                                        }
+                                        </style>
+                                </div>
+                              </div>
+
+                              <div class="col-sm-12">
+                                <!-- select -->
+                                <div class="form-group">
+                                  <label>Tipo de corchos</label>
+                                  <select class="form-control" name="tipo_de_corchos">
+                                    <option selected disabled>Seleccione un tipo de corcho</option>
+                                    <option>Sintetico</option>
+                                    <option>Hibrido</option>
+                                    <option>Alcornoque</option>
+                                    
+                                  </select>
+                                </div>
+                              </div>
+
+                              <div class="col-sm-12">
+                                <div class="form-group">
+                                    <label>Insumos</label>
+                                    <textarea class="form-control" rows="3" placeholder="Ingrese insumos..." name="insumos"></textarea>
+                                </div>
+                            </div>
+                            
+                            <div class="col-sm-12">
+                                <div class="form-group">
+                                    <label>Operarios</label>
+                                    <textarea class="form-control" rows="3" placeholder="Ingrese operarios..." name="operarios"></textarea>
+                                </div>
+                            </div>
+                            
+                            <div class="col-sm-12">
+                                <div class="form-group">
+                                    <label>Observaciones</label>
+                                    <textarea class="form-control" rows="3" placeholder="Ingrese observaciones..." name="observaciones"></textarea>
+                                </div>
+                            </div>
+                            
+                            </div>
+                            <button style="margin-top:30px" type="submit" class="btn btn-block btn-warning btn-lg">Registrar embotellamiento</button>
+                          </form>
+                        </div>
+                        <!-- /.card-body -->
+                      </div>
+
+
+
+                </div>
+                <!-- /.col -->
+            </div>
+            <!-- /.row -->
+        </div><!-- /.container-fluid -->
+    </section>
+
+
+{% endblock content %}
+
+
+

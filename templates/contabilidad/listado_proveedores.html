@@ -1,0 +1,141 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="content-wrapper">
+    <!-- Content Header (Page header) -->
+    <section class="content-header">
+      <div class="container-fluid">
+        <div class="row mb-2">
+          <div class="col-sm-6">
+            <h1>Listado Proveedores</h1>
+          </div>
+          <div class="col-sm-6">
+            <ol class="breadcrumb float-sm-right">
+              
+              <a type="button"  href="{% url "proveedor_create" %}" class="btn btn-block btn-outline-primary">Agregar proveedor</a>
+            </ol>
+          </div>
+        </div>
+      </div><!-- /.container-fluid -->
+    </section>
+    <section class="content">
+        <div class="container-fluid">
+          
+            <div class="row">
+              
+                <div class="col-md-12">
+                  
+                    <div class="card card-warning">
+                        <div class="card-header">
+                          <h3 class="card-title">Lista de todos los Clientes</h3>
+                        </div>
+                        <!-- /.card-header -->
+                        
+                            
+                            <!-- /.card-header -->
+                            <div class="card-body">
+                              <table id="example1" class="table table-bordered table-striped">
+                                <thead>
+                                <tr>
+                                  <th>ID</th>
+                                  <th>Nombre</th>
+                                  <th>Apellido</th>
+                                  <th>CUIT/CUIL</th>
+                                  <th>Dirección</th>
+                                  <th>Teléfono</th>
+                                  <th>Cuenta Corriente</th>
+                                  <th>Editar</th>
+                                  <th>Eliminar</th>
+                                  <th> + Detalles</th>
+                                  
+                                </tr>
+                                </thead>
+                                <tbody>
+                                    {% for proveedor in listado_proveedores %}
+                                    <tr>
+                                        <td>{{proveedor.id}}</td>
+                                        <td>{{proveedor.nombre}}</td>
+                                        <td>{{proveedor.apellido}}</td>
+                                        <td>{{proveedor.cuit_cuil}}</td>
+                                        <td>{{proveedor.direccion}}</td>
+                                        <td>{{proveedor.telefono}}</td>
+                                        
+                                        <td>
+                                            {% if proveedor.cuenta_corriente %}
+                                            <a href="#">Detalle cuenta corriente</a>
+                                            {% else %}
+                                            {{proveedor.cuenta_corriente}}
+                                            {% endif %}
+                                        </td>
+                                        <td><a href="{% url 'proveedor_update' proveedor.id %}">Editar proveedor</a></td>
+                                        <td><button onclick="confirmDelete({{ proveedor.id }})">Eliminar proveedor</button></td>
+                                        <td><a href="#">Ver más detalles</a></td>
+
+                                      </tr>
+                                    
+                                    
+                                    {% endfor %}
+                                
+                                
+                              </table>
+                            </div>
+                            <!-- /.card-body -->
+                          </div>
+                        
+                        <!-- /.card-body -->
+                      
+
+
+
+                </div>
+                <!-- /.col -->
+            </div>
+            <!-- /.row -->
+        </div><!-- /.container-fluid -->
+    </section>
+    <script>
+      function confirmDelete(proveedorId) {
+        Swal.fire({
+            title: '¿Estás seguro?',
+            text: "¡No podrás revertir esto!",
+            icon: 'warning',
+            showCancelButton: true,
+            confirmButtonColor: '#3085d6',
+            cancelButtonColor: '#d33',
+            confirmButtonText: 'Sí, eliminar!'
+        }).then((result) => {
+            if (result.isConfirmed) {
+                $.ajax({
+                    url: '/proveedores_insumos/delete/' + proveedorId + '/',
+                    method: 'POST',
+                    data: {
+                        'csrfmiddlewaretoken': $('input[name="csrfmiddlewaretoken"]').val(),
+                        'id': proveedorId
+                    },
+                    
+                    success: function(response) {
+                        // Manejar la respuesta
+                        if(response.success) {
+                            window.location.reload();
+                        }
+                    }
+                    
+                });
+                
+            }
+        })
+    }
+      </script>
+
+
+
+
+
+
+{% endblock content %}
+
+
+
+
+
+
