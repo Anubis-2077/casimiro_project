@@ -105,16 +105,24 @@ class ProveedorInsumosForm(forms.ModelForm):
 #--------------formularios de asignacion de stock a bodegas--------------
 
 class StockBodegaEtiquetadoForm(forms.ModelForm):
+
     class Meta:
         model = StockBodegaEtiquetado
-        fields = ['stock', 'cantidad_botellas', 'deposito']
+        fields = '__all__'
         
-StockBodegaEtiquetadoFormSet = formset_factory(StockBodegaEtiquetadoForm, extra=1)
+
 
 class StockBodegaEmpaquetadoForm(forms.ModelForm):
     class Meta:
         model = StockBodegaEmpaquetado
         fields = ['stock', 'cantidad_cajas', 'deposito']
         
-StockBodegaEmpaquetadoFormSet = formset_factory(StockBodegaEmpaquetadoForm, extra=1)
+class MoverStockForm(forms.ModelForm):
+    stock= forms.ModelChoiceField(queryset=StockBodegaEtiquetado.objects.all())
+    
+    class Meta:
+        model=MoverStockEtiquetado
+        fields = ['stock', 'cantidad', 'deposito']
+        
+
   

@@ -313,3 +313,9 @@ class Acreedor(models.Model):
     fecha_inicio_acreedor = models.DateField(auto_now_add=True)
     fecha_fin_acreedor = models.DateField(null=True, blank=True)
     descripcion = models.CharField(max_length=200)
+    
+class MoverStockEtiquetado(models.Model):
+    stock = models.ForeignKey(StockBodegaEtiquetado, on_delete=models.CASCADE, related_name='stock_origen')
+    deposito= models.ForeignKey(Deposito,on_delete=models.CASCADE, related_name='deposito_destino')
+    cantidad = models.IntegerField()
+    fecha_movimiento = models.DateTimeField(auto_now_add=True)

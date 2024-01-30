@@ -55,7 +55,7 @@ urlpatterns = [
     path('deposito/editar/<int:pk>/', editar_deposito, name='editar_deposito'),
     path('deposito/eliminar/<int:pk>/', eliminar_deposito, name='eliminar_deposito'),
     path('deposito/detalles_deposito/<int:pk>/', detalles_deposito, name='detalles_deposito'),
-    path('deposito/mover_stock/<int:pk>/', mover_stock, name='mover_stock'),
+    path('deposito/mover_stock/<int:pk>/', MoverStockView.as_view(), name='mover_stock'),
     #informacion del producto para la tabla
     path('get_producto_info/<int:producto_id>/', get_producto_info, name='get_producto_info'),
     

@@ -7,7 +7,7 @@ import string
 import random
 from datetime import datetime 
 from django.shortcuts import get_object_or_404
-from django.http import HttpResponse, JsonResponse
+from django.http import HttpRequest, HttpResponse, JsonResponse
 from django.db.models import Q
 from django.db.models import Subquery, OuterRef
 from django.urls import reverse
@@ -18,6 +18,8 @@ from django.views.generic import CreateView, UpdateView, DeleteView
 from django.views.decorators.csrf import csrf_exempt
 from django.views.decorators.http import require_POST
 from django.contrib.auth.decorators import login_required
+from django.forms import formset_factory
+
 
 
 
@@ -778,48 +780,45 @@ def get_producto_info(request, producto_id):
     return JsonResponse(data)
 
 
-def mover_stock(request, pk):
-    BODEGA_ID = 3
-    deposito = get_object_or_404(Deposito, pk=pk)
-    stock_etiquetado = StockBodegaEtiquetado.objects.filter(deposito_id=BODEGA_ID)
-    stock_empaquetado = StockBodegaEmpaquetado.objects.filter(deposito_id=BODEGA_ID)
-    productos = list(stock_etiquetado) + list(stock_empaquetado)
 
-    if request.method == 'POST':
-        formset_etiquetado = StockBodegaEtiquetadoFormSet(request.POST, request.FILES, prefix='etiquetado')
-        formset_empaquetado = StockBodegaEmpaquetadoFormSet(request.POST, request.FILES, prefix='empaquetado')
+class MoverStockView(FormView):
+    template_name='depositos/mover_stock.html'
+    form_class = formset_factory(MoverStockForm, extra=2)
+    success_url='index_admin'
+    
+    def get_context_data(self, **kwargs: Any) -> dict[str, Any]:
+        context = super(MoverStockView, self).get_context_data(**kwargs)
+        
+    # Agrega tus variables personalizadas al contexto
+        BODEGA_ID = 3
+        deposito = get_object_or_404(Deposito, pk=self.kwargs['pk'])  # Asume que 'pk' se pasa como parámetro a la URL
+        stock_etiquetado = StockBodegaEtiquetado.objects.filter(deposito_id=BODEGA_ID)
 
-        if formset_etiquetado.is_valid() and formset_empaquetado.is_valid():
-            print("Formularios de Stock Etiquetado:")
-            for form in formset_etiquetado:
-                # Si el formulario no está vacío (es decir, no es un formulario extra)
-                if form.cleaned_data:
-                    print("Formulario:", form.cleaned_data)
+        # Agregar deposito y stock_etiquetado al contexto
+        context['deposito'] = deposito
+        context['stock_etiquetado'] = stock_etiquetado
 
-            print("\nFormularios de Stock Empaquetado:")
-            for form in formset_empaquetado:
-                # Si el formulario no está vacío
-                if form.cleaned_data:
-                    print("Formulario:", form.cleaned_data)
+        return context
+    
+    def form_valid(self, form):
+       
+       
+        print("formulario valido")
+        for f in form:
+            print (f.cleaned_data)
+        return super(MoverStockView, self).form_valid(form)
 
-            # Aquí podrías redirigir o hacer otra cosa
-            return redirect('lista_depositos')
-        else:
-            print("Formularios no válidos")
-            
+    def form_invalid(self, formset):
+        
+        print("formulario invalido")
+        for form in formset:
+            print(form.errors)
+        return self.render_to_response(self.get_context_data(form=formset))
+    
+    
 
-    else:
-        formset_etiquetado = StockBodegaEtiquetadoFormSet(prefix='etiquetado')
-        formset_empaquetado = StockBodegaEmpaquetadoFormSet(prefix='empaquetado')
 
-    context = {
-        'productos': productos,
-        'deposito': deposito,
-        'formset_etiquetado': formset_etiquetado,
-        'formset_empaquetado': formset_empaquetado
-    }
-
-    return render(request, 'depositos/mover_stock.html', context)
+   
 
     
     
