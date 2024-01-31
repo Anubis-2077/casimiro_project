@@ -36,6 +36,8 @@ urlpatterns = [
     path('embotellamiento/', EmbotellamientoView.as_view(), name='embotellamiento'),
     
     #stock
+    path('stock/seleccionar_stock/<int:pk>/', seleccionar_stock, name="seleccionar_stock"),
+
     path('stock/sin_etiquetar/', StockSinEtiquetarView.as_view(), name='sin_etiquetar'),
     path('stock/sin_etiquetar/<str:varietal>/', StockDetailView.as_view(), name='stock_detail'),
     path('stock/registrar_etiquetado/', RegistrarEtiquetadoView.as_view(), name='registrar_etiquetado'),
@@ -55,9 +57,9 @@ urlpatterns = [
     path('deposito/editar/<int:pk>/', editar_deposito, name='editar_deposito'),
     path('deposito/eliminar/<int:pk>/', eliminar_deposito, name='eliminar_deposito'),
     path('deposito/detalles_deposito/<int:pk>/', detalles_deposito, name='detalles_deposito'),
-    path('deposito/mover_stock/<int:pk>/', MoverStockView.as_view(), name='mover_stock'),
-    #informacion del producto para la tabla
+    path('deposito/mover_stock_etiquetado/<int:pk>/', MoverStockEtiquetadoView.as_view(), name='mover_stock_etiquetado'),
     path('get_producto_info/<int:producto_id>/', get_producto_info, name='get_producto_info'),
+    path('deposito/detalles/<int:pk>/', DetallesDepositoView.as_view(), name='detalles_deposito'),
     
     
     

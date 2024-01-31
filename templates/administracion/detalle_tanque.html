@@ -47,21 +47,29 @@
                 </li>
                 <li class="list-group-item">
                  <b>Contenido</b> <a class="float-right">
-                    {% if contenido %}
-                    <p> {{ contenido.molienda.cargamento.varietal }}</p>
-                {% else %}
-                    <p>Vacio.</p>
-                {% endif %}</a>
+                  {% if contenido and contenido.cantidad > 0 and not contenido.embotellado %}
+                  <p> {{ contenido.molienda.cargamento.varietal }}</p>
+              {% else %}
+                  <p>Vacio.</p>
+              {% endif %}</a>
                 </li>
                 <li class="list-group-item">
-                  <b>Lote</b> <a class="float-right">{{ contenido.molienda.cargamento.lote }} </a>
+                  <b>Lote</b> <a class="float-right">{% if contenido and contenido.cantidad > 0 and not contenido.embotellado %}
+                    <p> {{ contenido.molienda.cargamento.lote }}</p>
+                {% else %}
+                    <p>Vacio.</p>
+                {% endif %} </a>
                 </li>
                 <li class="list-group-item">
                   <b>cantidad</b> <a class="float-right">
                     {% if contenido.molienda %}
-                    <a class="float-right">{{ contenido.cantidad }} lts</a>
+                    <a class="float-right">{% if contenido and contenido.cantidad > 0 and not contenido.embotellado %}
+                      <p> {{ contenido.cantidad }}lts</p>
+                  {% else %}
+                      <p>Vacio.</p>
+                  {% endif %} </a>
                     {% else %}
-                    <a class="float-right"> 0 lts
+                    <a class="float-right">
                 {% endif %}</a>
                 </li>
                 
@@ -287,47 +295,18 @@
                   <form class="form-horizontal" method="post" enctype="multipart/form-data">
                     {% csrf_token %}
                     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
-                    <script>
-                      $(document).ready(function() {
-                          $('#id_mover_contenido').change(function() {
-                              if ($(this).is(':checked')) {
-                                  var selectedMoliendaId = $('select[name="molienda"]').val(); // Obtener el valor seleccionado del select de molienda
-                                  
-                                  $.ajax({
-                                      url: '/obtener_contenidos_tanques/' + selectedMoliendaId + '/',
-                                      headers: { 'Accept': 'application/json' },
-                                      data: {
-                                          mover_contenido: true,
-                                          molienda: selectedMoliendaId  // Pasar el ID de molienda en la solicitud AJAX
-                                      },
-                                      success: function(data) {
-                                          // Imprimir los datos para verificar su estructura
-                                          var selectOptions = '';
-                                          for (var i = 0; i < data.length; i++) {
-                                              selectOptions += '<option>' + data[i].contenido + ' (Tanque ' + data[i].tanque + ', Cantidad: ' + data[i].cantidad + ' litros)</option>';
-                                          }
-                                          $('#contenido-select').html('<select class="custom-select" name="contenido_trasladado">' + selectOptions + '</select>');
-                  
-                                          // Recupera el contenido_id de la primera opción (asumiendo que solo hay una)
-                                          var contenidoId = data[0].contenido_id;
-                  
-                                          // Agrega un campo oculto con el valor de contenido_id
-                                          $('#contenido-id').append('<input type="number" name="contenido_origen" value="' + contenidoId + '" readonly>');
-                  
-                                          // Actualiza el campo "Cantidad (lts)" con el valor de contenido.cantidad
-                                          var cantidad = data[0].cantidad;
-                                          $('input[name="cantidad"]').val(cantidad);
-                                      }
-                                  });
-                              } else {
-                                  $('#contenido-select').html('');
-                              }
-                          });
-                      });
-                  </script>
+                    
 
 
                     <input type="hidden" name="form_type" value="form1">
+
+                    <div class="form-group row">
+                      <label for="inputEmail" class="col-sm-2 col-form-label">Mover contenido</label>
+                      <div class="col-sm-10">
+                        <input type="checkbox" id="id_mover_contenido" name="mover_contenido">
+                        <label for="id_mover_contenido">Mover contenido</label>
+                      </div>
+                    </div>
 
                     <div class="form-group row" >
                       <label for="inputEmail" class="col-sm-2 col-form-label">Tanque</label>
@@ -341,30 +320,98 @@
                       <label for="inputName" class="col-sm-2 col-form-label" >Molienda</label>
                       <div class="col-sm-10">
                         <div class="form-group">
+                          <div id="molienda_en_contenido"><select class="custom-select" name="molienda" onchange="obtenerCantidadDisponible(this.value)" >
                             
-                            <select class="custom-select" name="molienda" onchange="obtenerCantidadDisponible(this.value)" >
+                            
+                            {% for i in molienda_contenido %}
+                              <option value="{{ i.molienda.id }}">Lote:{{ i.molienda.cargamento.lote }},  Varietal: {{ i.molienda.cargamento.varietal }}, Rendimiento: {{ i.molienda.rendimiento }} lts, Tanque origen:{{ i.tanque.numero }}</option>
+                            {% endfor %}
+
+                          </select></div> 
+
+                            <div id="molienda_no_en_contenido"><select class="custom-select" name="molienda" onchange="obtenerCantidadDisponible(this.value)" >
+                              <option selected>Seleccione una molienda</option>
                               
                               {% for i in molienda %}
                                 <option value="{{ i.id }}">Lote:{{ i.cargamento.lote }},  Varietal: {{ i.cargamento.varietal }}, Rendimiento: {{ i.rendimiento }} lts</option>
                               {% endfor %}
-                              
-                              
-                            </select>
+
+                            </select></div>
+
+                             
+
+                            <script>
+                              $(document).ready(function() {
+                                // Función para alternar entre select de moliendas
+                                function toggleMoliendaSelects() {
+                                  if ($('#id_mover_contenido').is(':checked')) {
+                                      $('#molienda_no_en_contenido').hide().find('select').prop('disabled', true);
+                                      $('#molienda_en_contenido').show().find('select').prop('disabled', false);
+                                  } else {
+                                      $('#molienda_en_contenido').hide().find('select').prop('disabled', true);
+                                      $('#molienda_no_en_contenido').show().find('select').prop('disabled', false);
+                                  }
+                              }
+                            
+                                // Llamar a toggleMoliendaSelects al cargar la página y en cada cambio del checkbox
+                                toggleMoliendaSelects();
+                                $('#id_mover_contenido').change(function() {
+                                    toggleMoliendaSelects();
+                            
+                                    // El resto de tu lógica para manejar el cambio en el checkbox...
+                                });
+                            });
+                            </script>
+                            <script>
+                              $(document).ready(function() {
+                                  $('#id_mover_contenido').change(function() {
+                                      if ($(this).is(':checked')) {
+                                          var selectedMoliendaId = $('select[name="molienda"]').val(); // Obtener el valor seleccionado del select de molienda
+                                          
+                                          $.ajax({
+                                              url: '/obtener_contenidos_tanques/' + selectedMoliendaId + '/',
+                                              headers: { 'Accept': 'application/json' },
+                                              data: {
+                                                  mover_contenido: true,
+                                                  molienda: selectedMoliendaId  // Pasar el ID de molienda en la solicitud AJAX
+                                              },
+                                              success: function(data) {
+                                                  // Imprimir los datos para verificar su estructura
+                                                  var selectOptions = '';
+                                                  for (var i = 0; i < data.length; i++) {
+                                                      selectOptions += '<option>' + data[i].contenido + ' (Tanque ' + data[i].tanque + ', Cantidad: ' + data[i].cantidad + ' litros)</option>';
+                                                  }
+                                                  $('#contenido-select').html('<select class="custom-select" name="contenido_trasladado">' + selectOptions + '</select>');
+                          
+                                                  // Recupera el contenido_id de la primera opción (asumiendo que solo hay una)
+                                                  var contenidoId = data[0].contenido_id;
+                          
+                                                  // Agrega un campo oculto con el valor de contenido_id
+                                                  $('#contenido-id').append('<input type="number" name="contenido_origen" value="' + contenidoId + '" readonly>');
+                          
+                                                  // Actualiza el campo "Cantidad (lts)" con el valor de contenido.cantidad
+                                                  var cantidad = data[0].cantidad;
+                                                  $('input[name="cantidad"]').val(cantidad);
+                                              }
+                                          });
+                                      } else {
+                                          $('#contenido-select').html('');
+                                      }
+                                  });
+                              });
+                          </script>
+
+
+                            
                           </div>
                       </div>
                     </div>
 
-                    <div class="form-group row">
-                      <label for="inputEmail" class="col-sm-2 col-form-label">Mover contenido</label>
-                      <div class="col-sm-10">
-                        <input type="checkbox" id="id_mover_contenido" name="mover_contenido">
-                        <label for="id_mover_contenido">Mover contenido</label>
-                      </div>
-                    </div>
                     
-                    <div id="contenido-select"></div>
                     
-                    <div id="contenido-id" ></div>
+                    <div id="contenido-select" style="display:none"></div>
+                    
+                    <div id="contenido-id" style="display:none"></div>
                     
 
                     <div class="form-group row" >

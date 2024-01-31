@@ -15,7 +15,7 @@ class Proveedor(models.Model):
 
 
 class Cargamento(models.Model):
-    fecha = models.DateField(null=True)
+    fecha = models.DateField(auto_now_add=True, null=True)
     lote = models.CharField(max_length=10, unique=True)
     peso_bruto = models.IntegerField()
     peso_neto = models.IntegerField()
@@ -30,7 +30,7 @@ class Cargamento(models.Model):
     origen = models.CharField(max_length=200)
     parral = models.CharField(max_length=200)
     cuartel = models.CharField(max_length=200)
-    declarado = models.BooleanField(default=False)
+    declarado = models.BooleanField(default=False, blank=True)
     azucar = models.DecimalField(max_digits=5, decimal_places=2)
     
     def __str__(self):
@@ -50,7 +50,7 @@ class Molienda(models.Model):
         return self.contenido_set.filter(embotellado=True).exists()
     
     def __str__(self):
-        return f"Molienda lote N° {self.cargamento.lote}, varietal: {self.cargamento.varietal}, fecha: {self.fecha_molienda}, rendimiento: {self.rendimiento}"
+        return f"Molienda lote N° {self.cargamento.lote}, id:{self.id} varietal: {self.cargamento.varietal}, fecha: {self.fecha_molienda}, rendimiento: {self.rendimiento}"
 
 class Tanque(models.Model):
     numero = models.IntegerField(unique=True)
@@ -66,7 +66,7 @@ class Contenido(models.Model):
     tanque = models.ForeignKey(Tanque, on_delete=models.CASCADE)
     molienda = models.ForeignKey(Molienda, on_delete=models.CASCADE, blank=True, null=True)
     fecha_ingreso = models.DateTimeField(default=datetime.today, null=True)
-    fecha_salida = models.DateTimeField(null=True, blank=True)
+    fecha_salida = models.DateTimeField(null=True, blank=True,)
     cantidad = models.IntegerField(null=True)
     mover_contenido = models.BooleanField(default=False)
     contenido_trasladado = models.CharField(blank=True, null=True)

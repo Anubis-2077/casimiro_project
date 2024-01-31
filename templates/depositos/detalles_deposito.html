@@ -3,7 +3,123 @@
 {% block content  %}
 
 
-<h1>soy los detalles del deposito {{ deposito.nombre }}</h1>
+<div class="content-wrapper">
+    <!-- Content Header (Page header) -->
+    <section class="content-header">
+      <div class="container-fluid">
+        <div class="row mb-2">
+          <div class="col-sm-6">
+            <h1>Detalles Deposito: {{ deposito.nombre }}</h1>
+          </div>
+          <div class="col-sm-6">
+            <ol class="breadcrumb float-sm-right">
+              
+              <a type="button"  href="{% url "crear_deposito" %}" class="btn btn-block btn-outline-primary">Crear depósito</a>
+            </ol>
+          </div>
+        </div>
+      </div><!-- /.container-fluid -->
+    </section>
+   
+        
+    
+        <!-- Main content -->
+        <section class="content">
+          <div class="container-fluid">
+            <div class="row">
+              <div class="col-md-12">
+                <div class="card">
+                    <div class="card-header">
+                      <h3 class="card-title">Stock Embotellado</h3>
+                    </div>
+                    <!-- /.card-header -->
+                    <div class="card-body p-0">
+                      <table class="table table-striped">
+                        <thead>
+                          <tr>
+                            <th>#</th>
+                            <th>Lote</th>
+                            <th>Varietal</th>
+                            <th>Cantidad</th>
+                            <th>Fecha etiquetado</th>
+                          </tr>
+                        </thead>
+                        <tbody>
+                          
+                            {% for i in etiquetados %}
+                                {% if etiquetados.cantidad_botellas != 0 %}
+                                    <tr>
+                                    <td>{{ i.id }}</td>
+                                    <td> {{ i.lote }}</td>
+                                    <td> {{ i.varietal }}</td>
+                                    <td> {{ i.cantidad_botellas }}</td>
+                                    <td>{{ i.fecha_etiquetado }}</td>
+                                    </tr>
+                                {% endif %}
+                            {% endfor %}
+                            
+                          
+                          
+                        </tbody>
+                      </table>
+                    </div>
+                    <!-- /.card-body -->
+                  </div>
+                <!-- /.card -->
+    
+                <div class="card">
+                    <div class="card-header">
+                      <h3 class="card-title">Stock Empaquetado</h3>
+                    </div>
+                    <!-- /.card-header -->
+                    <div class="card-body p-0">
+                        <table class="table table-striped">
+                            <thead>
+                              <tr>
+                                <th>#</th>
+                                <th>Lote</th>
+                                <th>Varietal</th>
+                                <th>Cantidad</th>
+                                <th>Fecha etiquetado</th>
+                              </tr>
+                            </thead>
+                            <tbody>
+                                
+                                {% for i in empaquetados %}
+                                    {% if empaquetados.cantidad_cajas != 0 %}
+                                        <tr>
+                                        <td>{{ i.id }}</td>
+                                        <td> {{ i.lote }}</td>
+                                        <td> {{ i.varietal }}</td>
+                                        <td> {{ i.cantidad_cajas }}</td>
+                                        <td>{{ i.fecha_empaquetado }}</td>
+                                        </tr>
+                                    {% endif %}
+                                {% endfor %}
+                                
+                              
+                              
+                            </tbody>
+                          </table>
+                    </div>
+                    <!-- /.card-body -->
+                  </div>
+                
+    
+                
+                
+                </div>
+              <!-- /.col -->
+            </div>
+           
+            
+            <!-- /.row -->
+          </div><!-- /.container-fluid -->
+        </section>
+      
+      
+      
+      
 
 {% endblock content  %}
 

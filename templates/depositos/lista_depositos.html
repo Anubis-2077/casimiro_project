@@ -53,8 +53,8 @@
                                         <td>{{deposito.id}}</td>
                                         <td>{{deposito.nombre}}</td>
                                         <td>{{deposito.ubicacion}}</td>
-                                        <td><a href="{% url 'mover_stock' pk=deposito.id %}" class="btn btn-primary"><i class="fa-solid fa-check"></i> agregar stock</a></td>
-                                        <td><a href="">ver mas detalles</a></td>
+                                        <td><a href="{% url 'seleccionar_stock' pk=deposito.id %}" class="btn btn-primary"><i class="fa-solid fa-check"></i> agregar stock</a></td>
+                                        <td><a href="{% url "detalles_deposito" pk=deposito.id %}">ver mas detalles</a></td>
                                         <td><a href="{% url 'editar_deposito' pk=deposito.id %}" class="btn btn-warning"><i class="fa-regular fa-pen-to-square"> </i>Editar deposito</a></td>
                                         <td > <a href="{% url 'eliminar_deposito' pk=deposito.id %}" class="btn btn-danger"><i class="fa-solid fa-trash"> </i>Eliminar deposito</a></td>
                                         

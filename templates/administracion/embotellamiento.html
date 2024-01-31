@@ -38,7 +38,7 @@
                                       <select class="form-control" name="contenido">
                                         <option selected disabled>Seleccione un contenido</option>
                                         {% for contenido in contenidos %}
-                                            <option value="{{ contenido.id }}">id: {{ contenido.id }} Lote {{ contenido.molienda.cargamento.lote }} Varietal: {{ contenido.molienda.cargamento.varietal }} Tanque: {{ contenido.tanque.numero }}</option>
+                                            <option value="{{ contenido.id }}"><strong>Lote:</strong> {{ contenido.molienda.cargamento.lote }}, <strong>Varietal:</strong> {{ contenido.molienda.cargamento.varietal }}, <strong>Cantidad:</strong>{{ contenido.cantidad }}lts, <strong>Tanque:</strong> {{ contenido.tanque.numero }} </option>
                                         {% endfor %}
 
                                       </select>

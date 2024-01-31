@@ -1,6 +1,6 @@
 from typing import Any
 from django.shortcuts import render, redirect, HttpResponseRedirect
-from django.views.generic import FormView, ListView, View, TemplateView
+from django.views.generic import FormView, ListView, View, TemplateView, DetailView
 from administracion.forms import *
 from django.urls import reverse_lazy
 import string
@@ -9,7 +9,7 @@ from datetime import datetime
 from django.shortcuts import get_object_or_404
 from django.http import HttpRequest, HttpResponse, JsonResponse
 from django.db.models import Q
-from django.db.models import Subquery, OuterRef
+from django.db.models import Subquery, OuterRef, Exists
 from django.urls import reverse
 from django.http import Http404
 from django.utils.dateparse import parse_datetime
@@ -32,12 +32,12 @@ def index_admin(request):
 #-------------------------------------Login Views-----------------------------------
 
 
-
+#-------------------------------------- Cosecha Views
 
 class ProveedorView(FormView):
     template_name = 'administracion/proveedor_form.html'
     form_class = Proveedorform
-    success_url= reverse_lazy('index_admin')
+    success_url= reverse_lazy('proveedores_registrados')
 
     def form_valid(self, form):
         form.save()
@@ -53,12 +53,10 @@ def proveedores_registrados(request):
     
     return render (request, 'administracion/proveedores_registrados.html', {'proveedores': proveedores})
    
-
-
 class IngCosechaFormView(FormView):
     template_name = 'administracion/ingresar_cosecha.html'
     form_class = CargamentoForm
-    success_url = reverse_lazy('index_admin')
+    success_url = reverse_lazy('cosechas_registradas')
     
     def generar_numero_lote(self):
         caracteres = string.ascii_letters + string.digits
@@ -84,7 +82,6 @@ class IngCosechaFormView(FormView):
         context['lote'] = self.generar_numero_lote()
         return context 
         
-        
 class CosechasRegistradasView(ListView):
     template_name = 'administracion/cosechas_registradas.html'
     model = Cargamento
@@ -94,22 +91,26 @@ class CosechasRegistradasView(ListView):
 ###### Fin administracion Cosechas #############
 
 
+
+
+
+
 ###### Administracion moliendas ###########    
     
     
 class RegistrarMoliendaView(FormView):
     template_name = 'administracion/registrar_molienda.html'
     form_class = Moliendaform
-    success_url = reverse_lazy ('index_admin')
+    success_url = reverse_lazy ('moliendas_registradas')
     
     def form_valid(self, form):
-        print ("el formulario es valido")
-        print (form.cleaned_data)
+        
+        
         form.save()
         return super().form_valid(form)
     
     def form_invalid(self, form):
-        print ("el formulario es invalido")
+        
         print (form.errors)
         response = super().form_invalid(form)
     
@@ -118,7 +119,7 @@ class RegistrarMoliendaView(FormView):
         cargamentos = Cargamento.objects.exclude(molienda__isnull=False)
         context ["cargamentos"] = cargamentos
             
-        print(context)
+        
         return context
     
 class MoliendasRegistradasView(ListView):
@@ -173,12 +174,38 @@ class DetalleTanqueView(View):
         contenido = Contenido.objects.filter(tanque=tanque_select).last()
         tareas = NotaTarea.objects.filter(tanque=tanque_select)
         tanque = Tanque.objects.get(numero = numero_tanque)
-        moliendas = Molienda.objects.all()
+        tanques = Tanque.objects.all()
+        #moliendas = Molienda.objects.all()
         
-        moliendas = [molienda for molienda in moliendas if not molienda.contenido_set.filter(embotellado=True).exists()]
+        #moliendas = [molienda for molienda in moliendas if not molienda.contenido_set.filter(embotellado=True).exists()]
+        
+        moliendas_no_en_contenido = Molienda.objects.annotate(
+        esta_en_contenido=Exists(
+            Contenido.objects.filter(molienda_id=OuterRef('pk'))
+        )
+        ).filter(esta_en_contenido=False)
+        
+        """moliendas_no_embotelladas = Molienda.objects.annotate(
+        esta_embotellada=Exists(
+            Contenido.objects.filter(molienda_id=OuterRef('pk'), embotellado=False)
+        )
+        ).filter(esta_embotellada=True)"""
+        
+        contenidos_filtrados = []
+        for tanque in tanques:
+            ultimo_contenido = Contenido.objects.filter(tanque=tanque).select_related('molienda').order_by('-fecha_ingreso').first()
+            if ultimo_contenido and ultimo_contenido.cantidad > 0 and not ultimo_contenido.embotellado:
+                contenidos_filtrados.append(ultimo_contenido)
+        
+        
+        
+        
+        
+        
         
         context = {"tanque_detalle": tanque_select,
-                   "molienda": moliendas,
+                   "molienda": moliendas_no_en_contenido,
+                   "molienda_contenido":contenidos_filtrados,
                    "fecha": fecha_hora_formateada,
                    "form1" : form1_instance,
                    "form2" : form2_instance,
@@ -213,30 +240,42 @@ class DetalleTanqueView(View):
                         tanque = Tanque.objects.get(id=tanque_id)
                         contenido_origen = Contenido.objects.get(id=contenido_origen_id)
                         molienda = Molienda.objects.get(id=molienda_id)
+                        
+                        #print(contenido_origen)
 
                         # Actualizar fecha de salida en el contenido de origen
                         contenido_origen.fecha_salida = fecha_hora_actual
                         contenido_origen.save()
                         
+                        #print("este es el contenido de origen:",contenido_origen)
+                        
+                        
                         #crear una nueva instancia del contenido en el tanque de origen en donde molienda sea
                         nuevo_contenido_origen = Contenido.objects.create(
                                 tanque=contenido_origen.tanque,
-                                molienda=Molienda.objects.get(pk=30),
+                                molienda=molienda,
                                 fecha_ingreso=fecha_hora_actual,
                                 fecha_salida=None,
                                 cantidad=0,  # Siempre es 0 en este caso
                                 mover_contenido=False,
-                                contenido_trasladado=None
+                                contenido_trasladado=None,
+                                embotellado=False
                                 )
+                        
                                                         
                         nuevo_contenido_origen.save()
-                        print(nuevo_contenido_origen)
+                        
+                        #print("este es el nuevo contenido de origen:",nuevo_contenido_origen)
+                        
+                        #print("esta es la instancia del formulario1:",form1_instance)
                         # Ahora, puedes guardar la instancia de form1 si es necesario
                         form1_instance.save()
+                        redirect ('lista_tanques')
                         
 
                     except (Tanque.DoesNotExist, Contenido.DoesNotExist, Molienda.DoesNotExist) as e:
                         error_message = f"Error: {str(e)}"
+                        print("este es el error:",error_message)
                         return render(request, self.template_name, {'error_message': error_message})
 
                 else:
@@ -326,7 +365,7 @@ class EditarNotaTareaView(View):
 
 class EmbotellamientoView(FormView):
     template_name = 'administracion/embotellamiento.html'
-    success_url = reverse_lazy('index_admin')
+    success_url = reverse_lazy('sin_etiquetar')
     form_class = EmbotellamientoForm
     
     def get_context_data(self, **kwargs):
@@ -336,8 +375,8 @@ class EmbotellamientoView(FormView):
         # Obtener la lista de tanques disponibles
         tanques = Tanque.objects.all()
 
-        print("este es el valor/formato de fecha_hoy:")
-        print(fecha_hora_formateada)
+        #print("este es el valor/formato de fecha_hoy:")
+        #print(fecha_hora_formateada)
         contenidos_filtrados = []
         for tanque in tanques:
             # Obtener el último contenido asociado a cada tanque
@@ -361,32 +400,48 @@ class EmbotellamientoView(FormView):
 
         # Actualiza el campo 'embotellado' en el objeto Contenido
         contenido = Contenido.objects.get(pk=contenido_id)
-        contenido.embotellado = True
-        contenido.save()
-        print("el contenido se modifico:")
-        print(contenido)
-        print(contenido.embotellado)
-        
+        # Cantidad máxima de botellas basada en los litros disponibles
+        max_botellas = contenido.cantidad / 0.75  # Asumiendo que cada botella es de 750ml
 
+        numero_botellas_emb = form.cleaned_data['cantidad_botellas']  # Asumiendo que este campo existe en tu formulario
+
+        if numero_botellas_emb > max_botellas:
+            form.add_error('cantidad_botellas', 'No puedes embotellar más botellas de las disponibles.')
+            return self.form_invalid(form)
+
+        # Actualizar la cantidad restante en el tanque
+        litros_restantes = contenido.cantidad - (numero_botellas_emb * 0.75)
+        if litros_restantes > 0.74:
+        # Si queda más de 0.74 litros, actualizar la cantidad
+            contenido.cantidad = litros_restantes
+            #print("este es el contenido:", contenido)
+            contenido.save()
+        else:
+            # Si no quedan litros, marcar el contenido como embotellado
+            
+            contenido.embotellado = True
+            contenido.cantidad = 0
+           #print("este es el contenido pasando por el else:" ,contenido)
+            contenido.save()
+            #print("el contenido se modifico:")
+            #print(contenido)
+            #print(contenido.embotellado)
+        
         # Crea una nueva instancia de Embotellamiento
         embotellamiento = form.save(commit=False)
         embotellamiento.contenido = contenido  # Asocia el contenido al embotellamiento
         embotellamiento.save()
 
-        # Crea una nueva instancia de Contenido en el tanque de origen
-        nuevo_contenido_origen = Contenido.objects.create(
-            tanque=contenido.tanque,
-            molienda=Molienda.objects.get(pk=30),
-            fecha_ingreso=datetime.now(),
-            fecha_salida=None,
-            cantidad=0,  # Siempre es 0 en este caso
-            mover_contenido=False,
-            contenido_trasladado=None
-        )
-        nuevo_contenido_origen.save()
-
         # Crea una nueva instancia de StockBodega
-        stock_bodega = StockBodegaSinEtiquetar(embotellamiento=embotellamiento)
+        stock_bodega = StockBodegaSinEtiquetar.objects.create(
+        embotellamiento=embotellamiento,
+        cantidad_botellas=form.cleaned_data['cantidad_botellas'],  
+        varietal=contenido.molienda.cargamento.varietal,  
+        lote=contenido.molienda.cargamento.lote, 
+        etiquetado=False,
+        deposito=Deposito.objects.get(id=3)  
+    )
+        #print("este es el stock bodega:",stock_bodega)
         stock_bodega.save()
 
         return super().form_valid(form)
@@ -409,7 +464,7 @@ class StockSinEtiquetarView(ListView):
         context = super().get_context_data(**kwargs)
 
         # Define los varietales
-        varietales = ['Rose', 'Cabernet Franc', 'Cabernet Sauvignon', 'Extra Brut', 'Reserva Malbec', 'Malbec OAK', 'Malbec', 'Syrah', 'Moscatel', 'Alejandria']
+        varietales = ['Rose', 'Cabernet Franc', 'Cabernet Sauvignon', 'Extra Brut', 'Reserva Malbec', 'Malbec OAK', 'Malbec', 'Syrah', 'Moscatel', 'Alejandria','Torrontes']
 
         # Crea un diccionario para almacenar las cantidades de cada varietal
         cantidades = {}
@@ -450,24 +505,24 @@ class StockDetailView(TemplateView):
         return context  
     
     
-    
+####################  Etiquetado ########################    
     
 class RegistrarEtiquetadoView(FormView):
     """ vista con el formulario para registrar un etiquetado """
     template_name = 'administracion/stock_etiquetado_form.html'
-    success_url = reverse_lazy('stock_bodega')
+    success_url = reverse_lazy('stock_etiquetado')
     form_class = EtiquetadoForm  
 
     def get(self, request, *args, **kwargs):
-        print("Cargando la vista RegistrarEtiquetadoView")
+        #print("Cargando la vista RegistrarEtiquetadoView")
         return super().get(request, *args, **kwargs)
 
     def post(self, request, *args, **kwargs):
-        print("Formulario enviado en RegistrarEtiquetadoView")
+        #print("Formulario enviado en RegistrarEtiquetadoView")
         return super().post(request, *args, **kwargs)
 
     def get_context_data(self, **kwargs):
-        print("Preparando el contexto para RegistrarEtiquetadoView")
+        #print("Preparando el contexto para RegistrarEtiquetadoView")
         context = super().get_context_data(**kwargs)
         fecha_hora_formateada = datetime.today().strftime("%Y-%m-%d %H:%M")
         context["stock_embotellados"] = StockBodegaSinEtiquetar.objects.filter(etiquetado=False)
@@ -490,13 +545,25 @@ class RegistrarEtiquetadoView(FormView):
                 if stock.cantidad_botellas == 0:
                     print("el codigo pasa por aca")
                     stock.etiquetado = True
+                    stock.cantidad_botellas = 0
                 print("el codigo esta pasando por el try")
-                print(stock.etiquetado)
-                print(stock)
+                print("este es el stock etiquetado:",stock.etiquetado)
+                print("este es el stock sin etiquetar:",stock)
                 stock.save()  # Guardar el objeto modificado en la base de datos
 
                 # Crea una nueva instancia de BotellaEtiquetada
-                botella_etiquetada = StockBodegaEtiquetado(stock=stock, cantidad_botellas=cantidad_botellas)
+                
+                botella_etiquetada = StockBodegaEtiquetado.objects.create(
+                    stock=stock,
+                    fecha_etiquetado=datetime.now(),  # O la fecha que corresponda
+                    cantidad_botellas=cantidad_botellas,
+                    varietal=stock.varietal,  #
+                    lote=stock.lote,         
+                    empaquetado=False,       
+                    observaciones="",        
+                    deposito=Deposito.objects.get(pk=3)  
+                )
+                print("este es el nuevos tock etiquetado:",botella_etiquetada)
                 botella_etiquetada.save()  # Guardar el objeto en la base de datos
 
                 return super().form_valid(form)
@@ -524,7 +591,7 @@ class StockEtiquetadoLista(ListView):
 
         # Define los varietales
         varietales = ['Rose', 'Cabernet Franc', 'Cabernet Sauvignon', 'Extra Brut', 'Reserva Malbec', 'Malbec OAK', 'Malbec', 'Syrah', 'Moscatel', 'Alejandria','Torrontes']
-        deposito = Deposito.objects.get(nombre='Bodega')
+        deposito = Deposito.objects.get(id=3) #poner el id del deposito Bodega
         # Crea un diccionario para almacenar las cantidades de cada varietal
         cantidades = {}
         
@@ -564,12 +631,13 @@ class StockBodegaEtiquetadoDetalle(TemplateView):
         return context
 
 
+##################### Empaquetado ####################
 
 
 
 class RegistrarEmpaquetadoView(FormView):
     template_name = 'administracion/stock_empaquetado_form.html'
-    success_url = reverse_lazy('stock_bodega')
+    success_url = reverse_lazy('stock_empaquetado')
     form_class = EmpaquetadoForm
 
     def get_context_data(self, **kwargs):
@@ -588,24 +656,30 @@ class RegistrarEmpaquetadoView(FormView):
         
 
         
-            
-        if cantidad_disponible >= cantidad_cajas * 6:
+        if stock.cantidad_botellas >= cantidad_cajas * 6:
             stock.cantidad_botellas -= cantidad_cajas * 6
-            if stock.cantidad_botellas == 0:
-                stock.empaquetado = True
-            print("este es el stock")
-            print(stock)
+            stock.empaquetado = stock.cantidad_botellas <= 0
             stock.save()
+            #print("este es el stock: ",stock)
+            """ if cantidad_disponible >= cantidad_cajas * 6:
+                stock.cantidad_botellas -= cantidad_cajas * 6
+                if stock.cantidad_botellas <= 0:
+                    stock.empaquetado = True """
             
-            deposito_defecto = Deposito.objects.get(nombre='Bodega')
-            fecha_empaquetado_actual = datetime.now()
-            stock_empaquetado = StockBodegaEmpaquetado(stock=stock, cantidad_cajas=cantidad_cajas)
-            stock_empaquetado.fecha_empaquetado = fecha_empaquetado_actual
-            stock_empaquetado.varietal = stock.varietal  # Aquí accedes a varietal desde el objeto stock
-            stock_empaquetado.lote = stock.lote
-            stock_empaquetado.deposito = deposito_defecto
-            print("este es el stock empaquetado")
-            print(stock_empaquetado)
+            #stock.save()
+            
+            deposito_defecto = Deposito.objects.get(id=3)
+            fecha_empaquetado_actual = timezone.now()
+            stock_empaquetado = StockBodegaEmpaquetado.objects.create(
+            stock=stock,
+            cantidad_cajas=cantidad_cajas,
+            empaquetado=stock.empaquetado,
+            varietal=stock.varietal,
+            lote=stock.lote,
+            fecha_empaquetado=fecha_empaquetado_actual,
+            deposito=deposito_defecto
+        )
+            #print("este es el stock empaquetado: ",stock_empaquetado)
             
             stock_empaquetado.save()
 
@@ -613,6 +687,7 @@ class RegistrarEmpaquetadoView(FormView):
         
         else:
             raise ValidationError("No puede empaquetar más de lo disponible")
+            return self.form_invalid(form)
         
     def form_invalid(self, form):
         print ("el formulario es invalido")
@@ -639,7 +714,7 @@ class StockEmpaquetadoLista(ListView):
         total_cajas = 0
 
         #deposito
-        deposito = Deposito.objects.get(nombre='Bodega')
+        deposito = Deposito.objects.get(id=3)
         
         # Obtiene las cantidades y los lotes de cada varietal
         for varietal in varietales:
@@ -682,8 +757,8 @@ class StockEmpaquetadoDetalle(TemplateView):
     
     
     
-    
-# ------------------------------- Depositos ------------------------------    
+# ------------------------------- Depositos--- Bodega!!!!!!! ------------------------------    
+
     
 def stock(request):
     return render (request, 'administracion/stock.html')
@@ -691,11 +766,32 @@ def stock(request):
 def stock_bodega(request):
     # Sumar la cantidad total de todos los contenidos
     total_contenido = Contenido.objects.aggregate(total=Sum('cantidad'))
+    
+    
+    
     total_litros = total_contenido['total']  # Esto es el total de litros en todos los contenidos
 
     # En caso de que desees sumar solo los contenidos que cumplen ciertas condiciones
     # Por ejemplo, sumar solo los contenidos que aún están en los tanques (fecha_salida es None)
     total_contenido_en_tanques = Contenido.objects.filter(fecha_salida__isnull=True).aggregate(total=Sum('cantidad'))
+    
+    """ contenidos_en_tanques = Contenido.objects.filter(fecha_salida__isnull=True)
+
+    # Imprimir cada contenido y su cantidad
+    for contenido in contenidos_en_tanques:
+        print(f"Contenido ID: {contenido.id}, Cantidad: {contenido.cantidad}")
+
+    # Sumar y mostrar el total
+    total_contenido_en_tanques = contenidos_en_tanques.aggregate(total=Sum('cantidad'))
+    print(f"Total calculado: {total_contenido_en_tanques['total']}") """
+    
+    
+    
+    
+    
+    
+    
+    
     BOTELLAS_POR_CAJA = 6
     
     total_botellas_sin_etiquetar = StockBodegaSinEtiquetar.objects.filter(etiquetado=False).aggregate(total=Sum('cantidad_botellas'))
@@ -719,6 +815,8 @@ def stock_bodega(request):
     
     return render (request, 'administracion/stock_bodega.html', context)
 
+
+#--------------------------Depositos --- Secundarios
 
 def crear_deposito(request):
     if request.method == 'POST':
@@ -781,13 +879,39 @@ def get_producto_info(request, producto_id):
 
 
 
-class MoverStockView(FormView):
+#---------------------------Movimiento de stock
+
+
+def seleccionar_stock(request, pk):
+    # Recuperar el depósito utilizando el pk
+    deposito = get_object_or_404(Deposito, pk=pk)
+
+    # Pasar el depósito a la plantilla
+    return render(request, 'depositos/redireccionar.html', {'deposito': deposito})
+
+class DetallesDepositoView(DetailView):
+    model = Deposito
+    template_name = 'depositos/detalles_deposito.html'
+    context_object_name = 'deposito'
+    
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        deposito = self.object  # El objeto Deposito ya recuperado por DetailView
+        
+        
+        context['etiquetados'] = StockBodegaEtiquetado.objects.filter(deposito=deposito)
+        context['empaquetados'] = StockBodegaEmpaquetado.objects.filter(deposito=deposito)
+        
+        return context
+        
+
+class MoverStockEtiquetadoView(FormView):
     template_name='depositos/mover_stock.html'
     form_class = formset_factory(MoverStockForm, extra=2)
-    success_url='index_admin'
+    success_url= reverse_lazy ('index_admin')
     
     def get_context_data(self, **kwargs: Any) -> dict[str, Any]:
-        context = super(MoverStockView, self).get_context_data(**kwargs)
+        context = super(MoverStockEtiquetadoView, self).get_context_data(**kwargs)
         
     # Agrega tus variables personalizadas al contexto
         BODEGA_ID = 3
@@ -806,7 +930,7 @@ class MoverStockView(FormView):
         print("formulario valido")
         for f in form:
             print (f.cleaned_data)
-        return super(MoverStockView, self).form_valid(form)
+        return super(MoverStockEtiquetadoView, self).form_valid(form)
 
     def form_invalid(self, formset):
         
