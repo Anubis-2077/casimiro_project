@@ -58,8 +58,11 @@ urlpatterns = [
     path('deposito/eliminar/<int:pk>/', eliminar_deposito, name='eliminar_deposito'),
     path('deposito/detalles_deposito/<int:pk>/', detalles_deposito, name='detalles_deposito'),
     path('deposito/mover_stock_etiquetado/<int:pk>/', MoverStockEtiquetadoView.as_view(), name='mover_stock_etiquetado'),
+    path('deposito/mover_stock_empaquetado/<int:pk>/', MoverStockEmpaquetadoView.as_view(), name='mover_stock_empaquetado'),
     path('get_producto_info/<int:producto_id>/', get_producto_info, name='get_producto_info'),
+    path('get_producto_info_empaquetado/<int:producto_id>/', get_producto_info_empaquetado, name='get_producto_info_empaquetado'),
     path('deposito/detalles/<int:pk>/', DetallesDepositoView.as_view(), name='detalles_deposito'),
+    path('deposito/historial/', HistorialMovimientosView.as_view(), name='historial_movimientos_stock'),
     
     
     

@@ -11,12 +11,7 @@
           <div class="col-sm-6">
             <h1>Detalles Deposito: {{ deposito.nombre }}</h1>
           </div>
-          <div class="col-sm-6">
-            <ol class="breadcrumb float-sm-right">
-              
-              <a type="button"  href="{% url "crear_deposito" %}" class="btn btn-block btn-outline-primary">Crear depósito</a>
-            </ol>
-          </div>
+          
         </div>
       </div><!-- /.container-fluid -->
     </section>
@@ -42,6 +37,7 @@
                             <th>Varietal</th>
                             <th>Cantidad</th>
                             <th>Fecha etiquetado</th>
+                            <th>Fecha movimiento</th>
                           </tr>
                         </thead>
                         <tbody>
@@ -50,10 +46,11 @@
                                 {% if etiquetados.cantidad_botellas != 0 %}
                                     <tr>
                                     <td>{{ i.id }}</td>
-                                    <td> {{ i.lote }}</td>
-                                    <td> {{ i.varietal }}</td>
-                                    <td> {{ i.cantidad_botellas }}</td>
-                                    <td>{{ i.fecha_etiquetado }}</td>
+                                    <td> {{ i.stock.lote }}</td>
+                                    <td> {{ i.stock.varietal }}</td>
+                                    <td> {{ i.cantidad }}</td>
+                                    <td>{{ i.stock.fecha_etiquetado }}</td>
+                                    <td>{{ i.fecha_movimiento }}</td>
                                     </tr>
                                 {% endif %}
                             {% endfor %}
@@ -81,6 +78,7 @@
                                 <th>Varietal</th>
                                 <th>Cantidad</th>
                                 <th>Fecha etiquetado</th>
+                                <th>Fecha movimiento</th>
                               </tr>
                             </thead>
                             <tbody>
@@ -89,10 +87,11 @@
                                     {% if empaquetados.cantidad_cajas != 0 %}
                                         <tr>
                                         <td>{{ i.id }}</td>
-                                        <td> {{ i.lote }}</td>
-                                        <td> {{ i.varietal }}</td>
-                                        <td> {{ i.cantidad_cajas }}</td>
-                                        <td>{{ i.fecha_empaquetado }}</td>
+                                        <td> {{ i.stock.lote }}</td>
+                                        <td> {{ i.stock.varietal }}</td>
+                                        <td> {{ i.cantidad }}</td>
+                                        <td>{{ i.stock.stock.fecha_eti }}</td>
+                                        <td>{{ i.fecha_movimiento }}</td>
                                         </tr>
                                     {% endif %}
                                 {% endfor %}

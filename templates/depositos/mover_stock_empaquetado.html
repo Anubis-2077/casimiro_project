@@ -22,7 +22,7 @@
     <section class="content">
         <div class="container-fluid">
             <div class="row">
-                <div class="col-12 d-flex justify-content-center align-items-center ">
+                <div class="col-12 d-flex justify-content-center align-items-center">
                   
                     </div>
                     </div>
@@ -48,7 +48,7 @@
                             
                             <div class="card-body table-responsive p-0">
                               <input type="hidden" name="" id="depositoId" value="{{ deposito.id }}">
-                              <form id="FormDepositos" action="" method="post">
+                              <form id="FormDepositos"  method="post" enctype="multipart/form-data">
                                   {% csrf_token %}
                                   {{ form.management_form }}
                                 <table class="table table-hover text-nowrap">
@@ -56,14 +56,19 @@
                                     <tr>
                                       <th>Lote</th>
                                       <th>Producto</th>
-                                      <th>Tipo</th>
+                                      
                                       <th>fecha de envasado</th>
-                                      <th>Cantidad a mover</th>
+                                      <th>Cantidad Botellas</th>
+                                      <th>Cantidad disp. cajas</th>
+                                      <th>Cantidad a mover (cajas)</th>
                                       <th>Eliminar producto</th>
                                       
                                     </tr>
                                   </thead>
                                   <tbody>
+                                    <div style="display:none" >{{ formset.as_p }}</div>
+                                    <h1 style="display:none" >{{ deposito.id }}</h1>
+                                    
                                     {% comment %} <tr>
                                       <td><strong id="campo_lote"></strong></td>
                                       
@@ -71,7 +76,7 @@
                                           <select class="custom-select select_producto">
                                             <option selected value="">Seleccione un producto</option>
                                             {% for producto in stock_etiquetado %}
-                                                <option value="{{ producto.id }}" data-model="etiquetado">{{ producto.varietal }}</option>
+                                                <option value="{{ producto.id }}" data-model="etiquetado">{{ producto.varietal }} {{ producto.lote }} </option>
                                             {% endfor %}
                                             {% for producto in stock_empaquetado %}
                                                 <option value="{{ producto.id }}" data-model="empaquetado">{{ producto.varietal }}</option>
@@ -86,12 +91,6 @@
                                       
                                     </tr> {% endcomment %}
 
-                                    {% comment %} {% for f in form %}
-                                    <h1> este es un h1{{ f.stock }}</h1>
-                                    <h1> este es un h1{{ f.cantidad_botellas }}</h1>
-                                    <h1> este es un h1{{ f.deposito }}</h1>
-                                    <p></p>
-                                  {% endfor %} {% endcomment %}
                                     
                                                                 
                                   </tbody>
@@ -136,15 +135,17 @@
                         <td>
                             <select class="custom-select select_producto" name="form-${contadorGeneral}-stock" id="form-${contadorGeneral}-stock">
                                 <option selected value="">Seleccione un producto</option>
-                                {% for producto in stock_etiquetado %}
-                                    <option value="{{ producto.id }}" data-model="etiquetado">{{ producto.varietal }}</option>
+                                {% for producto in stock_empaquetado %}
+                                    <option value="{{ producto.id }}" data-model="empaquetado">{{ producto.varietal }}, Lote: {{ producto.lote }}</option>
                                 {% endfor %}
                                 
                             </select>
                         </td>
-                        <td><strong class="tipo"></strong></td>
+                        
                         <td><strong class="fecha_envasado"></strong></td>
-                        <td><input type="number" class="form-control" name="form-${contadorGeneral}-cantidad" id="form-${contadorGeneral}"-cantidad"></td>
+                        <td><strong class="cantidad_botellas"></strong></td>
+                        <td><strong class="cantidad_disponible"></strong></td>
+                        <td><input type="number" class="form-control" name="form-${contadorGeneral}-cantidad" id="form-${contadorGeneral}-cantidad"></td>
                         <td><button type="button" class="btn btn-block btn-outline-danger btn-sm eliminar_producto">Eliminar</button></td>
                         <input type="hidden" name="form-${contadorGeneral}-deposito" value="${$('#depositoId').val()}" id="form-${contadorGeneral}-deposito">
                     </tr>`;
@@ -175,12 +176,14 @@
             } else {
                 // Realiza la solicitud AJAX para obtener información del producto
                 $.ajax({
-                    url: '/get_producto_info/' + productoId + '/',
+                    url: '/get_producto_info_empaquetado/' + productoId + '/',
                     dataType: 'json',
                     success: function(data) {
                         tr.find('.campo_lote').text(data.lote);  
                         tr.find('.fecha_envasado').text(data.fecha_envasado); 
-                        tr.find('.tipo').text(data.tipo); 
+                        tr.find('.cantidad_disponible').text (data.cantidad_cajas + " Cajas")
+                        tr.find('.cantidad_botellas').text (data.cantidad_botellas + " Botellas")
+                        
                     },
                     error: function(xhr, status, error) {
                         console.error("Error en AJAX: ", status, error);

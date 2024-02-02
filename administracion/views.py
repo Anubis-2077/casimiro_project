@@ -13,13 +13,15 @@ from django.db.models import Subquery, OuterRef, Exists
 from django.urls import reverse
 from django.http import Http404
 from django.utils.dateparse import parse_datetime
-from django.forms import inlineformset_factory
+from django.forms import modelformset_factory
 from django.views.generic import CreateView, UpdateView, DeleteView
 from django.views.decorators.csrf import csrf_exempt
 from django.views.decorators.http import require_POST
 from django.contrib.auth.decorators import login_required
 from django.forms import formset_factory
+from itertools import chain
 
+from django.utils.decorators import method_decorator
 
 
 
@@ -859,27 +861,41 @@ def detalles_deposito(request,pk):
     return render (request, 'depositos/detalles_deposito.html', {'deposito':deposito})
 
 def get_producto_info(request, producto_id):
-    try:
-        producto = StockBodegaEtiquetado.objects.get(id=producto_id)
+    producto = StockBodegaEtiquetado.objects.get(id=producto_id)
         # Accediendo a fecha_envasado a través de la relación con StockBodegaSinEtiquetar y Embotellamiento
-        fecha_envasado = producto.stock.embotellamiento.fecha_envasado
-        tipo = "Stock etiquetado"
-    except StockBodegaEtiquetado.DoesNotExist:
-        producto = get_object_or_404(StockBodegaEmpaquetado, id=producto_id)
-        # Si es un StockBodegaEmpaquetado, debes acceder a través de dos niveles de relaciones
-        fecha_envasado = producto.stock.stock.embotellamiento.fecha_envasado
-        tipo = "Stock empaquetado"
+    fecha_envasado = producto.stock.embotellamiento.fecha_envasado
+    tipo = "Stock etiquetado"
+    cantidad_botellas= producto.cantidad_botellas
 
     data = {
-        'lote': producto.lote,
-        'tipo': tipo,
-        'fecha_envasado': fecha_envasado.strftime('%Y-%m-%d') if fecha_envasado else ''
-    }
+            'lote': producto.lote,
+            'tipo': tipo,
+            'fecha_envasado': fecha_envasado.strftime('%Y-%m-%d') if fecha_envasado else '',
+            'cantidad_botellas': cantidad_botellas
+        }
+    
+    return JsonResponse(data)
+
+def get_producto_info_empaquetado(request, producto_id):
+    producto = StockBodegaEmpaquetado.objects.get(id=producto_id)
+        # Accediendo a fecha_envasado a través de la relación con StockBodegaSinEtiquetar y Embotellamiento
+    fecha_empaquetado = producto.stock.stock.embotellamiento.fecha_envasado
+    tipo = "Stock empaquetado"
+    cantidad_cajas= producto.cantidad_cajas
+    cantidad_botellas = cantidad_cajas * 6
+
+    data = {
+            'lote': producto.lote,
+            'tipo': tipo,
+            'fecha_envasado': fecha_empaquetado.strftime('%Y-%m-%d') if fecha_empaquetado else '',
+            'cantidad_cajas': cantidad_cajas,
+            'cantidad_botellas': cantidad_botellas
+        }
+    
     return JsonResponse(data)
 
 
-
-#---------------------------Movimiento de stock
+#---------------------------Movimiento de stock-------------------------------------------
 
 
 def seleccionar_stock(request, pk):
@@ -899,47 +915,136 @@ class DetallesDepositoView(DetailView):
         deposito = self.object  # El objeto Deposito ya recuperado por DetailView
         
         
-        context['etiquetados'] = StockBodegaEtiquetado.objects.filter(deposito=deposito)
-        context['empaquetados'] = StockBodegaEmpaquetado.objects.filter(deposito=deposito)
+        context['etiquetados'] = MoverStockEtiquetado.objects.filter(deposito=deposito)
+        context['empaquetados'] = MoverStockEmpaquetado.objects.filter(deposito=deposito)
         
         return context
         
-
-class MoverStockEtiquetadoView(FormView):
-    template_name='depositos/mover_stock.html'
-    form_class = formset_factory(MoverStockForm, extra=2)
-    success_url= reverse_lazy ('index_admin')
+class MoverStockEtiquetadoView(View):
+    template_name= 'depositos/mover_stock_etiquetado.html'
     
-    def get_context_data(self, **kwargs: Any) -> dict[str, Any]:
-        context = super(MoverStockEtiquetadoView, self).get_context_data(**kwargs)
-        
-    # Agrega tus variables personalizadas al contexto
+    def get(self, request, *args, **kwargs):
+        Formset = modelformset_factory(MoverStockEtiquetado, form=MoverStockEtiquetadoForm, extra=10)
+        formset = Formset(queryset=MoverStockEtiquetado.objects.none())
+
         BODEGA_ID = 3
         deposito = get_object_or_404(Deposito, pk=self.kwargs['pk'])  # Asume que 'pk' se pasa como parámetro a la URL
         stock_etiquetado = StockBodegaEtiquetado.objects.filter(deposito_id=BODEGA_ID)
 
-        # Agregar deposito y stock_etiquetado al contexto
-        context['deposito'] = deposito
-        context['stock_etiquetado'] = stock_etiquetado
+        context = {
+            'formset': formset,
+            'deposito': deposito,
+            'stock_etiquetado': stock_etiquetado
+        }
 
-        return context
+        return render(request, self.template_name, context)
+            
+    def post(self, request, *args, **kwargs):
+        Formset = modelformset_factory(MoverStockEtiquetado, form=MoverStockEtiquetadoForm, extra=10)
+        formset = Formset(request.POST)
+        deposito = get_object_or_404(Deposito, pk=self.kwargs['pk']) 
+
+        if formset.is_valid():
+            for form in formset.forms:  # Iterar sobre formset.forms
+                # Ahora puedes acceder a form.cleaned_data porque formset.is_valid() fue llamado
+                if form.cleaned_data:  # Asegúrate de que el formulario no esté vacío
+                    stock_id = form.cleaned_data.get('stock').id
+                    cantidad_a_mover = form.cleaned_data.get('cantidad')
+                    
+                    stock_etiquetado = StockBodegaEtiquetado.objects.get(id=stock_id)
+                    stock_etiquetado.cantidad_botellas -= cantidad_a_mover
+                    if stock_etiquetado.cantidad_botellas < 0:
+                        stock_etiquetado.cantidad_botellas = 0
+                    
+                    stock_etiquetado.save()
+                    form.save()
+                    #print("este es el stock empaquetado: " ,stock_etiquetado)
+                    #print("este es el form: ", form.cleaned_data)
+
+            return redirect(reverse('detalles_deposito', kwargs={'pk': deposito.pk}))
+        else:
+            print("estos son los errores: ", formset.errors)
+            
+        return render(request, 'depositos/mover_stock_etiquetado.html', {'formset': formset})
     
-    def form_valid(self, form):
-       
-       
-        print("formulario valido")
-        for f in form:
-            print (f.cleaned_data)
-        return super(MoverStockEtiquetadoView, self).form_valid(form)
+    
+    
+    
+    
+#--------------------------stock empaquetado----------------------------
 
-    def form_invalid(self, formset):
+class MoverStockEmpaquetadoView(View):
+    template_name= 'depositos/mover_stock_empaquetado.html'
+    
+    def get(self, request, *args, **kwargs):
+        Formset = modelformset_factory(MoverStockEmpaquetado, form=MoverStockEmpaquetadoForm, extra=10)
+        formset = Formset(queryset=MoverStockEmpaquetado.objects.none())
+
+        BODEGA_ID = 3
+        deposito = get_object_or_404(Deposito, pk=self.kwargs['pk'])  
+        stock_empaquetado = StockBodegaEmpaquetado.objects.filter(deposito_id=BODEGA_ID)
+
+        context = {
+            'formset': formset,
+            'deposito': deposito,
+            'stock_empaquetado': stock_empaquetado
+        }
+
+        return render(request, self.template_name, context)
+
+    
+    def post(self, request, *args, **kwargs):
+        Formset = modelformset_factory(MoverStockEmpaquetado, form=MoverStockEmpaquetadoForm, extra=10)
+        formset = Formset(request.POST)
+        deposito = get_object_or_404(Deposito, pk=self.kwargs['pk']) 
+
+        if formset.is_valid():
+            for form in formset.forms:  # Iterar sobre formset.forms
+                # Ahora puedes acceder a form.cleaned_data porque formset.is_valid() fue llamado
+                if form.cleaned_data:  # Asegúrate de que el formulario no esté vacío
+                    stock_id = form.cleaned_data.get('stock').id
+                    cantidad_a_mover = form.cleaned_data.get('cantidad')
+                    
+                    stock_empaquetado = StockBodegaEmpaquetado.objects.get(id=stock_id)
+                    stock_empaquetado.cantidad_cajas -= cantidad_a_mover
+                    if stock_empaquetado.cantidad_cajas < 0:
+                        stock_empaquetado.cantidad_cajas = 0
+                    
+                    stock_empaquetado.save()
+                    form.save()
+                    #print("este es el stock empaquetado: " ,stock_empaquetado)
+                    #print("este es el form: ", form.cleaned_data)
+
+            return redirect(reverse('detalles_deposito', kwargs={'pk': deposito.pk}))
+        else:
+            # Manejo de formset no válido
+            return render(request, 'depositos/mover_stock_empaquetado.html', {'formset': formset})
+            
+
+class HistorialMovimientosView(ListView):
+    model = MoverStockEmpaquetado
+    template_name = 'depositos/historial_movimientos.html'
+    
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
         
-        print("formulario invalido")
-        for form in formset:
-            print(form.errors)
-        return self.render_to_response(self.get_context_data(form=formset))
-    
-    
+        movimientos_empaquetado = MoverStockEmpaquetado.objects.all()
+        for movimiento in movimientos_empaquetado:
+            movimiento.tipo_movimiento = 'Empaquetado'
+        
+        movimientos_etiquetados = MoverStockEtiquetado.objects.all()
+        for movimiento in movimientos_etiquetados:
+            movimiento.tipo_movimiento = 'Etiquetado'
+        
+        # Combina y opcionalmente ordena los movimientos
+        movimientos_combinados = sorted(
+            chain(movimientos_empaquetado, movimientos_etiquetados),
+            key=lambda movimiento: movimiento.fecha_movimiento, reverse=True)
+        
+        context['movimientos'] = movimientos_combinados
+        
+        return context
+        
 
 
    

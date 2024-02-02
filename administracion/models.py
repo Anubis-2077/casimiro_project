@@ -319,3 +319,18 @@ class MoverStockEtiquetado(models.Model):
     deposito= models.ForeignKey(Deposito,on_delete=models.CASCADE, related_name='deposito_destino')
     cantidad = models.IntegerField()
     fecha_movimiento = models.DateTimeField(auto_now_add=True)
+    
+    def __str__(self):
+        
+        return f"Lote: {self.stock.lote}, Carietal: {self.stock.varietal}, Cantidad: {self.cantidad}, Fecha: {self.fecha_movimiento}"
+
+
+class MoverStockEmpaquetado(models.Model):
+    stock = models.ForeignKey(StockBodegaEmpaquetado, on_delete=models.CASCADE, related_name='stock_origen_empaquetado')
+    deposito= models.ForeignKey(Deposito,on_delete=models.CASCADE, related_name='deposito_destino_empaquetado')
+    cantidad = models.IntegerField()
+    fecha_movimiento = models.DateTimeField(auto_now_add=True)
+    
+    def __str__(self):
+        
+        return f"Lote: {self.stock.lote}, Varietal: {self.stock.varietal}, Cantidad: {self.cantidad}, Fecha: {self.fecha_movimiento}"

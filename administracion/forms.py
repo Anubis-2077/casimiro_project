@@ -2,6 +2,7 @@ from django import forms
 from administracion.models import *
 from allauth.account.forms import LoginForm
 from django.forms import formset_factory
+from django.core.exceptions import ValidationError, ObjectDoesNotExist
 
 class CustomLoginForm(LoginForm):
     def __init__(self, *args, **kwargs):
@@ -117,12 +118,51 @@ class StockBodegaEmpaquetadoForm(forms.ModelForm):
         model = StockBodegaEmpaquetado
         fields = ['stock', 'cantidad_cajas', 'deposito']
         
-class MoverStockForm(forms.ModelForm):
+class MoverStockEtiquetadoForm(forms.ModelForm):
     stock= forms.ModelChoiceField(queryset=StockBodegaEtiquetado.objects.all())
     
     class Meta:
         model=MoverStockEtiquetado
         fields = ['stock', 'cantidad', 'deposito']
+    
+    def clean(self):
+        cleaned_data = super().clean()
+        cantidad = cleaned_data.get("cantidad")
+        stock_id = cleaned_data.get("stock")
         
+        if stock_id:
+            stock = StockBodegaEtiquetado.objects.get(pk=stock_id.id)
+            
+            if cantidad > stock.cantidad_botellas:
+                raise ValidationError("La cantidad a mover no puede ser mayor a la cantidad disponible.")
 
-  
+        return cleaned_data
+    
+    
+
+class MoverStockEmpaquetadoForm(forms.ModelForm):
+    stock=forms.ModelChoiceField(queryset=StockBodegaEmpaquetado.objects.all())
+    
+    class Meta:
+        model=MoverStockEmpaquetado
+        fields = ['stock', 'cantidad', 'deposito']
+        
+    def clean(self):
+        cleaned_data = super().clean()
+        cantidad = cleaned_data.get('cantidad')
+        stock_id = cleaned_data.get('stock')
+        
+        if cantidad <= 0:
+            raise ValidationError('La cantidad debe ser mayor que cero.')
+
+        if stock_id:
+            try:
+                stock = StockBodegaEmpaquetado.objects.get(pk=stock_id.id)
+                
+                if cantidad > stock.cantidad_cajas:
+                    raise ValidationError('No se puede mover una cantidad mayor a la existente.')
+            except ObjectDoesNotExist:
+                raise ValidationError('El stock especificado no existe.')
+
+        return cleaned_data
+                
