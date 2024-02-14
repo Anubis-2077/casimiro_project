@@ -1,0 +1,254 @@
+{% extends "base.html" %}
+{% load widget_tweaks %}
+
+{% block content  %}
+<div class="content-wrapper">
+    <!-- Content Header (Page header) -->
+    <section class="content-header">
+      <div class="container-fluid">
+        <div class="row mb-2">
+          <div class="col-sm-6">
+            <h1>Nueva venta <strong>Bodega</strong> </h1>
+          </div>
+          <div class="col-sm-6">
+            <ol class="breadcrumb float-sm-right">
+              <li class="breadcrumb-item"><a href="{% url "index_admin" %}">Inicio</a></li>
+              
+            </ol>
+          </div>
+        </div>
+      </div><!-- /.container-fluid -->
+    </section>
+    <section class="content">
+        <div class="container-fluid">
+            <div class="row">
+                <div class="col-12 d-flex justify-content-center align-items-center">
+                  
+                    </div>
+                    </div>
+                    <div class="card">
+                      <div class="row">
+                        <div class="col-12">
+                          
+                            <div class="card-header">
+                              <h3 class="card-title">Nueva Venta </h3>
+              
+                              <div class="card-tools">
+                                <div class="input-group input-group-sm" style="width: 150px;">
+                                  <input type="text" name="table_search" class="form-control float-right" placeholder="Search">
+              
+                                  <div class="input-group-append">
+                                    <button type="submit" class="btn btn-default"><i class="fas fa-search"></i></button>
+                                  </div>
+                                </div>
+                              </div>
+                            </div>
+                            <table class="table table-hover text-nowrap">
+                                <thead>
+                                    <tr>
+                                        <th></th>
+                                        <th></th>
+                                    </tr>
+                                </thead>
+                                <form method="post" action="" enctype="multipart/form-data">
+                                  {% csrf_token %}
+                                  <!-- Campos de Venta aquí -->
+                                  <tfoot>
+                                      <tr>
+                                          <th>Comprador</th>
+                                          <th>
+                                              <select class="form-control" name="comprador">
+                                                  <option selected>Seleccione un comprador</option>
+                                                  {% for cliente in clientes %}
+                                                      <option value="{{ cliente.id }}">{{ cliente.nombre }} {{ cliente.apellido }}</option>
+                                                  {% endfor %}
+                                              </select>
+                                          </th>
+                                      </tr>
+                                      <tr>
+                                        <th>Condicion</th>
+                                        <th><select name="condicion" class="form-control">
+                                            <option selected value="">Seleccione una condición</option>
+                                            {% for valor, descripcion in condiciones %}
+                                                <option value="{{ valor }}">{{ descripcion }}</option>
+                                            {% endfor %}
+                                        </select></th>
+                                    </tr>
+                                    <tr>
+                                        <th>Deposito</th>
+                                        <th><select name="deposito" class="form-control">
+                                            
+                                            {% for deposito in depositos %}
+                                              {% if deposito.id == 3 %}
+                                                <option value="{{deposito.id }}" selected >{{ deposito.nombre }} </option>
+                                                {% endif %}
+                                            {% endfor %}
+                                            
+                                        </select></th>
+                                    </tr>
+                                    <tr>
+                                        <th>Fecha</th>
+                                        <th><input class="form-control" type="text" name="fecha_venta" value="{{ fecha }}" readonly></th>
+                                    </tr>
+                                    <tr>
+                                        <th>Precio Total</th>
+                                        <th><input type="number" class="form-control" name="precio_total" ></th>
+                                    </tr>
+                                      
+                                  </tfoot>
+                              
+                                  <!-- Detalles de Venta Formset -->
+                                  {{ detalle_formset.management_form }}
+                                  <div class="card-body table-responsive p-0">
+                                      <table class="table table-hover text-nowrap">
+                                          <thead>
+                                              <tr>
+                                                  <th>Empaquetado</th>
+                                                  <th>Etiquetado</th>
+                                                  <th>Precio unitario</th>
+                                                  <th>Cantidad</th>
+                                                  <th>Bonificación %</th>
+                                                  <th>Precio parcial</th>
+                                                  <th>Eliminar producto</th>
+                                              </tr>
+                                          </thead>
+                                          <tbody>
+                                            
+                                            {% for form in detalle_formset %}
+                                                <tr>
+                                                    <td>{{ form.prod_empaquetado|add_class:"form-control empaquetado" }}</td> <!-- Asegúrate de que estos nombres coincidan con los de tu modelo/formulario -->
+                                                    <td>{{ form.prod_etiquetado|add_class:"form-control etiquetado" }}</td>
+                                                    <td>{{ form.precio_unitario|add_class:"form-control precio_unitario" }}</td>
+                                                    <td>{{ form.cantidad|add_class:"form-control cantidad" }}</td>
+                                                    
+                                                    <td><input type="number" class="form-control bonificacion"></td>
+                                                    <td class="total_parcial">$ 0</td>
+                                                    <td>{{ form.DELETE }}</td>
+                                                </tr>
+                                            {% endfor %}
+                                        </tbody>
+                                      </table>
+                                  </div>
+                              
+                                  
+                                  <button type="submit" id="boton_envio_general" class="btn btn-block btn-outline-primary btn-lg" style="margin-bottom:20px">Confirmar venta</button>
+                              </form>
+                              
+                                
+
+                            
+                            
+                            <!-- /.card-body -->
+                          
+                          <!-- /.card -->
+                        </div>
+                      </div>
+                    </div>
+                  
+                <!-- /.card-body -->
+              
+        </div>
+    </section>
+    
+
+    <script>
+
+      $(document).ready(function() {
+        $('table').on('change', '.empaquetado, .etiquetado', function() {
+            var tr = $(this).closest('tr');
+            var productoId = $(this).val(); 
+            
+            // Resetea el otro select dependiendo de cuál se cambió
+            if($(this).hasClass('empaquetado')) {
+                tr.find('.etiquetado').val(''); // Resetea etiquetado
+            } else if($(this).hasClass('etiquetado')) {
+                tr.find('.empaquetado').val(''); // Resetea empaquetado
+            }
+    
+            // Solo realiza la solicitud AJAX si productoId no está vacío
+            if (productoId !== "") {
+              $.ajax({
+                url: `/contabilidad/obtener_detalles_venta/${productoId}/${$(this).hasClass('empaquetado') ? 'empaquetado' : 'etiquetado'}/`,
+                dataType: 'json',
+                data: {
+                    'producto_id': productoId,
+                    'tipo': $(this).hasClass('empaquetado') ? 'empaquetado' : 'etiquetado'
+                },
+                dataType: 'json',
+                success: function(data) {
+                        // Asume que 'data.precio_unitario' contiene el precio unitario que deseas establecer
+                        tr.find('.precio_unitario').val(data.precio_unitario).attr('data-precio-original', data.precio_unitario);;
+                        
+                        console.log(data);
+                    },
+                    error: function(xhr, status, error) {
+                        console.error("Error en AJAX: ", status, error);
+                    }
+                });
+            } else {
+                // Opcional: Limpia el precio unitario si el valor del producto está vacío
+                tr.find('.precio_unitario').val('');
+            }
+            
+            console.log("Se realizó un cambio en empaquetado o etiquetado");
+        });
+    });
+    
+
+
+
+        function actualizarTotalParcial(tr) {
+          var cantidad = parseInt(tr.find('.cantidad').val()) || 0;
+          var precioUnitario = parseFloat(tr.find('.precio_unitario').val()) || 0;
+          var totalParcial = cantidad * Math.round(precioUnitario); // Multiplicación directa, precioUnitario ya es un número entero
+          tr.find('.total_parcial').text('$ ' + totalParcial.toFixed(2));
+          actualizarPrecioTotal();
+      }
+
+    function actualizarPrecioTotal() {
+      var precioTotal = 0;
+      $('.total_parcial').each(function() {
+          var valor = parseFloat($(this).text().replace('$', '')) * 100; // Convierte cada total parcial a centavos
+          precioTotal += valor;
+      });
+      $('input[name="precio_total"]').val((precioTotal / 100)); // Convierte el total de vuelta a dólares para mostrar
+  }
+
+    // Evento para cuando cambia la cantidad
+  $('table').on('input', '.cantidad', function() {
+    var tr = $(this).closest('tr');
+    actualizarTotalParcial(tr);
+  });
+
+  // Evento para cuando se actualiza la bonificación
+  // Asumiendo que este evento ajusta el precio unitario
+  $('table').on('input', '.bonificacion', function() {
+    var tr = $(this).closest('tr');
+    var bonificacion = parseFloat($(this).val()) || 0;
+
+    // Usar el precio original desde el atributo 'data-precio-original'
+    var precioOriginal = parseFloat(tr.find('.precio_unitario').attr('data-precio-original')) || 0;
+
+    // Calcular el nuevo precio con el descuento aplicado
+    var precioConDescuento = precioOriginal * (1 - (bonificacion / 100));
+
+    // Actualizar el valor del input de precio unitario con el nuevo precio
+    tr.find('.precio_unitario').val(precioConDescuento.toFixed(2)); // Usar toFixed(2) para mantener dos decimales
+
+    actualizarTotalParcial(tr); // Actualizar el total parcial después de aplicar el descuento
+});
+    
+    
+    
+    </script>
+    
+
+
+
+
+
+{% endblock content  %}
+
+
+
+

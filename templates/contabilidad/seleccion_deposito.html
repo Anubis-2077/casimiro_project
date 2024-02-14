@@ -1,0 +1,46 @@
+{% extends "base.html" %}
+
+{% block content %}
+
+<div class="content-wrapper">
+    <section class="content-header">
+        <div class="container-fluid">
+          <div class="row mb-2">
+            <div class="col-sm-6">
+              <h1>Selecciona el depósito para la venta</h1>
+            </div>
+            <div class="col-sm-6">
+              <ol class="breadcrumb float-sm-right">
+                
+               
+              </ol>
+            </div>
+          </div>
+        </div><!-- /.container-fluid -->
+      </section>
+      <section>
+        {% for deposito in depositos %}
+        {% if deposito.nombre == BODEGA %}
+        <a href="{% url "nueva_venta_bodega" pk=deposito.id %}"  class="btn btn-block btn-info btn-lg" style="">{{ deposito.nombre }}</a>
+        {% else %}
+        <a href="{% url "nueva_venta_sucursal" pk=deposito.id %}"  class="btn btn-block btn-info btn-lg" style="">{{ deposito.nombre }}</a>
+        {% endif %}
+        
+        
+        
+        {% endfor %}
+      </section>
+
+
+</div>
+
+
+
+
+{% endblock content %}
+
+
+
+
+
+

@@ -43,7 +43,7 @@
                         <tbody>
                           
                             {% for i in etiquetados %}
-                                {% if etiquetados.cantidad_botellas != 0 %}
+                                {% if i.cantidad != 0 %}
                                     <tr>
                                     <td>{{ i.id }}</td>
                                     <td> {{ i.stock.lote }}</td>

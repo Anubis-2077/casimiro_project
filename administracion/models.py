@@ -157,6 +157,8 @@ class StockBodegaSinEtiquetar(models.Model):
     def __str__(self):
         return f"Stock sin etiquetar varietal {self.varietal} cantidad: {self.cantidad_botellas} lote: {self.lote}"
 
+
+
 class StockBodegaEtiquetado(models.Model):
     stock = models.ForeignKey(StockBodegaSinEtiquetar, on_delete=models.CASCADE, null=True)
     fecha_etiquetado = models.DateTimeField(default=datetime.today())
@@ -166,6 +168,7 @@ class StockBodegaEtiquetado(models.Model):
     empaquetado = models.BooleanField(default=False)
     observaciones = models.TextField(default=" ", null=True)
     deposito = models.ForeignKey('Deposito', on_delete=models.SET_NULL, null=True, blank=True, default=get_default_deposito)
+    precio=models.IntegerField(null=True)
 
 
     def save(self, *args, **kwargs):
@@ -186,6 +189,7 @@ class StockBodegaEmpaquetado(models.Model):
     lote = models.CharField(max_length=255)
     fecha_empaquetado= models.DateTimeField(null=True)
     deposito = models.ForeignKey('Deposito', on_delete=models.SET_NULL, null=True, blank=True)
+    precio=models.IntegerField(null=True)
 
     
     
@@ -195,7 +199,11 @@ class StockBodegaEmpaquetado(models.Model):
         super().save(*args, **kwargs)
         
     def __str__(self):
-        return f"cantidad de cajas: {self.cantidad_cajas}, varietal: {self.varietal}, lote:{self.lote}"
+        return f"id: {self.id}, cantidad de cajas: {self.cantidad_cajas}, varietal: {self.varietal}, lote:{self.lote}"
+    
+    
+
+    
     
 class Deposito(models.Model):
     nombre = models.CharField(max_length=100)
@@ -205,115 +213,8 @@ class Deposito(models.Model):
     def __str__(self):
         return self.nombre
 
-
-class HistorialMovimientosEtiquetado(models.Model):
-    origen = models.ForeignKey(Deposito, related_name='movimientos_origen_etiquetado', on_delete=models.CASCADE)
-    destino = models.ForeignKey(Deposito, related_name='movimientos_destino_etiquetado', on_delete=models.CASCADE)
-    fecha = models.DateTimeField(auto_now_add=True)
-    cantidad_botellas = models.PositiveIntegerField()
-    usuario = models.ForeignKey(User, on_delete=models.CASCADE)
-    stock = models.ForeignKey(StockBodegaEtiquetado, on_delete=models.CASCADE)  # Ajustar según tus modelos
-    
-    
-    def __str__(self):
-        return f"{self.cantidad_botellas} de {self.stock} de {self.origen} a {self.destino}"
-
-
-class HistorialMovimientosEmpaquetado(models.Model):
-    origen = models.ForeignKey(Deposito, related_name='movimientos_origen_empaquetado', on_delete=models.CASCADE)
-    destino = models.ForeignKey(Deposito, related_name='movimientos_destino_empaquetado', on_delete=models.CASCADE)
-    fecha = models.DateTimeField(auto_now_add=True)
-    cantidad_cajas = models.PositiveIntegerField()
-    usuario = models.ForeignKey(User, on_delete=models.CASCADE)
-    stock = models.ForeignKey(StockBodegaEmpaquetado, on_delete=models.CASCADE)  # Ajustar según tus modelos
-    
-    
-    def __str__(self):
-        return f"{self.cantidad_cajas} de {self.stock} de {self.origen} a {self.destino}"
-    
-    
-class Cliente(models.Model):
-    nombre = models.CharField(max_length=100)
-    apellido = models.CharField(max_length=50, null=True)
-    cuit_cuil = models.CharField(max_length=50)
-    direccion = models.TextField()
-    email = models.EmailField()
-    telefono = models.CharField(max_length=50)
-    tipo = models.CharField(max_length=50, choices=[('mayorista', 'Mayorista'), ('minorista', 'Minorista'), ('final', 'Consumidor Final')])
-    observaciones= models.TextField(null=True, blank=True)
-    cuenta_corriente = models.OneToOneField(
-        'CuentaCorrienteDeudores',
-        on_delete=models.CASCADE,
-        null=True,
-        blank=True,
-        related_name='cliente_relacionado' 
-    )
     
 
-class ProveedorInsumos(models.Model):
-    nombre = models.CharField(max_length=100)
-    apellido = models.CharField(max_length=50, null=True)
-    cuit_cuil = models.CharField(max_length=50)
-    direccion = models.TextField()
-    email = models.EmailField()
-    telefono = models.CharField(max_length=50)
-    observaciones= models.TextField(null=True, blank=True)
-    cuenta_corriente = models.OneToOneField(
-        'CuentaCorrienteAcreedores',
-        on_delete=models.CASCADE,
-        null=True,
-        blank=True,
-        related_name='proveedor_insumos_relacionado'
-    )
-    
-    
-    def __str__(self):
-        return f"el id es: {self.id}, proveedor: {self.nombre}, apellido: {self.apellido}"
-
-class CuentaCorrienteDeudores(models.Model):
-    cliente = models.ForeignKey(
-        Cliente,
-        on_delete=models.CASCADE,
-        related_name='cuenta_corriente_clientes'  
-    )
-    saldo = models.DecimalField(max_digits=10, decimal_places=2, default=0)
-    ventas = models.ManyToManyField('VentaCuentaCorriente', related_name='cuenta_corriente_deudores')
-
-class VentaCuentaCorriente(models.Model):
-    fecha = models.DateField(auto_now_add=True)
-    descripcion = models.TextField()
-    monto = models.DecimalField(max_digits=10, decimal_places=2)
-    confirmada = models.BooleanField(default=False)
-
-    class Meta:
-        ordering = ['-fecha']
-
-class CuentaCorrienteAcreedores(models.Model):
-    proveedor_insumos = models.ForeignKey(ProveedorInsumos, on_delete=models.CASCADE,  related_name='cuenta_corriente_proveedores_insumos' )
-    saldo = models.DecimalField(max_digits=10, decimal_places=2, default=0)
-    compras = models.ManyToManyField('CompraCuentaCorriente', related_name='cuenta_corriente_acreedores')
-
-class CompraCuentaCorriente(models.Model):
-    fecha = models.DateField(auto_now_add=True)
-    descripcion = models.TextField()
-    monto = models.DecimalField(max_digits=10, decimal_places=2)
-    confirmada = models.BooleanField(default=False)
-
-    class Meta:
-        ordering = ['-fecha']
-
-class Deudor(models.Model):
-    cliente = models.ForeignKey(Cliente, on_delete=models.CASCADE)
-    fecha_inicio_deuda = models.DateField(auto_now_add=True)
-    fecha_fin_deuda = models.DateField(null=True, blank=True)
-    descripcion = models.CharField(max_length=200)
-
-class Acreedor(models.Model):
-    proveedor_insumos = models.ForeignKey(ProveedorInsumos, on_delete=models.CASCADE)
-    fecha_inicio_acreedor = models.DateField(auto_now_add=True)
-    fecha_fin_acreedor = models.DateField(null=True, blank=True)
-    descripcion = models.CharField(max_length=200)
-    
 class MoverStockEtiquetado(models.Model):
     stock = models.ForeignKey(StockBodegaEtiquetado, on_delete=models.CASCADE, related_name='stock_origen')
     deposito= models.ForeignKey(Deposito,on_delete=models.CASCADE, related_name='deposito_destino')
@@ -322,7 +223,7 @@ class MoverStockEtiquetado(models.Model):
     
     def __str__(self):
         
-        return f"Lote: {self.stock.lote}, Carietal: {self.stock.varietal}, Cantidad: {self.cantidad}, Fecha: {self.fecha_movimiento}"
+        return f"Id: {self.id} Lote: {self.stock.lote}, Carietal: {self.stock.varietal}, Cantidad: {self.cantidad}, Fecha: {self.fecha_movimiento}"
 
 
 class MoverStockEmpaquetado(models.Model):
@@ -333,4 +234,4 @@ class MoverStockEmpaquetado(models.Model):
     
     def __str__(self):
         
-        return f"Lote: {self.stock.lote}, Varietal: {self.stock.varietal}, Cantidad: {self.cantidad}, Fecha: {self.fecha_movimiento}"
+        return f"Id: {self.id} Lote: {self.stock.lote}, Varietal: {self.stock.varietal}, Cantidad: {self.cantidad}, Fecha: {self.fecha_movimiento}"

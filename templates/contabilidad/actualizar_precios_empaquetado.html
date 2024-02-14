@@ -1,0 +1,64 @@
+{% extends "base.html" %}
+{% load widget_tweaks %}
+
+{% block content %}
+<div class="content-wrapper">
+    <!-- Content Header (Page header) -->
+    <section class="content-header">
+      <div class="container-fluid">
+        <div class="row mb-2">
+          <div class="col-sm-6">
+            <h1>Actualizar precios stock Empaquetado </h1>
+          </div>
+          <div class="col-sm-6">
+            <ol class="breadcrumb float-sm-right">
+              
+             
+            </ol>
+          </div>
+        </div>
+      </div><!-- /.container-fluid -->
+    </section>
+
+    <section>
+        <div class="col-md-12">
+            <!-- general form elements disabled -->
+            <div class="card card-warning">
+              <div class="card-header">
+                <h3 class="card-title">Complete el formulario para actualizar los precios</h3>
+              </div>
+              <!-- /.card-header -->
+              <div class="card-body">
+                
+                    <form method="post">
+                      {% csrf_token %}
+                      {{ empaquetado_formset.management_form }}
+                      
+                      {% for form in empaquetado_formset %}
+                      
+                      <div class="form-group">
+                        <input type="hidden" name="{{ form.prefix }}-id" value="{{ form.instance.pk }}" />
+                          <label>Varietal: {{ form.instance.varietal }}, Lote: {{ form.instance.lote }}, Tipo: Caja x 6 U.</label>
+                          {{ form.precio|add_class:"form-control" |attr:"placeholder:$" }}
+                      </div>
+                          
+                      {% endfor %}
+                  
+                     
+                    
+                      <button type="submit" class="btn btn-block btn-outline-primary btn-lg">Guardar cambios</button>
+                    
+                      
+                  </form>
+                  
+                
+                
+            </div>
+              <!-- /.card-body -->
+            </div>
+            <!-- /.card -->
+            
+          </div>
+    </section>
+
+{% endblock content %}

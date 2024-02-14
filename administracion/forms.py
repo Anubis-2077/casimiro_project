@@ -83,25 +83,9 @@ class DepositoForm(forms.ModelForm):
         model = Deposito
         fields = ['nombre', 'ubicacion']
         
-class HistorialEtiquetadoForm(forms.ModelForm):
-    class Meta:
-        model = HistorialMovimientosEtiquetado
-        fields = '__all__'
-        
-class HistorialEmpaquetadoForm(forms.ModelForm):
-    class Meta:
-        model = HistorialMovimientosEmpaquetado
-        fields = '__all__'
-        
-class ClienteForm(forms.ModelForm):
-    class Meta:
-        model = Cliente
-        fields = ['nombre', 'apellido', 'cuit_cuil', 'direccion', 'telefono', 'email', 'observaciones', 'tipo']
 
-class ProveedorInsumosForm(forms.ModelForm):
-    class Meta:
-        model = ProveedorInsumos
-        fields = ['nombre','apellido', 'cuit_cuil', 'direccion', 'email', 'telefono','observaciones']
+        
+
         
 #--------------formularios de asignacion de stock a bodegas--------------
 

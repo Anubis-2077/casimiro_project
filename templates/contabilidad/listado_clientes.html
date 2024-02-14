@@ -43,6 +43,7 @@
                                   <th>CUIT/CUIL</th>
                                   <th>Dirección</th>
                                   <th>Teléfono</th>
+                                  <th>Tipo</th>
                                   <th>Cuenta Corriente</th>
                                   <th>Editar</th>
                                   <th>Eliminar</th>
@@ -59,6 +60,7 @@
                                         <td>{{cliente.cuit_cuil}}</td>
                                         <td>{{cliente.direccion}}</td>
                                         <td>{{cliente.telefono}}</td>
+                                        <td>{{ cliente.tipo }}</td>
                                         
                                         <td>
                                             {% if cliente.cuenta_corriente %}
@@ -67,8 +69,8 @@
                                             {{cliente.cuenta_corriente}}
                                             {% endif %}
                                         </td>
-                                        <td><a href="{% url 'cliente_update' cliente.id %}">Editar cliente</a></td>
-                                        <td><button onclick="confirmDelete({{ cliente.id }})">Eliminar Cliente</button></td>
+                                        <td><a class="btn btn-block btn-outline-info" href="{% url 'cliente_update' cliente.id %}">Editar cliente</a></td>
+                                        <td><button class="btn btn-block btn-outline-danger" onclick="confirmDelete({{ cliente.id }})">Eliminar Cliente</button></td>
                                         <td><a href="#">Ver más detalles</a></td>
 
                                       </tr>

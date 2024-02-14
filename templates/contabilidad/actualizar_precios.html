@@ -1,0 +1,45 @@
+{% extends "base.html" %}
+
+
+{% block content %}
+
+<div class="content-wrapper">
+    <section class="content-header">
+        <div class="container-fluid">
+          <div class="row mb-2">
+            <div class="col-sm-6">
+              <h1>Selecciona el depósito para la venta</h1>
+            </div>
+            <div class="col-sm-6">
+              <ol class="breadcrumb float-sm-right">
+                
+               
+              </ol>
+            </div>
+          </div>
+        </div>
+      </section>
+      <section>
+        
+        <a href="{% url "actualizar_precios_etiquetado" %}"  class="btn btn-block btn-info btn-lg" style="">Actualizar precios stock etiquetado</a>
+
+        <a href="{% url "actualizar_precios_empaquetado" %}"  class="btn btn-block btn-info btn-lg" style="">Actualizar precios stock empaquetado</a>
+        
+        
+        
+      </section>
+
+
+</div>
+
+
+
+
+{% endblock content %}
+
+
+
+
+
+
+

@@ -76,15 +76,24 @@ urlpatterns = [
     path('proveedores_insumos/editar/<int:pk>/', ProveedorInsumosUpdateView.as_view(), name='proveedor_update'),
     path('proveedores_insumos/delete/<int:pk>/', eliminar_proveedor, name='proveedor_delete'),
     
-    path('ventas/', registrar_ventas ,name='ventas'),
+    
+    path('contabilidad/actualizar__precios/', actualizar_precios, name='actualizar_precios'),
+    path('contabilidad/actualizar_precios_empaquetado/', ActualizarPreciosEmpaquetadoView.as_view() ,name='actualizar_precios_empaquetado'),
+    path('contabilidad/actualizar_precios_etiquetado/', ActualizarPreciosEtiquetadoView.as_view() ,name='actualizar_precios_etiquetado'),
+    path('contabilidad/seleccion_deposito/', seleccion_deposito ,name='seleccion_deposito_venta'),
+    path('contabilidad/obtener_detalles_venta/<int:producto_id>/<str:tipo>/', obtener_detalles_venta, name="obtener_detalles_venta"),
+    path('contabilidad/obtener_detalles_venta_sucursal/<int:producto_id>/<str:tipo>/', obtener_detalles_venta_sucursal, name="obtener_detalles_venta_sucursal"),
+    path('contabilidad/nueva_venta/<int:pk>/', CrearVentaBodegaView.as_view() ,name='nueva_venta_bodega'),
+    path('contabilidad/nueva_venta_sucursal/<int:pk>/', CrearVentaSucursalView.as_view() ,name='nueva_venta_sucursal'),
     path('registro_deudores/', registro_deudores ,name='registro_deudores'),
     path('registro_acreedores/', registro_acreedores ,name='registro_acreedores'),
+    path('contabilidad/detalle_ventas/', DetallesVentasView.as_view(), name='detalle_ventas'),
     
     
     
     
     
-    
+    #---------------------------------------tareas---------------------------------------------
     path('nueva_tarea/', nueva_tarea ,name='nueva_tarea'),
     path('tareas_realizadas/', tareas_realizadas ,name='tareas_realizadas'),
     path('listado_tareas/', listado_tareas ,name='listado_tareas'),

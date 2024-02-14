@@ -466,7 +466,7 @@ class StockSinEtiquetarView(ListView):
         context = super().get_context_data(**kwargs)
 
         # Define los varietales
-        varietales = ['Rose', 'Cabernet Franc', 'Cabernet Sauvignon', 'Extra Brut', 'Reserva Malbec', 'Malbec OAK', 'Malbec', 'Syrah', 'Moscatel', 'Alejandria','Torrontes']
+        varietales = ['Rose', 'Cabernet Franc', 'tempranillo', 'Semillon', 'Cabernet Sauvignon', 'Extra Brut', 'Reserva Malbec', 'Malbec OAK', 'Malbec', 'Syrah', 'Moscatel', 'Alejandria','Torrontes']
 
         # Crea un diccionario para almacenar las cantidades de cada varietal
         cantidades = {}
@@ -592,7 +592,7 @@ class StockEtiquetadoLista(ListView):
         context = super().get_context_data(**kwargs)
 
         # Define los varietales
-        varietales = ['Rose', 'Cabernet Franc', 'Cabernet Sauvignon', 'Extra Brut', 'Reserva Malbec', 'Malbec OAK', 'Malbec', 'Syrah', 'Moscatel', 'Alejandria','Torrontes']
+        varietales = ['Rose', 'Cabernet Franc', 'Cabernet Sauvignon', 'Semillon', 'Extra Brut', 'Reserva Malbec', 'Malbec OAK', 'Malbec', 'Syrah', 'Moscatel', 'Alejandria','Torrontes', 'tempranillo']
         deposito = Deposito.objects.get(id=3) #poner el id del deposito Bodega
         # Crea un diccionario para almacenar las cantidades de cada varietal
         cantidades = {}
@@ -704,7 +704,7 @@ class StockEmpaquetadoLista(ListView):
         context = super().get_context_data(**kwargs)
 
         # Define los varietales
-        varietales = ['Rose', 'Cabernet Franc', 'Cabernet Sauvignon', 'Extra Brut', 'Reserva Malbec', 'Malbec OAK', 'Malbec', 'Syrah', 'Moscatel', 'Alejandria','Torrontes']
+        varietales = ['Semillon', 'tempranillo', 'Rose', 'Cabernet Franc', 'Cabernet Sauvignon', 'Extra Brut', 'Reserva Malbec', 'Malbec OAK', 'Malbec', 'Syrah', 'Moscatel', 'Alejandria','Torrontes']
 
         # Crea un diccionario para almacenar las cantidades de cada varietal
         cantidades = {}
@@ -1054,59 +1054,4 @@ class HistorialMovimientosView(ListView):
     
 
 
-# ------------------------------------  CONTABILIDAD   ---------------------------------------------
-# ------------------------------------  CLIENTES -------------------------------------
-
-def cliente_list(request):
-    listado_clientes = Cliente.objects.all()
-    return render (request, 'contabilidad/listado_clientes.html', {'listado_clientes': listado_clientes})
-
-class ClienteCreateView(CreateView):
-    model = Cliente
-    form_class = ClienteForm
-    template_name = 'contabilidad/create_cliente.html'
-    success_url = reverse_lazy('listado_clientes')  
-
-class ClienteUpdateView(UpdateView):
-    model = Cliente
-    form_class = ClienteForm
-    template_name = 'contabilidad/create_cliente.html'
-    success_url = reverse_lazy('listado_clientes')
     
-
-@csrf_exempt
-@require_POST
-def eliminar_cliente(request, pk):
-    cliente_id = request.POST.get('id')
-    cliente = get_object_or_404(Cliente, id=cliente_id)
-    cliente.delete()
-    return JsonResponse({'success': True})
-    
-    
-# ------------------------------------  PROVEEDORES -------------------------------------
-    
-    
-def proveedor_list (request):
-    listado_proveedores = ProveedorInsumos.objects.all()
-    return render (request, 'contabilidad/listado_proveedores.html', {'listado_proveedores': listado_proveedores})
-
-class ProveedorInsumosCreateView(CreateView):
-    model = ProveedorInsumos
-    form_class = ProveedorInsumosForm
-    template_name = 'contabilidad/create_proveedor.html'
-    success_url = reverse_lazy('listado_proveedores')  
-
-class ProveedorInsumosUpdateView(UpdateView):
-    model = ProveedorInsumos
-    form_class = ProveedorInsumosForm
-    template_name = 'contabilidad/create_proveedor.html'
-    success_url = reverse_lazy('listado_proveedores')
-    
-@csrf_exempt
-@require_POST
-def eliminar_proveedor(request, pk):
-    proveedor_id = request.POST.get('id')
-    proveedor = get_object_or_404(ProveedorInsumos, id=proveedor_id)
-    proveedor.delete()
-    print("el proveedor se elimino exitosamente")
-    return JsonResponse({'success': True})

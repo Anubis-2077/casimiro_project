@@ -27,7 +27,7 @@
                   
                     <div class="card card-warning">
                         <div class="card-header">
-                          <h3 class="card-title">Lista de todos los Clientes</h3>
+                          <h3 class="card-title">Lista de todos los Proveedores</h3>
                         </div>
                         <!-- /.card-header -->
                         
@@ -67,8 +67,8 @@
                                             {{proveedor.cuenta_corriente}}
                                             {% endif %}
                                         </td>
-                                        <td><a href="{% url 'proveedor_update' proveedor.id %}">Editar proveedor</a></td>
-                                        <td><button onclick="confirmDelete({{ proveedor.id }})">Eliminar proveedor</button></td>
+                                        <td><a class="btn btn-block btn-outline-info" href="{% url 'proveedor_update' proveedor.id %}">Editar proveedor</a></td>
+                                        <td><button class="btn btn-block btn-outline-danger" onclick="confirmDelete({{ proveedor.id }})">Eliminar proveedor</button></td>
                                         <td><a href="#">Ver más detalles</a></td>
 
                                       </tr>

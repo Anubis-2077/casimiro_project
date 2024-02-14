@@ -1,0 +1,106 @@
+{% extends "base.html" %}
+{% load static %}
+
+
+{% block content %}
+<div class="content-wrapper">
+    <!-- Content Header (Page header) -->
+    <section class="content-header">
+      <div class="container-fluid">
+        <div class="row mb-2">
+          <div class="col-sm-6">
+            <h1>Detalle de Ventas</h1>
+          </div>
+          <div class="col-sm-6">
+            <ol class="breadcrumb float-sm-right">
+              
+             
+            </ol>
+          </div>
+        </div>
+      </div><!-- /.container-fluid -->
+    </section>
+
+    <section>
+        <div class="col-md-12">
+            <div class="card card-success">
+                <div class="card-header">
+                  <h3 class="card-title">Detalle mensual de ventas</h3>
+  
+                  <div class="card-tools">
+                    <button type="button" class="btn btn-tool" data-card-widget="collapse"><i class="fas fa-minus"></i>
+                    </button>
+                    
+                  </div>
+                </div>
+                <div class="card">
+                    <div class="card-body">
+                      <h5 class="card-title">Bar CHart</h5>
+        
+                      <!-- Bar Chart -->
+                      <canvas id="barChart" style="max-height: auto;"></canvas>
+                      <script>
+                        document.addEventListener("DOMContentLoaded", () => {
+                            new Chart(document.querySelector('#barChart'), {
+                              type: 'bar',
+                              data: {
+                                labels: {{ meses|safe }},
+                                datasets: [{
+                                  label: 'Ventas mensuales',
+                                  data: {{ totales|safe }},
+                                  backgroundColor: [
+                                  'rgba(255, 99, 132, 0.2)',
+                                  'rgba(255, 159, 64, 0.2)',
+                                  'rgba(255, 205, 86, 0.2)',
+                                  'rgba(75, 192, 192, 0.2)',
+                                  'rgba(54, 162, 235, 0.2)',
+                                  'rgba(153, 102, 255, 0.2)',
+                                  'rgba(201, 203, 207, 0.2)',
+                                  'rgba(102, 255, 51, 0.2)',
+                                    'rgba(255, 51, 153, 0.2)',
+                                    'rgba(51, 153, 255, 0.2)',
+                                    'rgba(255, 204, 51, 0.2)',
+                                    'rgba(153, 51, 255, 0.2)'
+                                ],
+                                borderColor: [
+                                  'rgb(255, 99, 132)',
+                                  'rgb(255, 159, 64)',
+                                  'rgb(255, 205, 86)',
+                                  'rgb(75, 192, 192)',
+                                  'rgb(54, 162, 235)',
+                                  'rgb(153, 102, 255)',
+                                  'rgb(201, 203, 207)',
+                                'rgb(102, 255, 51)',
+                                    'rgb(255, 51, 153)',
+                                    'rgb(51, 153, 255)',
+                                    'rgb(255, 204, 51)',
+                                    'rgb(153, 51, 255)'
+                                ],
+                                borderWidth: 1
+                              }]
+                            },
+                            options: {
+                              scales: {
+                                y: {
+                                  beginAtZero: true
+                                }
+                              }
+                            }
+                          });
+                        });
+                      </script>
+                      <!-- End Bar CHart -->
+        
+                    </div>
+                  </div>
+                <!-- /.card-body -->
+              </div>
+            
+            
+          </div>
+    </section>
+    
+{% endblock content %}
+
+
+

@@ -281,15 +281,24 @@
             <ul class="nav nav-treeview">
 
               <li class="nav-item">
-                <a href="#" class="nav-link">
+                <a href="{% url "seleccion_deposito_venta" %}" class="nav-link">
                   <i class="fa-solid fa-file-invoice-dollar"></i>
                   <p>Registrar Venta</p>
                 </a>
               </li>
               <li class="nav-item">
-                <a href="#" class="nav-link">
+                <a href="{% url "actualizar_precios" %}" class="nav-link">
                   <i class="fa-solid fa-file-invoice-dollar"></i>
-                  <p>Ventas en Linea</p>
+                  <p>Actualizar precios</p>
+                </a>
+              </li>
+
+
+
+              <li class="nav-item">
+                <a href="{% url "detalle_ventas" %}" class="nav-link">
+                  <i class="fa-solid fa-file-invoice-dollar"></i>
+                  <p>Detalle ventas</p>
                 </a>
               </li>
 
