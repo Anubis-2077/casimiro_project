@@ -12,6 +12,14 @@ class Proveedor(models.Model):
     
     def __str__(self) -> str:
         return self.razon_social
+    
+class Varietal(models.Model):
+    nombre = models.CharField(max_length=50)
+    imagen = models.ImageField()
+    uva = models.CharField(max_length=50)
+    
+    def __str__(self):
+        return self.nombre, self.id
 
 
 class Cargamento(models.Model):
@@ -26,7 +34,7 @@ class Cargamento(models.Model):
     camionero_razon_social = models.CharField(max_length=100, blank=True)
     camionero_cuit = models.CharField(default=0)
     proveedor = models.ForeignKey(Proveedor, on_delete=models.CASCADE,)
-    varietal = models.CharField(max_length=200)
+    varietal = models.ForeignKey(Varietal, on_delete=models.CASCADE, null= True)
     origen = models.CharField(max_length=200)
     parral = models.CharField(max_length=200)
     cuartel = models.CharField(max_length=200)
@@ -44,7 +52,7 @@ class Molienda(models.Model):
     responsables = models.CharField(max_length=200)
     cantidad_operarios = models.IntegerField()
     rendimiento = models.IntegerField()
-    analisis = models.FileField(upload_to='analisis/', blank=True)
+    
     
     def embotellado(self):
         return self.contenido_set.filter(embotellado=True).exists()
@@ -137,7 +145,7 @@ def get_default_deposito():
 class StockBodegaSinEtiquetar(models.Model):
     embotellamiento = models.ForeignKey(Embotellamiento, on_delete=models.CASCADE)
     cantidad_botellas = models.PositiveIntegerField(null=True)
-    varietal = models.CharField(max_length=255)
+    varietal = models.ForeignKey(Varietal, on_delete=models.CASCADE)
     lote = models.CharField(max_length=255)
     etiquetado = models.BooleanField(default=False)
     deposito = models.ForeignKey('Deposito', on_delete=models.SET_NULL, null=True, blank=True, default=get_default_deposito)
@@ -163,7 +171,7 @@ class StockBodegaEtiquetado(models.Model):
     stock = models.ForeignKey(StockBodegaSinEtiquetar, on_delete=models.CASCADE, null=True)
     fecha_etiquetado = models.DateTimeField(default=datetime.today())
     cantidad_botellas = models.PositiveIntegerField(null=True)
-    varietal = models.CharField(max_length=255)
+    varietal = models.ForeignKey(Varietal, on_delete=models.CASCADE)
     lote = models.CharField(max_length=255)
     empaquetado = models.BooleanField(default=False)
     observaciones = models.TextField(default=" ", null=True)
@@ -185,7 +193,7 @@ class StockBodegaEmpaquetado(models.Model):
     stock = models.ForeignKey(StockBodegaEtiquetado, on_delete=models.CASCADE)
     cantidad_cajas = models.IntegerField(null=True)
     empaquetado = models.BooleanField(default=False)
-    varietal = models.CharField(max_length=255)
+    varietal = models.ForeignKey(Varietal, on_delete=models.CASCADE)
     lote = models.CharField(max_length=255)
     fecha_empaquetado= models.DateTimeField(null=True)
     deposito = models.ForeignKey('Deposito', on_delete=models.SET_NULL, null=True, blank=True)

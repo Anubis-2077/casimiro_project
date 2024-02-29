@@ -1,0 +1,607 @@
+{% load static %}
+{% load app_filter %}
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="{% static "assets/styles/tienda_style5.css" %}">
+    <script src="https://kit.fontawesome.com/92fbd7711c.js" crossorigin="anonymous"></script>
+    <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.7.2/css/all.css">
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+    <script src="{% static "/assets/js/main_index.js" %}"></script>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <link rel="stylesheet" href="{% static "/assets/styles/bootstrap.min.css" %}">
+    <link rel="stylesheet" href="{% static "/assets/styles/style_tienda.css" %}">
+    <title>Casimiro Wines - Tienda</title>
+</head>
+
+<body>
+    <header class="header" id="menu">
+        <div class="logo">
+            <h2 id="logo_nombre" data-menuanchor="Inicio"> <a href="index.html"
+                    style="text-decoration: none; color:white;">Casimiro</a></h2>
+        </div>
+        <nav>
+            <ul class="nav-links">
+                <li data-menuanchor="Nosotros"><a href="#Nosotros">Nosotros</a></li>
+                <li data-menuanchor="Vinos"><a href="#Vinos">Vinos</a></li>
+                <li data-menuanchor="Galeria"><a href="#Galeria">Galeria</a></li>
+                <li data-menuanchor="Visitas"><a href="#Visitas">Visitas</a></li>
+                <li data-menuanchor="Contacto"><a href="#Contacto">Contacto</a></li>
+                <button id="openAsideBtn"> <i class="fa-solid fa-cart-shopping" style="font-size:20px"></i> </button>
+            </ul>
+            
+            
+        </nav>
+        
+    </header>
+    <main>
+
+        <section class="main_container">
+            {% for item in stock_etiquetado %}
+                <div class="card-{{ item.varietal.nombre|slugify }}">
+                    <div class="imgBox">
+                        <!-- Asegúrate de que el campo 'imagen' sea accesible en tu modelo Varietal -->
+                        <img src="{{ item.varietal.imagen.url }}" alt="{{ item.varietal.nombre }}" class="mouse">
+                    </div>
+
+                    <div class="contentBox">
+                        <h3>{{ item.varietal.nombre }}</h3>
+                        <h2 class="price">${{ item.precio }}</h2>
+                        <button class="buy add-to-cart-btn" data-product-id="{{ item.id }}" data-product-type="etiquetado">Agregar al carrito</button>
+
+                    </div>
+                </div>
+            {% endfor %}
+
+            {% for item in stock_empaquetado %}
+                <div class="card-{{ item.varietal.nombre|slugify }}">
+                    <div class="imgBox">
+                        <!-- Asegúrate de que el modelo Varietal tenga un campo 'imagen' -->
+                        <img src="{{ item.varietal.imagen.url  }}" alt="{{ item.varietal.nombre }}" class="mouse">
+                    </div>
+
+                    <div class="contentBox">
+                        <h3>{{ item.varietal.nombre }} caja X 6u.</h3>
+                        <h2 class="price">${{ item.precio }}</h2>
+                        <button class="buy add-to-cart-btn" data-product-id="{{ item.id }}" data-product-type="empaquetado">Agregar al carrito</button>
+
+                    </div>
+                </div>
+            {% endfor %}
+
+           
+        </section>
+        
+        {% comment %} <section class="main_container">
+            <div class="card-rose">
+
+                <div class="imgBox">
+                    <img src="{% static "/assets/img/vinos/1rose.png" %}" alt="mouse corsair" class="mouse">
+                </div>
+    
+                <div class="contentBox">
+                    <h3>Rosé</h3>
+                    <h2 class="price">$3950</h2>
+                    
+                    <a href="#" class="buy">Agregar al carrito</a>
+                </div>
+    
+            </div>
+
+
+            
+            
+            <div class="card-franc">
+
+                <div class="imgBox">
+                    <img src="{% static "/assets/img/vinos/2Cabernet_franc_reserv.png" %}" alt="mouse corsair" class="mouse">
+                </div>
+    
+                <div class="contentBox">
+                    <h3>Cabernet Franc</h3>
+                    <h2 class="price">$6400</h2>
+                    <a href="#" class="buy">Agregar al carrito</a>
+                </div>
+    
+            </div>
+            <div class="card-cs">
+
+                <div class="imgBox">
+                    <img src="{% static "/assets/img/vinos/3Cabernet_reserva.png" %}" alt="mouse corsair" class="mouse">
+                </div>
+    
+                <div class="contentBox">
+                    <h3>Cabernet Sauvignon</h3>
+                    <h2 class="price">$3950</h2>
+                    <a href="#" class="buy">Agregar al carrito</a>
+                </div>
+    
+            </div>
+            <div class="card-eb">
+
+                <div class="imgBox">
+                    <img src="{% static "/assets/img/vinos/4Champagne.png" %}" alt="mouse corsair" class="mouse">
+                </div>
+    
+                <div class="contentBox">
+                    <h3>Extra Brut</h3>
+                    <h2 class="price">$4200</h2>
+                    <a href="#" class="buy">Agregar al carrito</a>
+                </div>
+    
+            </div>
+            
+            <div class="card-rm">
+
+                <div class="imgBox">
+                    <img src="{% static "/assets/img/vinos/5Malbec_reserva.png" %}" alt="mouse corsair" class="mouse">
+                </div>
+    
+                <div class="contentBox">
+                    <h3>Reserva Malbec</h3>
+                    <h2 class="price">$8500</h2>
+                    <a href="#" class="buy">Agregar al carrito</a>
+                </div>
+    
+            </div>
+            <div class="card-oak">
+
+                <div class="imgBox">
+                    <img src="{% static "/assets/img/vinos/6Malbec_OAK.png" %}" alt="mouse corsair" class="mouse">
+                </div>
+    
+                <div class="contentBox">
+                    <h3>Malbec OAK Reserva</h3>
+                    <h2 class="price">$4200</h2>
+                    <a href="#" class="buy">Agregar al carrito</a>
+                </div>
+    
+            </div>
+            <div class="card-mal">
+
+                <div class="imgBox">
+                    <img src="{% static "/assets/img/vinos/7Malbec_pedernal_Calingasta.png" %}" alt="mouse corsair" class="mouse">
+                </div>
+    
+                <div class="contentBox">
+                    <h3>Malbec Pedernal</h3>
+                    <h2 class="price">$3200</h2>
+                    <a href="#" class="buy">Agregar al carrito</a>
+                </div>
+    
+            </div>
+            <div class="card-syrah">
+
+                <div class="imgBox">
+                    <img src="{% static "/assets/img/vinos/8syrah.png" %}" alt="mouse corsair" class="mouse">
+                </div>
+    
+                <div class="contentBox">
+                    <h3>Syrah</h3>
+                    <h2 class="price">$3200</h2>
+                    <a href="#" class="buy">Agregar al carrito</a>
+                </div>
+    
+            </div>
+            <div class="card-mos">
+
+                <div class="imgBox">
+                    <img src="{% static "/assets/img/vinos/9Moscatel_de_Alej.png" %}" alt="mouse corsair" class="mouse">
+                </div>
+    
+                <div class="contentBox">
+                    <h3>Moscatel de Alejandría</h3>
+                    <h2 class="price">$3950</h2>
+                    <a href="#" class="buy">Agregar al carrito</a>
+                </div>
+    
+            </div>
+            <div class="card-bdb">
+
+                <div class="imgBox">
+                    <img src="{% static "/assets/img/vinos/10blanc_de_blanc.png" %}" alt="mouse corsair" class="mouse">
+                </div>
+    
+                <div class="contentBox">
+                    <h3>Blanc de Blancs</h3>
+                    <h2 class="price">$3950</h2>
+                    <a href="#" class="buy">Agregar al carrito</a>
+                </div>
+    
+            </div>
+
+            <div class="card-vbd">
+
+                <div class="imgBox">
+                    <img src="{% static "/assets/img/vinos/11blanco_dulce.png" %}" alt="mouse corsair" class="mouse">
+                </div>
+    
+                <div class="contentBox">
+                    <h3>Blanco Dulce</h3>
+                    <h2 class="price">$3950</h2>
+                    <a href="#" class="buy">Agregar al carrito</a>
+                </div>
+    
+            </div>
+            <div class="card-br">
+
+                <div class="imgBox">
+                    <img src="{% static "/assets/img/vinos/12Bonarda_reserva.png" %}" alt="mouse corsair" class="mouse">
+                </div>
+    
+                <div class="contentBox">
+                    <h3>Bonarda Reserva</h3>
+                    <h2 class="price">$3950</h2>
+                    <a href="#" class="buy">Agregar al carrito</a>
+                </div>
+    
+            </div>
+            <div class="card-sem">
+
+                <div class="imgBox">
+                    <img src="{% static "/assets/img/vinos/13fresco.png" %}" alt="mouse corsair" class="mouse">
+                </div>
+    
+                <div class="contentBox">
+                    <h3>Semillón Fresco</h3>
+                    <h2 class="price">$3950</h2>
+                    <a href="#" class="buy">Agregar al carrito</a>
+                </div>
+    
+            </div>
+            <div class="card-grm">
+
+                <div class="imgBox">
+                    <img src="{% static "/assets/img/vinos/14Gran_reserv_malbec.png" %}" alt="mouse corsair" class="mouse">
+                </div>
+    
+                <div class="contentBox">
+                    <h3>Gran Reserva Malbec</h3>
+                    <h2 class="price">$3950</h2>
+                    <a href="#" class="buy">Agregar al carrito</a>
+                </div>
+    
+            </div>
+
+            <div class="card-sb">
+
+                <div class="imgBox">
+                    <img src="{% static "/assets/img/vinos/16Sauvig_Blanc.png" %}" alt="mouse corsair" class="mouse">
+                </div>
+    
+                <div class="contentBox">
+                    <h3>Sauvignon Blanc</h3>
+                    <h2 class="price">$3950</h2>
+                    <a href="#" class="buy">Agregar al carrito</a>
+                </div>
+    
+            </div>
+
+            <div class="card-torr">
+
+                <div class="imgBox">
+                    <img src="{% static "/assets/img/vinos/17torrontes_riojano.png" %}" alt="mouse corsair" class="mouse">
+                </div>
+    
+                <div class="contentBox">
+                    <h3>Torrontés Riojano</h3>
+                    <h2 class="price">$3950</h2>
+                    <a href="#" class="buy">Agregar al carrito</a>
+                </div>
+    
+            </div>
+
+            <div class="card-torrsj">
+
+                <div class="imgBox">
+                    <img src="{% static "/assets/img/vinos/18torrontes.png" %}" alt="mouse corsair" class="mouse">
+                </div>
+    
+                <div class="contentBox">
+                    <h3>Torrontés Sanjuanino</h3>
+                    <h2 class="price">$3950</h2>
+                    <a href="#" class="buy">Agregar al carrito</a>
+                </div>
+    
+            </div>
+
+            <div class="card-semres">
+
+                <div class="imgBox">
+                    <img src="{% static "/assets/img/vinos/15reserva.png" %}" alt="mouse corsair" class="mouse">
+                </div>
+    
+                <div class="contentBox">
+                    <h3>Semillón Reserva</h3>
+                    <h2 class="price">$3950</h2>
+                    <a href="#" class="buy">Agregar al carrito</a>
+                </div>
+    
+            </div>
+
+        </section> {% endcomment %}
+        
+
+          
+          <svg class="hide">
+            <symbol id="left" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"></path></symbol>
+            <symbol id="right" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path></symbol>
+          </svg>
+        
+    </main>
+    <aside id="myAside" style="display: none;">
+            
+                <div class="titulo-carrito" >
+                    <h1>Carrito de compras</h1>
+                    
+                  </div>
+                  <section class="section" >
+                    <div class="row" id="carrito-contenido">
+
+                        
+                       
+                            
+                       
+                            
+                                {% for item in items_del_carrito %}
+                                    <div class="col-lg-12" id="contenido-{{ item.id }}">
+                                        <div class="card mb-3 card-carrito">
+                                        <div class="row g-0">
+                                            <div class="col-md-4">
+                                            <img src="{{ item.producto.varietal.imagen.url}}" class="img-fluid rounded-start" alt="...">
+                                            </div>
+                                            <div class="col-md-8">
+                                            <div class="card-body">
+
+                                                <h5 class="card-title titulo-vino">{{ item.producto.varietal.nombre }} </h5>
+                                                <p class="card-text">This is a wider card with supporting text below as a natural lead-in to additional content. This content is a little bit longer.</p>
+                                                <h4 style="color:#FFFFFF"> $ {{ item.producto.precio }}</h4>
+                                                <div id="item-{{ item.id }}" class="cantidad-producto">
+                                                    <button class="btn btn-secondary btn-decremento" id="decrementar" data-item-id="{{ item.id }}">-</button>
+                                                    <input type="text" id="cantidad-{{ item.id }}" class="form-control cantidad-input" value="{{ item.cantidad }}" style="width: 60px; display: inline-block; text-align: center;">
+                                                    <button class="btn btn-secondary btn-incremento " id="incrementar" data-item-id="{{ item.id }}">+</button>
+                                                    <button class="btn btn-danger eliminar-producto" data-item-id="{{ item.id }}">Eliminar</button>
+                                            </div>
+                                            </div>
+                                        </div>
+                                        </div>
+                                    </div>
+                                
+                                
+                                {% endfor %}
+                                
+
+                        
+              
+                      
+                    </div>
+                  </section>
+                  
+                  <div class="row justify-content-center align-items-center" id="">
+                    <div class="col-lg-12">
+                        <div class="card mb-3">
+                            <div class="row g-0 justify-content-center align-items-center">
+                                <div class="col-md-4 d-flex justify-content-center align-items-center">
+                                    <h5 class="total-carrito">Total: </h5>
+                                </div>
+                                <div class="col-md-8 d-flex justify-content-center align-items-center">
+                                    
+                                        <p class="total-carrito" id="precio-total-carrito" style="color:#FFFFFF">$ {{ precio_total }}</p>
+                                    
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                  
+
+
+                  <div class="d-flex justify-content-center checkout-button-container">
+                    <button class="btn btn-primary btn-lg checkout-button" type="button" id="boton-pagar">Continuar compra</button>
+                    <button class="btn btn-danger btn-lg checkout-button" type="button" id="limpiar-carrito">limpiar carrito</button> 
+                </div>
+                
+    </aside>
+    <!-- Backdrop -->
+    <div id="backdrop" style="display: none;"></div>
+</body>
+<script src="https://use.fontawesome.com/releases/v5.15.4/js/all.js"></script>
+<script src="{% static "/js/bootstrap.bundle.min.js" %}"></script>
+<script>
+            $(document).ready(function() {
+                $('.add-to-cart-btn').click(function() {
+                    var productoId = $(this).data('product-id');
+                    var productoTipo = $(this).data('product-type');
+            
+                    $.ajax({
+                        url: '/add-to-cart/',
+                        method: 'POST',
+                        data: {
+                            producto_id: productoId,
+                            producto_tipo: productoTipo,
+                        },
+                        success: function(response) {
+                            $('#mensaje-carrito-vacio').hide();
+                            $('#carrito-contenido').show();
+                            var cart_item_id = response.cart_item_id
+                            console.log(cart_item_id)
+                            var tituloProducto = response.producto_nombre;
+                            if (response.es_empaquetado) {
+                                tituloProducto += " x 6u.";  
+                            }
+                            if (response.ya_en_carrito) {
+                                alert('Producto ya agregado al carrito, use el carrito para modificar cantidades');
+                            } else {
+                                // Asegúrate de usar backticks para definir el contenido HTML
+                                $('#carrito-contenido').append(`
+                                  <div class="col-lg-12" id="contenido-${cart_item_id}">
+                                    <div class="card mb-3 card-carrito">
+                                      <div class="row g-0">
+                                        <div class="col-md-4">
+                                          <img src="${response.producto_url_imagen}" class="img-fluid rounded-start" alt="...">
+                                        </div>
+                                        <div class="col-md-8">
+                                          <div class="card-body">
+                                            <h5 class="card-title titulo-vino">${tituloProducto}  </h5>
+                                            <p class="card-text">This is a wider card with supporting text below as a natural lead-in to additional content. This content is a little bit longer.</p>
+                                            <h6 class="">$ ${response.precio}</h6>
+                                            <div id="item-${cart_item_id}" class="cantidad-producto">
+                                                <button class="btn btn-secondary btn-decremento" id="decrementar" data-item-id="${cart_item_id}">-</button>
+                                                <input type="text" id="cantidad-${cart_item_id}" class="form-control cantidad-input" value="${response.cantidad_actual}" style="width: 60px; display: inline-block; text-align: center;">
+                                                <button class="btn btn-secondary btn-incremento" id="incrementar" data-item-id="${cart_item_id}">+</button>
+                                                <button class="btn btn-danger eliminar-producto" data-item-id="${cart_item_id}">Eliminar</button>
+                                            </div>
+                                          </div>
+                                        </div>
+                                      </div>
+                                    </div>
+                                  </div>
+                                `); // Aquí termina el append
+                                $('#precio-total-carrito').text(`$ ${response.precio_total_carrito}`);
+                                
+                            }
+                            $("#myAside").show().css('transform', 'translateX(0)'); 
+                            $("#backdrop").show();
+
+                        },
+                        error: function(error) {
+                            console.log(error);
+                        }
+                    });
+                });
+            });
+            
+</script>
+    <script>
+            $(document).ready(function() {
+                // Incrementar la cantidad
+                $(document).on('click', '#incrementar', function() {
+                    var itemId = $(this).data('item-id');
+                    $.ajax({
+                        url: `/incrementar-cantidad/${itemId}/`,
+                        method: 'POST',
+                        headers: {'X-CSRFToken': getCookie('csrftoken')},
+                        success: function(response) {
+                            $(`#cantidad-${itemId}`).val(response.nueva_cantidad);
+                            $('#precio-total-carrito').text(`$ ${response.precio_total_carrito}`);
+                        }
+                    });
+                });
+            
+                // Decrementar la cantidad
+                $(document).on('click', '#decrementar', function() {
+                    var itemId = $(this).data('item-id');
+                    $.ajax({
+                        url: `/decrementar-cantidad/${itemId}/`,
+                        method: 'POST',
+                        headers: {'X-CSRFToken': getCookie('csrftoken')},
+                        success: function(response) {
+                            $(`#cantidad-${itemId}`).val(response.nueva_cantidad);
+                            $('#precio-total-carrito').text(`$ ${response.precio_total_carrito}`);
+                        }
+                    });
+                });
+                
+            
+                // Eliminar un ítem
+                $('.eliminar').click(function() {
+                    var itemId = $(this).data('cart-item-id');
+                    $.ajax({
+                        url: `/eliminar-producto/${itemId}/`,
+                        method: 'POST',
+                        headers: {'X-CSRFToken': getCookie('csrftoken')},
+                        success: function(response) {
+                            // Suponiendo que cada ítem está en un contenedor con un ID específico
+                            $(`#item-${itemId}`).remove();
+                        }
+                    });
+                });
+            });
+        
+            // Función auxiliar para obtener el valor de una cookie por nombre
+            // Es necesaria para el CSRF token en solicitudes POST
+            function getCookie(name) {
+                let cookieValue = null;
+                if (document.cookie && document.cookie !== '') {
+                    const cookies = document.cookie.split(';');
+                    for (let i = 0; i < cookies.length; i++) {
+                        const cookie = cookies[i].trim();
+                        if (cookie.substring(0, name.length + 1) === (name + '=')) {
+                            cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                            break;
+                        }
+                    }
+                }
+                return cookieValue;
+            }
+        
+    </script>
+
+    <script>
+        $(document).ready(function() {
+            $("#boton-pagar").click(function() {
+                $.ajax({
+                    url: '/create_preference/',  // Asegúrate de usar la URL correcta
+                    method: 'POST',
+                    data: {
+                        // Datos adicionales si son necesarios
+                    },
+                    success: function(response) {
+                        var redirectUrl = "https://www.mercadopago.com.ar/checkout/v1/redirect?pref_id=" + response.preference_id;
+                        window.location.href = redirectUrl;
+                    },
+                    error: function(error) {
+                        console.log(error);
+                    }
+                });
+            });
+        });
+    </script>
+    <script>
+        document.getElementById('limpiar-carrito').addEventListener('click', function() {
+            Swal.fire({
+                title: '¿Estás seguro?',
+                text: "Esto vaciará tu carrito de compras.",
+                icon: 'warning',
+                showCancelButton: true,
+                confirmButtonColor: '#3085d6',
+                cancelButtonColor: '#d33',
+                confirmButtonText: 'Sí, vaciar carrito'
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    fetch('/limpiar-carrito/', {
+                        method: 'POST',
+                        
+                    })
+                    .then(response => response.json())
+                    .then(data => {
+                        Swal.fire(
+                            'Vaciado!',
+                            'Tu carrito ha sido vaciado exitosamente.',
+                            'success'
+                        ).then(() => {
+                            window.location.reload();
+                        });
+                    })
+                    .catch(error => {
+                        console.error('Error:', error);
+                        Swal.fire(
+                            'Error',
+                            'Ocurrió un error al intentar vaciar el carrito.',
+                            'error'
+                        );
+                    });
+                }
+            });
+        });
+        
+    </script>
+
+   
+
+
+</html>

@@ -1,5 +1,8 @@
 import os
 from pathlib import Path
+from decouple import config
+
+
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -33,6 +36,7 @@ INSTALLED_APPS = [
     'allauth.account',
     'allauth.socialaccount',
     'widget_tweaks',
+    'rest_framework',
 ]
 
 SITE_ID = 1
@@ -151,3 +155,8 @@ ACCOUNT_USERNAME_REQUIRED = False
 LOGIN_REDIRECT_URL = 'index_admin'
 
 ACCOUNT_FORMS = {'login': 'administracion.forms.CustomLoginForm'}
+
+
+#-------------------------------- MERCADOPAGO --------------------------#
+
+MERCADOPAGO_ACCESS_TOKEN = config('MERCADOPAGO_ACCESS_TOKEN')

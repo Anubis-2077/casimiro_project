@@ -23,6 +23,11 @@ from itertools import chain
 
 from django.utils.decorators import method_decorator
 
+def index(request):
+    return render (request, 'index/index.html')
+
+
+
 
 
 @login_required
@@ -82,6 +87,8 @@ class IngCosechaFormView(FormView):
         context = super().get_context_data(**kwargs)
         context['proveedores'] = Proveedor.objects.all()
         context['lote'] = self.generar_numero_lote()
+        varietales = Varietal.objects.all()
+        context ["varietales"] = varietales 
         return context 
         
 class CosechasRegistradasView(ListView):
@@ -105,6 +112,7 @@ class RegistrarMoliendaView(FormView):
     form_class = Moliendaform
     success_url = reverse_lazy ('moliendas_registradas')
     
+    
     def form_valid(self, form):
         
         
@@ -119,7 +127,9 @@ class RegistrarMoliendaView(FormView):
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         cargamentos = Cargamento.objects.exclude(molienda__isnull=False)
+        
         context ["cargamentos"] = cargamentos
+        
             
         
         return context
@@ -441,7 +451,7 @@ class EmbotellamientoView(FormView):
         varietal=contenido.molienda.cargamento.varietal,  
         lote=contenido.molienda.cargamento.lote, 
         etiquetado=False,
-        deposito=Deposito.objects.get(id=3)  
+        deposito=Deposito.objects.get(nombre="BODEGA")  
     )
         #print("este es el stock bodega:",stock_bodega)
         stock_bodega.save()
@@ -458,26 +468,26 @@ class EmbotellamientoView(FormView):
     
     
 class StockSinEtiquetarView(ListView):
-    """ vista que muestra la lista general del stock sin etiquetar """
+    """Vista que muestra la lista general del stock sin etiquetar."""
     template_name = 'administracion/stock_sin_etiquetar.html'
     model = StockBodegaSinEtiquetar
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
 
-        # Define los varietales
-        varietales = ['Rose', 'Cabernet Franc', 'tempranillo', 'Semillon', 'Cabernet Sauvignon', 'Extra Brut', 'Reserva Malbec', 'Malbec OAK', 'Malbec', 'Syrah', 'Moscatel', 'Alejandria','Torrontes']
+        # Obtiene todos los varietales de la base de datos
+        varietales = Varietal.objects.all()
 
         # Crea un diccionario para almacenar las cantidades de cada varietal
         cantidades = {}
-        
+
         # Inicializar la suma total de botellas
         total_botellas = 0
 
         # Obtiene las cantidades de cada varietal para botellas sin etiquetar
         for varietal in varietales:
             cantidad = StockBodegaSinEtiquetar.objects.filter(varietal=varietal, etiquetado=False).aggregate(Sum('cantidad_botellas'))['cantidad_botellas__sum'] or 0
-            cantidades[varietal] = cantidad
+            cantidades[varietal.nombre] = cantidad  # Usa el nombre del varietal como clave
             total_botellas += cantidad  # Suma la cantidad de botellas de este varietal al total
 
         context["total_botellas"] = total_botellas    
@@ -559,11 +569,11 @@ class RegistrarEtiquetadoView(FormView):
                     stock=stock,
                     fecha_etiquetado=datetime.now(),  # O la fecha que corresponda
                     cantidad_botellas=cantidad_botellas,
-                    varietal=stock.varietal,  #
+                    varietal=stock.varietal,  
                     lote=stock.lote,         
                     empaquetado=False,       
                     observaciones="",        
-                    deposito=Deposito.objects.get(pk=3)  
+                    deposito=Deposito.objects.get(nombre="BODEGA")  
                 )
                 print("este es el nuevos tock etiquetado:",botella_etiquetada)
                 botella_etiquetada.save()  # Guardar el objeto en la base de datos
@@ -592,8 +602,8 @@ class StockEtiquetadoLista(ListView):
         context = super().get_context_data(**kwargs)
 
         # Define los varietales
-        varietales = ['Rose', 'Cabernet Franc', 'Cabernet Sauvignon', 'Semillon', 'Extra Brut', 'Reserva Malbec', 'Malbec OAK', 'Malbec', 'Syrah', 'Moscatel', 'Alejandria','Torrontes', 'tempranillo']
-        deposito = Deposito.objects.get(id=3) #poner el id del deposito Bodega
+        varietales = Varietal.objects.all()
+        deposito = Deposito.objects.get(nombre="BODEGA") #poner el id del deposito Bodega
         # Crea un diccionario para almacenar las cantidades de cada varietal
         cantidades = {}
         
@@ -608,6 +618,8 @@ class StockEtiquetadoLista(ListView):
 
         context["total_botellas"] = total_botellas    
         context["cantidades"] = cantidades
+        print(total_botellas)
+        print (cantidades)
         return context
 
 class StockBodegaEtiquetadoDetalle(TemplateView):
@@ -619,10 +631,10 @@ class StockBodegaEtiquetadoDetalle(TemplateView):
 
         # Reemplaza los guiones bajos por espacios en blanco para obtener el nombre original del varietal
         varietal = self.kwargs['varietal'].replace('_', ' ')
-        deposito = Deposito.objects.get(nombre='Bodega')
+        deposito = Deposito.objects.get(nombre='BODEGA')
         # Filtra los objetos StockBodegaEtiquetado por varietal y etiquetado
         stocks = StockBodegaEtiquetado.objects.filter(varietal=varietal, deposito=deposito)
-        print(stocks)
+        
         # Calcula la cantidad total de botellas
         total_botellas = stocks.aggregate(Sum('cantidad_botellas'))['cantidad_botellas__sum'] or 0
 
@@ -670,7 +682,8 @@ class RegistrarEmpaquetadoView(FormView):
             
             #stock.save()
             
-            deposito_defecto = Deposito.objects.get(id=3)
+            deposito_defecto = Deposito.objects.get(nombre="BODEGA")
+            
             fecha_empaquetado_actual = timezone.now()
             stock_empaquetado = StockBodegaEmpaquetado.objects.create(
             stock=stock,
@@ -704,7 +717,7 @@ class StockEmpaquetadoLista(ListView):
         context = super().get_context_data(**kwargs)
 
         # Define los varietales
-        varietales = ['Semillon', 'tempranillo', 'Rose', 'Cabernet Franc', 'Cabernet Sauvignon', 'Extra Brut', 'Reserva Malbec', 'Malbec OAK', 'Malbec', 'Syrah', 'Moscatel', 'Alejandria','Torrontes']
+        varietales = Varietal.objects.all()
 
         # Crea un diccionario para almacenar las cantidades de cada varietal
         cantidades = {}
@@ -716,7 +729,7 @@ class StockEmpaquetadoLista(ListView):
         total_cajas = 0
 
         #deposito
-        deposito = Deposito.objects.get(id=3)
+        deposito = Deposito.objects.get(nombre="BODEGA")
         
         # Obtiene las cantidades y los lotes de cada varietal
         for varietal in varietales:
@@ -735,6 +748,9 @@ class StockEmpaquetadoLista(ListView):
         context["lotes"] = lotes
         return context
 
+
+
+
 class StockEmpaquetadoDetalle(TemplateView):
     template_name = 'administracion/detalle_stock_empaquetado.html'
     model = StockBodegaEmpaquetado
@@ -744,7 +760,7 @@ class StockEmpaquetadoDetalle(TemplateView):
 
         # Reemplaza los guiones bajos por espacios en blanco para obtener el nombre original del varietal
         varietal = self.kwargs['varietal'].replace('_', ' ')
-        deposito = Deposito.objects.get(nombre='Bodega')
+        deposito = Deposito.objects.get(nombre='BODEGA')
         # Filtra los objetos StockBodegaEmpaquetado por varietal
         stocks = StockBodegaEmpaquetado.objects.filter(varietal=varietal, deposito=deposito)
 
@@ -927,7 +943,8 @@ class MoverStockEtiquetadoView(View):
         Formset = modelformset_factory(MoverStockEtiquetado, form=MoverStockEtiquetadoForm, extra=10)
         formset = Formset(queryset=MoverStockEtiquetado.objects.none())
 
-        BODEGA_ID = 3
+        deposito = Deposito.objects.get(nombre="BODEGA")
+        BODEGA_ID = deposito.id
         deposito = get_object_or_404(Deposito, pk=self.kwargs['pk'])  # Asume que 'pk' se pasa como parámetro a la URL
         stock_etiquetado = StockBodegaEtiquetado.objects.filter(deposito_id=BODEGA_ID)
 
@@ -979,10 +996,11 @@ class MoverStockEmpaquetadoView(View):
     def get(self, request, *args, **kwargs):
         Formset = modelformset_factory(MoverStockEmpaquetado, form=MoverStockEmpaquetadoForm, extra=10)
         formset = Formset(queryset=MoverStockEmpaquetado.objects.none())
-
-        BODEGA_ID = 3
+       
+        bodega = Deposito.objects.get(nombre="BODEGA")
+        
         deposito = get_object_or_404(Deposito, pk=self.kwargs['pk'])  
-        stock_empaquetado = StockBodegaEmpaquetado.objects.filter(deposito_id=BODEGA_ID)
+        stock_empaquetado = StockBodegaEmpaquetado.objects.filter(deposito_id=bodega.id)
 
         context = {
             'formset': formset,

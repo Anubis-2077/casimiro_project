@@ -1,0 +1,491 @@
+{% load static %}
+
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8">
+    <title>Casimiro vinos</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" type="text/css" href="{% static "assets/fullpage/fullpage.css" %}" />
+    <link rel="stylesheet" href="{% static "assets/styles/estilos_index.css" %}">
+    <link rel="stylesheet" href="{% static "/assets/lightgallery_js/lightgallery.min.css" %}">
+    <link rel="stylesheet" href="{% static "/assets/lightgallery_js/style_lightgallery.css" %}">
+    <link rel="stylesheet" href="{% static "/assets/icons/bootstrap-icons.css" %}">
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/5.1.3/css/bootstrap.min.css" integrity="sha384-1CmrxMRARb6aLqgBO7yyAxTOQE2AKb9aCn3H6GgF13i62z3p/+PMDlczO2cwzas6" crossorigin="anonymous">
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/5.1.3/js/bootstrap.bundle.min.js" integrity="sha384-qtWp3DfOe/7LsL5LGbLbF4BQnxlP2NU+6GkLaoE4aY6EN/4q1j5zRq/0vR5L/arJ" crossorigin="anonymous"></script>
+    <script src="https://kit.fontawesome.com/92fbd7711c.js" crossorigin="anonymous"></script>
+    <!-- <script src="main_index.js"></script> -->
+    
+    <style>
+        .my-arrow {
+            display: none;
+        }
+
+        .fp-arrow {
+            display: none;
+        }
+    </style>
+
+</head>
+
+<body>
+    <header class="header" id="menu">
+        <div class="logo">
+            <h2 id="logo_nombre" data-menuanchor="Inicio"> <a href="#Inicio"
+                    style="text-decoration: none; color:white;">Casimiro</a></h2>
+        </div>
+        <nav>
+            <ul class="nav-links">
+                <li data-menuanchor="Nosotros"><a href="#Nosotros">Nosotros</a></li>
+                <li data-menuanchor="Vinos"><a href="#Vinos">Vinos</a></li>
+                <li data-menuanchor="Galeria"><a href="#Galeria">Galeria</a></li>
+                <li data-menuanchor="Visitas"><a href="#Visitas">Visitas</a></li>
+                <li data-menuanchor="Contacto"><a href="#Contacto">Contacto</a></li>
+            </ul>
+        </nav>
+        <a class="btn" href="{% url "tienda" %}"><button>Tienda</button></a>
+    </header>
+    <div id="fullpage">
+
+
+        <!-- .-----------------  section 1-----------------------  -->
+
+
+        <div class="section section1 container-fluid vh-100" id="section1" style="background-image: url('{% static "/assets/img/casimiro_intro.jpg" %}')">
+            <div class="row h-100 justify-content-center align-items-center">
+                <div class="col-auto text-center">
+                    <div class="position-ajustada">
+                      <h1 class="display-1" id="titulo">Casimiro</h1>
+                      <p class="fs-4 " id="subtitulo">Vinos de autor.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+
+
+        <!-- ---------- Section 2-------------- -->
+
+
+
+
+        <div class="section container-fluid" id="section2" style="background-image: url({% static "/assets/img/fondo_section_2.png" %});">
+            <div class="row vh-100 align-items-center d-flex">
+                <!-- Columna para el texto "Nosotros" con un 10% del borde izquierdo -->
+                <div class="col-auto" >
+                  <h2 class="nosotros_text">Nosotros</h2>
+                </div>
+                <!-- Columna para el texto descriptivo a un 25% del margen derecho -->
+                <div class="col-6 text-end nosotros_p" style="padding-right: 25%;">
+                  <p>Casimiro Wines es un emotivo proyecto vitivinícola que nació del deseo de Emiliano y Carlos Tinto por reavivar la tradición familiar y honrar la memoria de Casimiro Lorenzo, un enólogo y aviador. Esta bodega, fundada en el Valle de Calingasta, San Juan, comenzó su viaje con varietales como Malbec, Malbec Oak y Torrontés, y rápidamente conquistó el mercado argentino con su frescura y calidad. Hoy en día, Casimiro Wines ofrece una gama diversificada que incluye Bonarda, Cabernet Franc y más, llevando la pasión por el vino a todo el país.</p>
+                </div>
+              </div>
+              <!-- Fila para las imágenes que empiezan desde el 50% de la página hacia la izquierda -->
+              
+        </div>
+
+
+
+        <!-- --------------------- Section 3 -------------------------------- -->
+
+
+        <div class="section section_vinos d-flex justify-content-center align-items-center" id="section0">
+            <div class="slide">
+              <img class="bottle-image mx-auto d-block" src="{% static "/assets/img/vinos/1rose.png" %}" alt="Bottle">
+                <div class="linea-rose"></div>
+                <div class="rose-text">Rosé</div>
+
+                <div class="varietals-text"><span>Casimiro</span> Varietales</div>
+                <div class="lorem-text">El Rosé de Casimiro, de color rosa salmón brillante, ofrece aromas de fresas y melón. En boca, sabores de frutas rojas se mezclan con notas de cítricos, culminando en un final fresco y vibrante. Un vino rosado ligero, afrutado y refrescante.</div>
+                <a href="#" class="ov-btn-grow-skew">Ir a la tienda</a>
+            </div>
+            <div class="slide" id="slide_franc">
+                <img class="bottle-image mx-auto d-block" src="{% static "/assets/img/vinos/2Cabernet_franc_reserv.png" %}" alt="Bottle">
+                <div class="linea-franc"></div>
+                <div class="cabernet1-text">Cabernet</div>
+                <div class="franc-text">Franc</div>
+                <div class="varietals-text-franc"><span>Casimiro</span> Varietales</div>
+                <div class="lorem-text">El Cabernet Franc Reserva, un vino tinto robusto y sofisticado, deslumbra con su rica mezcla de frutas negras, notas de pimienta y un final largo y terroso. Un verdadero deleite para los amantes del vino.</div>
+                <a href="#" class="ov-btn-grow-skew-franc">Ir a la tienda</a>
+            </div>
+            <div class="slide">
+                <img class="bottle-image mx-auto d-block" src="{% static "/assets/img/vinos/3Cabernet_reserva.png" %}" alt="Bottle">
+                <div class="linea-sauv" style="background-color: #4803148f !important"></div>
+                <div class="cabernet2-text">Cabernet</div>
+                <div class="sauv-text">Sauvignon</div>
+                <div class="varietals-text-sauv"><span>Casimiro</span> Varietales</div>
+                <div class="lorem-text">El Cabernet Sauvignon Reserva de Casimiro, con su color rubí profundo, despliega aromas de grosella negra y cedro. En boca, sabores intensos de frutas oscuras se mezclan con notas de roble tostado, culminando en un final persistente y equilibrado. Un vino verdaderamente sofisticado.</div>
+                <a href="#" class="ov-btn-grow-skew-sauv">Ir a la tienda</a>
+            </div>
+            <div class="slide">
+                <img class="bottle-image mx-auto d-block" src="{% static "/assets/img/vinos/4Champagne.png" %}" alt="Bottle">
+                <div class="linea-brut"></div>
+                <div class="extra-text">Extra</div>
+                <div class="brut-text">Brut</div>
+                <div class="varietals-text-brut"><span>Casimiro</span> Varietales</div>
+                <div class="lorem-text">El Extra Brut de Casimiro, con su color dorado brillante, ofrece aromas de manzana verde y brioche. En el paladar, sabores cítricos crujientes se combinan con finas burbujas, dando paso a un final limpio y refrescante. Un espumoso elegante y vibrante.</div>
+                <a href="#" class="ov-btn-grow-skew-brut">Ir a la tienda</a>
+            </div>
+            <div class="slide">
+                <img class="bottle-image mx-auto d-block" src="{% static "/assets/img/vinos/5Malbec_reserva.png" %}" alt="Bottle">
+                <div class="linea-res"></div>
+                <div class="res-text">Reserva</div>
+                <div class="resm-text">Malbec</div>
+                <div class="varietals-text-res"><span>Casimiro</span> Varietales</div>
+                <div class="lorem-text">El Reserva Malbec de Casimiro, de color púrpura intenso, despliega aromas de ciruela y vainilla. En el paladar, sabores ricos de frutas rojas se entrelazan con notas de especias y chocolate, llevando a un final largo y sedoso. Un vino robusto y complejo.</div>
+                <a href="#" class="ov-btn-grow-skew-res">Ir a la tienda</a>
+            </div>
+            <div class="slide">
+                <img class="bottle-image mx-auto d-block" src="{% static "/assets/img/vinos/6Malbec_OAK.png" %}" alt="Bottle">
+                <div class="linea-oak"></div>
+                <div class="malbeco-text">Malbec</div>
+                <div class="oak-text">OAK </div>
+                <div class="varietals-text-oak"><span>Casimiro</span> Varietales</div>
+                <div class="lorem-text">El Malbec Oak Reserva de Casimiro, de color granate profundo, emana aromas de mora y roble ahumado. En el paladar, sabores de frutas negras se fusionan con notas de cuero y tabaco, culminando en un final suave y especiado. Un vino con cuerpo y refinado.</div>
+                <a href="#" class="ov-btn-grow-skew-oak">Ir a la tienda</a>
+            </div>
+            <div class="slide">
+                <img class="bottle-image mx-auto d-block" src="{% static "/assets/img/vinos/7Malbec_pedernal_Calingasta.png" %}" alt="Bottle">
+                <div class="linea-malbec"></div>
+                <div class="pedernal-text">Pedernal</div>
+                <div class="malbec-text">Malbec</div>
+                <div class="varietals-text-malbec"><span>Casimiro</span> Varietales</div>
+                <div class="lorem-text">El Malbec del Valle de Pedernal de Casimiro, de color violeta oscuro, ofrece aromas de cereza negra y pimienta. En boca, sabores de frutas maduras se mezclan con notas de grafito y mineralidad, llevando a un final largo y estructurado. Un vino elegante y terroso.</div>
+                <a href="#" class="ov-btn-grow-skew-malbec">Ir a la tienda</a>
+            </div>
+            <div class="slide">
+                <img class="bottle-image mx-auto d-block" src="{% static "/assets/img/vinos/8syrah.png" %}" alt="Bottle">
+                <div class="linea-syrah"></div>
+                <div class="syrah-text">Syrah</div>
+                <div class="varietals-text-syrah"><span>Casimiro</span> Varietales</div>
+                <div class="lorem-text">El Syrah de Casimiro, de color rubí oscuro, revela aromas de frambuesa y especias. En boca, sabores de frutas rojas se combinan con notas de pimienta negra y clavo, culminando en un final suave y picante. Un vino audaz y aromático.</div>
+                <a href="#" class="ov-btn-grow-skew-syrah">Ir a la tienda</a>
+            </div>
+            <div class="slide">
+                <img class="bottle-image mx-auto d-block" src="{% static "/assets/img/vinos/9Moscatel_de_Alej.png" %}" alt="Bottle">
+                <div class="linea-alej"></div>
+                <div class="moscatel-text">Moscatel</div>
+                <div class="alej-text">Alejandría</div>
+                <div class="varietals-text-alej"><span>Casimiro</span> Varietales</div>
+                <div class="lorem-text">El Moscatel de Alejandría de Casimiro, de color ámbar claro, desprende aromas de melocotón y flor de azahar. En el paladar, sabores de frutas tropicales se mezclan con notas de miel, culminando en un final dulce y refrescante. Un vino fragante y deliciosamente dulce.</div>
+                <a href="#" class="ov-btn-grow-skew-alej">Ir a la tienda</a>
+            </div>
+            <div class="slide">
+                <img class="bottle-image mx-auto d-block" src="{% static "/assets/img/vinos/10blanc_de_blanc.png" %}" alt="Bottle">
+                <div class="linea-blanc"></div>
+                <div class="blanc-text">Blancs</div>
+                <div class="blancs-text">Blanc de</div>
+                <div class="varietals-text-blanc"><span>Casimiro</span> Varietales</div>
+                <div class="lorem-text">El Blanc de Blancs de Casimiro, de color amarillo pálido, desprende aromas de pera y manzana verde. En boca, sabores de cítricos y melón se entrelazan con notas de almendra, culminando en un final crujiente y mineral. Un vino blanco fresco y elegante.</div>
+                <a href="#" class="ov-btn-grow-skew-blanc">Ir a la tienda</a>
+            </div>
+            <div class="slide">
+                <img class="bottle-image mx-auto d-block" src="{% static "/assets/img/vinos/11blanco_dulce.png" %}" alt="Bottle">
+                <div class="linea-bdulce"></div>
+                <div class="bdulce-text">Blanco</div>
+                <div class="dulce-text">Dulce</div>
+                <div class="varietals-text-bdulce"><span>Casimiro</span> Varietales</div>
+                <div class="lorem-text">El Blanco Dulce de Casimiro, de color dorado suave, emana aromas de lichi y jazmín. En el paladar, sabores de frutas exóticas se combinan con notas de miel, culminando en un final dulce y persistente. Un vino blanco dulce, exuberante y seductor.</div>
+                <a href="#" class="ov-btn-grow-skew-bdulce">Ir a la tienda</a>
+            </div>
+            <div class="slide">
+                <img class="bottle-image mx-auto d-block" src="{% static "/assets/img/vinos/12Bonarda_reserva.png" %}" alt="Bottle">
+                <div class="linea-bon"></div>
+                <div class="bon-text">Bonarda</div>
+                <div class="reserva-text">Reserva</div>
+                <div class="varietals-text-bon"><span>Casimiro</span> Varietales</div>
+                <div class="lorem-text">El Bonarda Reserva de Casimiro, de color rojo cereza oscuro, despliega aromas de frutas rojas y cuero. En boca, sabores de cereza y ciruela se mezclan con notas de tabaco, culminando en un final suave y terroso. Un vino tinto rico y de cuerpo medio.</div>
+                <a href="#" class="ov-btn-grow-skew-bon">Ir a la tienda</a>
+            </div>
+            <div class="slide">
+                <img class="bottle-image mx-auto d-block" src="{% static "/assets/img/vinos/13fresco.png" %}" alt="Bottle">
+                <div class="linea-semillon"></div>
+                <div class="semillon-text">Semillón</div>
+                <div class="varietals-text-semillon"><span>Casimiro</span> Varietales</div>
+                <div class="lorem-text">El Semillón de Casimiro, de color amarillo pajizo, ofrece aromas de limón y hierba cortada. En el paladar, sabores de manzana verde se mezclan con notas de heno, culminando en un final fresco y herbáceo. Un vino blanco seco, crujiente y refrescante.</div>
+                <a href="#" class="ov-btn-grow-skew-semillon">Ir a la tienda</a>
+            </div>
+            <div class="slide">
+                <img class="bottle-image mx-auto d-block" src="{% static "/assets/img/vinos/14Gran_reserv_malbec.png" %}" alt="Bottle">
+                <div class="linea-gran"></div>
+                <div class="gran-text">Gran <br> reserva</div>
+                <div class="resmal-text">Malbec</div>
+                <div class="varietals-text-gran"><span>Casimiro</span> Varietales</div>
+                <div class="lorem-text">El Gran Reserva Malbec de Casimiro, de color púrpura profundo, despliega aromas de mora y trufa. En boca, sabores de frutas negras se mezclan con notas de chocolate y vainilla, culminando en un final largo y lujoso. Un vino tinto opulento y sofisticado.</div>
+                <a href="#" class="ov-btn-grow-skew-gran">Ir a la tienda</a>
+            </div>
+            <div class="slide">
+                <img class="bottle-image mx-auto d-block" src="{% static "/assets/img/vinos/16Sauvig_Blanc.png" %}" alt="Bottle">
+                <div class="linea-sauvb"></div>
+                <div class="sauvb-text">Sauvignon</div>
+                <div class="sblanc-text">Blanc</div>
+                <div class="varietals-text-sauvb"><span>Casimiro</span> Varietales</div>
+                <div class="lorem-text">El Sauvignon Blanc de Casimiro, de color amarillo pálido, desprende aromas de grosella y hierba. En boca, sabores de cítricos y manzana verde se mezclan con notas de mineralidad, culminando en un final fresco y crujiente. Un vino blanco seco, vibrante y refrescante.</div>
+                <a href="#" class="ov-btn-grow-skew-sauvb">Ir a la tienda</a>
+            </div>
+            <div class="slide">
+                <img class="bottle-image mx-auto d-block" src="{% static "/assets/img/vinos/17torrontes_riojano.png" %}" alt="Bottle">
+                <div class="linea-torr"></div>
+                <div class="torr-text">Torrontés</div>
+                <div class="riojano-text">Riojano</div>
+                <div class="varietals-text-torr"><span>Casimiro</span> Varietales</div>
+                <div class="lorem-text">El Torrontés Riojano de Casimiro, de color amarillo dorado, ofrece aromas de flores blancas y melocotón. En boca, sabores de cítricos y pera se mezclan con notas de miel, culminando en un final fresco y floral. Un vino blanco aromático, exuberante y equilibrado.</div>
+                <a href="#" class="ov-btn-grow-skew-torr">Ir a la tienda</a>
+            </div>
+            <div class="slide">
+                <img class="bottle-image mx-auto d-block" src="{% static "/assets/img/vinos/18torrontes.png" %}" alt="Bottle">
+                <div class="linea-torro"></div>
+                <div class="torro-text">Torrontés</div>
+                <div class="sanjuanino-text">Sanjuanino</div>
+                <div class="varietals-text-torro"><span>Casimiro</span> Varietales</div>
+                <div class="lorem-text">El Torrontés Sanjuanino de Casimiro, de color amarillo limón, despliega aromas de jazmín y cítricos. En boca, sabores de melón y manzana se mezclan con notas de miel, culminando en un final suave y floral. Un vino blanco fragante, refrescante y delicadamente dulce.</div>
+                <a href="#" class="ov-btn-grow-skew-torro">Ir a la tienda</a>
+            </div>
+            <div class="slide">
+                <img class="bottle-image mx-auto d-block" src="{% static "/assets/img/vinos/15reserva.png" %}" alt="Bottle">
+                <div class="linea-semil"></div>
+                <div class="semil-text">Semillón</div>
+                <div class="semireserva-text">Reserva</div>
+                <div class="varietals-text-semil"><span>Casimiro</span> Varietales</div>
+                <div class="lorem-text">El Semillón Reserva de Casimiro, de color dorado suave, desprende aromas de limón y miel. En boca, sabores de manzana madura se mezclan con notas de almendra tostada, culminando en un final largo y cremoso. Un vino blanco rico, complejo y bien equilibrado.</div>
+                <a href="#" class="ov-btn-grow-skew-semil">Ir a la tienda</a>
+            </div>
+
+        </div>
+
+        <div class="section" id="section3">
+            <h1>Galeria</h1>
+            <div class="container" id="lightgallery">
+                <a href="{% static "/assets/img/galeria/1.jpg" %}">
+                    <img src="{% static "/assets/img/galeria/1.jpg" %}" />
+                </a>
+                <a href="{% static "/assets/img/galeria/2.jpg" %}" class="vertical">
+                    <img src="{% static "/assets/img/galeria/2.jpg" %}" />
+                </a>
+                <a href="{% static "/assets/img/galeria/3.jpg" %}" class="vertical">
+                    <img src="{% static "/assets/img/galeria/3.jpg" %}" />
+                </a>
+
+                <a href="{% static "/assets/img/galeria/4.jpg" %}" class="horizontal">
+                    <img src="{% static "/assets/img/galeria/4.jpg" %}" />
+                </a>
+
+                <!-- Repite el patrón para las imágenes del 5 al 20 -->
+                <a href="{% static "/assets/img/galeria/5.jpg" %}" class="vertical">
+                    <img src="{% static "/assets/img/galeria/5.jpg" %}" />
+                </a>
+
+                <a href="{% static "/assets/img/galeria/6.jpg" %}" class="vertical">
+                    <img src="{% static "/assets/img/galeria/6.jpg" %}" />
+                </a>
+
+                <a href="{% static "/assets/img/galeria/7.jpg" %}" class="horizontal">
+                    <img src="{% static "/assets/img/galeria/7.jpg" %}" />
+                </a>
+
+                <a href="{% static "/assets/img/galeria/8.jpg" %}" class="vertical">
+                    <img src="{% static "/assets/img/galeria/8.jpg" %}" />
+                </a>
+
+                <a href="{% static "/assets/img/galeria/9.jpg" %}" class="vertical">
+                    <img src="{% static "/assets/img/galeria/9.jpg" %}" />
+                </a>
+
+                <a href="{% static "/assets/img/galeria/10.jpg" %}" class="vertical">
+                    <img src="{% static "/assets/img/galeria/10.jpg" %}" />
+                </a>
+
+                <a href="{% static "/assets/img/galeria/11.jpg" %}" class="horizontal">
+                    <img src="{% static "/assets/img/galeria/11.jpg" %}" />
+                </a>
+
+                <a href="{% static "/assets/img/galeria/12.jpg" %}" class="horizontal">
+                    <img src="{% static "/assets/img/galeria/12.jpg" %}" />
+                </a>
+
+                <a href="{% static "/assets/img/galeria/13.jpg" %}" class="horizontal">
+                    <img src="{% static "/assets/img/galeria/13.jpg" %}" />
+                </a>
+
+                <a href="{% static "/assets/img/galeria/14.jpg" %}" class="horizontal">
+                    <img src="{% static "/assets/img/galeria/14.jpg" %}" />
+                </a>
+
+                <a href="{% static "/assets/img/galeria/15.jpg" %}" class="horizontal">
+                    <img src="{% static "/assets/img/galeria/15.jpg" %}" />
+                </a>
+
+                <a href="{% static "/assets/img/galeria/16.jpg" %}" class="horizontal">
+                    <img src="{% static "/assets/img/galeria/16.jpg" %}" />
+                </a>
+
+                <a href="{% static "/assets/img/galeria/17.jpg" %}" class="horizontal">
+                    <img src="{% static "/assets/img/galeria/17.jpg" %}" />
+                </a>
+
+                <a href="{% static "/assets/img/galeria/18.jpg" %}" class="horizontal">
+                    <img src="{% static "/assets/img/galeria/18.jpg" %}" />
+                </a>
+
+                <a href="{% static "/assets/img/galeria/19.jpg" %}" class="horizontal">
+                    <img src="{% static "/assets/img/galeria/19.jpg" %}" />
+                </a>
+                <a href="{% static "/assets/img/galeria/20.jpg" %}" class="horizontal">
+                    <img src="{% static "/assets/img/galeria/20.jpg" %}" />
+                </a>
+            </div>
+        </div>
+
+        <div class="section" id="section4">
+            <div class="reservas-container d-flex flex-column justify-content-center align-items-center h-100">
+              <div class="form-container text-center">
+                <h2>Reserva tu proxima experiencia</h2>
+                <form class="form" action="#">
+                  <input type="text" placeholder="Nombre y Apellido" class="form-input mb-3">
+                  <input type="text" placeholder="Dirección" class="form-input mb-3">
+                  <input type="number" placeholder="Telefono" class="form-input mb-3">
+                  <input type="e-mail" placeholder="Email" class="form-input mb-3">
+                  <select id="miSelect" name="miSelect" class="mb-3">
+                    <option value="opcion1">23 Sep 2023 </option>
+                    <option value="opcion2">7 Oct 2023</option>
+                    <option value="opcion3">21 Oct 2023</option>
+                  </select>
+                  <button class="boton_pagar">Pagar y reservar</button>
+                </form>
+              </div>
+              <div class="image-container">
+                <img class="image-contact" src="{% static "/assets/img/contact.jpg" %}" alt="">
+              </div>
+            </div>
+          </div>
+          
+
+        <div class="section" id="section4">
+            <div class="container">
+
+                <div class="section-title">
+                  <h2>Contacto </h2>
+                  <p>Dejanos tu mensaje para reservar tu visita o para hacer un pedido, hacemos envios a todo el país.</p>
+                </div>
+            </div>
+        
+            <div class="map">
+                <iframe style="border:0; width: 100%; height: 350px;" src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d2989.158268246233!2d-68.45595764233124!3d-31.441102074588837!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x968427ab3678c913%3A0x2012c39dc5dd18e4!2sBodega%20Las%20Cambachas!5e0!3m2!1ses-419!2sar!4v1694351653705!5m2!1ses-419!2sar" width="600" height="450" style="border:0;" allowfullscreen="" loading="lazy" referrerpolicy="no-referrer-when-downgrade"></iframe>
+            </div>
+        
+            <div class="contenedor_form">
+        
+                <div class="info-wrap">
+                  <div class="row">
+                    <div class="info_container">
+                        <a target="_blank" href="https://www.google.com/maps/dir//Bodega+Las+Cambachas+HG5X%2B75+La+Ca%C3%B1ada+San+Juan/@-31.4418654,-68.4520287,17z/data=!4m5!4m4!1m0!1m2!1m1!1s0x968427ab3678c913:0x2012c39dc5dd18e4"><i class="fa-sharp fa-solid fa-location-dot"></i></a>
+                      <h4>Dirección:</h4>
+                      <p>D.F. Sarmiento y Ontiveros <br>Angaco, San Juan - Argentina</p>
+                    </div>
+        
+                    <div class="info_container">
+                        <i class="fa-sharp fa-solid fa-clock"></i>
+                      <h4>Horario de atención:</h4>
+                      <p>Lunes-Domingo:<br>11:00 AM - 18:00 PM</p>
+                    </div>
+        
+                    <div class="info_container">
+                        <a target="_blank" href="mailto:winescasimiro@gmail.com?subject=Consulta%20desde%20la%20página%20web%20de%20Casimiro" ><i class="fa-solid fa-envelope"></i></a>
+                      <h4>Email:</h4>
+                      <p>winescasimiro@gmail.com</p>
+                    </div>
+        
+                    <div class="info_container">
+                        <a target="_blank" href="https://api.whatsapp.com/send?phone=+5492644581553&text=Hola%2C%20te%20escribo%20por%20una%20consulta%20desde%20la%20web%20de%20Casimiro%3A"><i class="fa-brands fa-whatsapp"></i></a>
+                      <h4>Whatsapp:</h4>
+                      <p>+54 9 264 4581553</p>
+                    </div>
+                  </div>
+                </div>
+        
+                <div class="contenedor_contacto">
+                    <div class="form_contacto">
+                      <form>
+                        <div class="form-group">
+                          <input type="text" class="form-control" placeholder="Nombre">
+                        </div>
+                        <div class="form-group">
+                          <input type="email" class="form-control" placeholder="Correo electrónico">
+                        </div>
+                        <div class="form-group">
+                          <input type="text" class="form-control" placeholder="Teléfono">
+                        </div>
+                        <div class="form-group">
+                          <input type="text" class="form-control" placeholder="Asunto">
+                        </div>
+                        <div class="form-group">
+                          <textarea class="form-control" rows="4" placeholder="Mensaje"></textarea>
+                        </div>
+                        <button type="submit" class="boton_enviar">Enviar</button>
+                      </form>
+                    </div>
+                  </div>
+        
+              </div>
+
+            <footer class="footer">
+                <p class="logo">Casimiro</p>
+                <p class="slogan">Vinos de autor</p>
+                <div class="line_footer"></div>
+                <div class="links">
+                    <a href="#">Ventas mayoristas</a> | 
+                    <a href="#">Términos legales</a> | 
+                    <a href="#">Preguntas frecuentes</a> | 
+                    <a href="#">Próximos eventos</a> | 
+                    <a href="{% url "index_admin" %}">Iniciar sesión</a>
+                </div>
+                <div class="icon">
+                    <a href="https://www.facebook.com/people/Casimiro-Wines/100037344055399/"><i class="fa-brands fa-facebook-f"></i></a>
+                    <a href="https://www.instagram.com/casimirowines/"><i class="fa-brands fa-instagram"></i></a>
+                    <a href=""><i class="fa-brands fa-x-twitter"></i></a>
+                    <a href=""><i class="fa-brands fa-youtube"></i></a>
+                  </div>
+                <p class="copyright">©Casimiro Wines Copyright. Todos los derechos reservados.</p>
+            </footer>  
+        </div>
+
+    </div>
+
+
+
+
+
+    </div>
+
+    <script src="https://use.fontawesome.com/releases/v5.15.4/js/all.js"></script>
+    <script type="text/javascript" src="{% static "assets/fullpage/fullpage.js" %}"></script>
+
+    <script type="text/javascript">
+        var myFullpage = new fullpage('#fullpage', {
+            anchors: ['Inicio', 'Nosotros', 'Vinos', 'Galeria', 'Visitas', 'Contacto'],
+            sectionsColor: ['#1bbc9b', '', '#000000', '#000000', '#000000', '#000000'],
+            navigationPosition: 'right',
+            navigationTooltips: ['Inicio', 'Nosotros', 'Vinos', 'Galeria', 'Visitas', 'Contacto'],
+            responsiveWidth: 900,
+            menu: '#menu',
+            navigation: true,
+            slidesNavigation: true,
+            scrollHorizontally: true,
+            scrollingSpeed: 1700,
+            afterResponsive: function (isResponsive) {
+
+            },
+        });
+
+    </script>
+    <script src="{% static "/assets/lightgallery_js/lightgallery.js" %}"></script>
+    <script>
+        var imagPop = document.getElementById("lightgallery");
+        lightGallery(imagPop);
+    </script>
+    
+
+</body>
+
+</html>

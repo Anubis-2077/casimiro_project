@@ -21,7 +21,7 @@
     <!-- general form elements disabled -->
     <div class="card card-warning">
       <div class="card-header">
-        <h3 class="card-title">General Elements</h3>
+        <h3 class="card-title">Ingresar Cosecha</h3>
       </div>
       <!-- /.card-header -->
       <div class="card-body">
@@ -109,7 +109,12 @@
               <!-- text input -->
               <div class="form-group">
                 <label>Varietal</label>
-                <input type="text" class="form-control" name="varietal" placeholder="Ingrese el varietal de uva.">
+                <select class="form-control" id="cargamento" name="varietal">
+                  <option value="" disabled selected>Elige un varietal</option>
+                  {% for varietal in varietales %}
+                  <option value="{{ varietal.id }}"> {{ varietal.nombre }}</option>
+                  {% endfor %}
+                </select>
               </div>
             </div>
             <div class="col-sm-12">
@@ -147,7 +152,7 @@
             
           </div>
 
-         <button style="margin-top:30px" type="submit" class="btn btn-block btn-warning btn-lg">ingresar Cargamento</button>
+         <button style="margin-top:30px" type="submit" class="btn btn-block btn-warning btn-lg">Ingresar cosecha</button>
         </form>
       </div>
       <!-- /.card-body -->

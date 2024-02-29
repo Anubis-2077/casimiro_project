@@ -1,5 +1,7 @@
 from django.db import models
 from administracion.models import *
+from django.contrib.contenttypes.fields import GenericForeignKey
+from django.contrib.contenttypes.models import ContentType
 
 # Create your models here.
 class Cliente(models.Model):
@@ -86,9 +88,6 @@ class Acreedor(models.Model):
     
 #---------------------------producto-----------------------------
 
-
-    
-    
     
 class Venta(models.Model):
     comprador = models.ForeignKey(Cliente, on_delete=models.CASCADE)
@@ -132,4 +131,17 @@ class DetalleVentaSucursal(models.Model):
             raise ValidationError("Una venta no puede tener simultáneamente un producto empaquetado y etiquetado.")
         if not self.prod_empaquetado and not self.prod_etiquetado:
             raise ValidationError("Debe especificar un producto empaquetado o etiquetado.")
+    
+
+#Carrito 
+class Carrito(models.Model):
+    user = models.ForeignKey(User, on_delete=models.SET_NULL, null=True, blank=True)
+    creado_en = models.DateTimeField(auto_now_add=True)
+
+class CartItem(models.Model):
+    carrito = models.ForeignKey(Carrito, on_delete=models.CASCADE, related_name='items')
+    content_type = models.ForeignKey(ContentType, on_delete=models.CASCADE)
+    object_id = models.PositiveIntegerField()
+    producto = GenericForeignKey('content_type', 'object_id')
+    cantidad = models.IntegerField(default=1)
     

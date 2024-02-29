@@ -4,9 +4,12 @@ from django.urls import path, include
 from administracion.views import *
 from contabilidad.views import *
 from tareas.views import *
+from django.conf.urls.static import static
 
 urlpatterns = [
     path('admin/', admin.site.urls),
+    path('', index, name="index"),
+    path('tienda/', TiendaView.as_view(), name='tienda'),
     path('index_admin/',index_admin, name='index_admin'),
 
     path('accounts/', include('allauth.urls')),
@@ -89,7 +92,14 @@ urlpatterns = [
     path('registro_acreedores/', registro_acreedores ,name='registro_acreedores'),
     path('contabilidad/detalle_ventas/', DetallesVentasView.as_view(), name='detalle_ventas'),
     
-    
+    #--------------------------------VENTAS EN LINEA 
+    path('create_preference/', CreatePreferenceView.as_view(), name='create_preference'),
+    path('add-to-cart/', add_to_cart, name='add-to-cart'),
+    path('carrito/detalle/', carrito_detalle, name='carrito-detalle'),
+    path('incrementar-cantidad/<int:item_id>/', incrementar_cantidad, name='incrementar-cantidad'),
+    path('decrementar-cantidad/<int:item_id>/', decrementar_cantidad, name='decrementar-cantidad'),
+    path('eliminar-producto/<int:item_id>/', eliminar_producto, name='eliminar-producto'),
+    path('limpiar-carrito/', limpiar_carrito, name='limpiar-carrito'),
     
     
     
@@ -97,4 +107,4 @@ urlpatterns = [
     path('nueva_tarea/', nueva_tarea ,name='nueva_tarea'),
     path('tareas_realizadas/', tareas_realizadas ,name='tareas_realizadas'),
     path('listado_tareas/', listado_tareas ,name='listado_tareas'),
-]
+] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
