@@ -431,15 +431,18 @@ class CreatePreferenceView(APIView):
         
         items = []
         for item in carrito.items.all():
-            producto = item.producto  # Asegúrate de tener una forma de acceder a la instancia de producto aquí
+            producto = item.producto
             items.append({
-                "title": producto.varietal.nombre,
-                "quantity": item.cantidad,
-                "unit_price": producto.precio,
+                "title": producto.varietal.nombre + " " + str(item.cantidad) + "u.",
+                "quantity": 1,  # Cada línea representa un producto distinto
+                "unit_price": producto.precio * item.cantidad,
             })
         
         sdk = mercadopago.SDK(settings.MERCADOPAGO_ACCESS_TOKEN)
-        preference_data = {"items": items}
+        preference_data = {
+            "items": items,
+            "external_reference": str(carrito_id),  # Opcional: referencia para identificar la compra
+        }
         preference_response = sdk.preference().create(preference_data)
         preference_id = preference_response["response"]["id"]
         
