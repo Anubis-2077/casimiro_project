@@ -287,13 +287,38 @@
                 </a>
               </li>
               <li class="nav-item">
-                <a href="{% url "actualizar_precios" %}" class="nav-link">
+                <a href="{% url "ventas_en_linea" %}" class="nav-link">
                   <i class="fa-solid fa-file-invoice-dollar"></i>
-                  <p>Actualizar precios</p>
+                  <p>Ventas en linea</p>
                 </a>
               </li>
 
+              <li class="nav-item has-treeview">
+                <a href="#" class="nav-link">
+                  <i class="fa-solid fa-money-check-dollar"></i>
+                  <p>
+                    Envios
+                    <i class="right fas fa-angle-left"></i>
+                  </p>
+                </a>
+                <ul class="nav nav-treeview">
+                  <li class="nav-item">
+                    <a href="{% url "envios_pendientes" %}" class="nav-link">
+                      <i class="fa-solid fa-circle-check" ></i>
+                      <p>Pendientes</p>
+                    </a>
+                  </li>
+                  <li class="nav-item">
+                    <a href="{% url "envios_realizados" %}" class="nav-link">
+                      <i class="fa-solid fa-circle-check" ></i>
+                      <p>Realizados</p>
+                    </a>
+                  </li>
 
+                  
+                  
+                </ul>
+              </li>
 
               <li class="nav-item">
                 <a href="{% url "detalle_ventas" %}" class="nav-link">
@@ -302,6 +327,16 @@
                 </a>
               </li>
 
+              <li class="nav-item">
+                <a href="{% url "actualizar_precios" %}" class="nav-link">
+                  <i class="fa-solid fa-file-invoice-dollar"></i>
+                  <p>Actualizar precios</p>
+                </a>
+              </li>
+
+
+
+              
               <li class="nav-item">
                 <a href="#" class="nav-link">
                   <i class="fa-solid fa-file-invoice-dollar"></i>

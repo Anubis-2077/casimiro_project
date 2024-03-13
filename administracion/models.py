@@ -185,7 +185,7 @@ class StockBodegaEtiquetado(models.Model):
         super().save(*args, **kwargs)
 
     def __str__(self):
-        return f"id: {self.id} Botella etiquetada varietal {self.varietal} cantidad: {self.cantidad_botellas} lote: {self.lote}, empaquetado: {self.empaquetado}"
+        return f"id: {self.id} Botella etiquetada varietal {self.varietal.nombre} cantidad: {self.cantidad_botellas} lote: {self.lote}, empaquetado: {self.empaquetado}"
 
 
 
@@ -207,7 +207,7 @@ class StockBodegaEmpaquetado(models.Model):
         super().save(*args, **kwargs)
         
     def __str__(self):
-        return f"id: {self.id}, cantidad de cajas: {self.cantidad_cajas}, varietal: {self.varietal}, lote:{self.lote}"
+        return f"id: {self.id}, cantidad: {self.cantidad_cajas}, varietal: {self.varietal.nombre}"
     
     
 

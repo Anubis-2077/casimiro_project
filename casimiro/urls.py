@@ -101,6 +101,14 @@ urlpatterns = [
     path('eliminar-producto/<int:item_id>/', eliminar_producto, name='eliminar-producto'),
     path('limpiar-carrito/', limpiar_carrito, name='limpiar-carrito'),
     
+    path('webhook/mercadopago/', mercadopago_webhook, name='mercadopago_webhook'),
+     
+    path('contabilidad/ventas_en_linea/', VentasEnLineaDashboardView.as_view(), name="ventas_en_linea"),
+    path('success/', SuccessView.as_view(), name="success"),
+    
+    path('contabilidad/envios_pendientes/', EnviosPendientesView.as_view(), name='envios_pendientes'),
+    path('contabilidad/envios/actualizar_estado/<int:pk>', ActualizarEnviosView.as_view(), name='actualizar_estado'),
+    path('contabilidad/envios_realizados', EnviosRealizadosView.as_view(), name='envios_realizados'),
     
     
     #---------------------------------------tareas---------------------------------------------

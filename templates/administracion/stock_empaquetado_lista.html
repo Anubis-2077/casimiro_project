@@ -56,7 +56,7 @@
                           
                             {% for varietal, cantidad in cantidades.items %}
                               <tr>
-                                  <td>{{ varietal }}</td>
+                                  <td>{{ varietal.nombre }}</td>
                                   <td>{{ cantidad }}</td>
                                   <td><a href="{% url 'stock_detail_empaquetado' "varietal.nombre" %}">Ver más detalles</a></td>
                               </tr>

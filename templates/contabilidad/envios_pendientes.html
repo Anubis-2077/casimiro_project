@@ -1,0 +1,130 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="content-wrapper">
+    <!-- Content Header (Page header) -->
+    <section class="content-header">
+      <div class="container-fluid">
+        <div class="row mb-2">
+          <div class="col-sm-6">
+            <h1>Listado de envios pendientes</h1>
+          </div>
+          
+        </div>
+      </div><!-- /.container-fluid -->
+    </section>
+    <section class="content">
+        <div class="container-fluid">
+          
+            <div class="row">
+              
+                <div class="col-md-12">
+                  
+                    <div class="card card-warning">
+                        <div class="card-header">
+                          <h3 class="card-title">Envios Pendientes</h3>
+                        </div>
+                        <!-- /.card-header -->
+                        
+                            
+                            <!-- /.card-header -->
+                            <div class="card-body">
+                              <table id="example1" class="table table-bordered table-striped">
+                                <thead>
+                                <tr>
+                                  <th>Cliente</th>
+                                  <th>Productos</th>
+                                  <th>Direccion de envio</th>
+                                  <th>telefono</th>
+                                  <th>Modificar estado</th>
+                                  
+                                  
+                                  
+                                </tr>
+                                </thead>
+                                <tbody>
+                                    {% for envio in envios %}
+                                    <tr>
+                                        <td>{{ envio.cliente.nombre }} {{ envio.cliente.apellido }}</td>
+                                        <td>
+                                            {% for detalle in envio.detalles_venta %}
+                                                <strong>LOTE:</strong> {{ detalle.prod_empaquetado.lote }}  <strong>VARIETAL:</strong> {{ detalle.prod_empaquetado.varietal.nombre }} <strong>CANTIDAD:</strong> {{ detalle.cantidad }}<br>
+                                            {% endfor %}
+                                        </td>
+                                        <td>{{ envio.cliente.direccion }}</td> 
+                                        <td>
+                                            {{ envio.cliente.telefono }}
+                                        </td>
+                                        <td>
+                                            <a class="btn btn-block btn-outline-info" href="{% url 'actualizar_estado' envio.id %}">Actualizar estado</a>
+                                        </td>
+                                    </tr>
+                                    {% endfor %}
+                                </tbody>
+                                        
+                                    
+                                    
+                                    
+                                
+                              </table>
+                            </div>
+                            <!-- /.card-body -->
+                          </div>
+                        
+                        <!-- /.card-body -->
+                      
+
+
+
+                </div>
+                <!-- /.col -->
+            </div>
+            <!-- /.row -->
+        </div><!-- /.container-fluid -->
+    </section>
+    <script>
+      function confirmDelete(proveedorId) {
+        Swal.fire({
+            title: '¿Estás seguro?',
+            text: "¡No podrás revertir esto!",
+            icon: 'warning',
+            showCancelButton: true,
+            confirmButtonColor: '#3085d6',
+            cancelButtonColor: '#d33',
+            confirmButtonText: 'Sí, eliminar!'
+        }).then((result) => {
+            if (result.isConfirmed) {
+                $.ajax({
+                    url: '/proveedores_insumos/delete/' + proveedorId + '/',
+                    method: 'POST',
+                    data: {
+                        'csrfmiddlewaretoken': $('input[name="csrfmiddlewaretoken"]').val(),
+                        'id': proveedorId
+                    },
+                    
+                    success: function(response) {
+                        // Manejar la respuesta
+                        if(response.success) {
+                            window.location.reload();
+                        }
+                    }
+                    
+                });
+                
+            }
+        })
+    }
+      </script>
+
+
+
+
+
+
+{% endblock content %}
+
+
+
+
+
+

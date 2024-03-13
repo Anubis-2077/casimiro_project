@@ -145,3 +145,14 @@ class CartItem(models.Model):
     producto = GenericForeignKey('content_type', 'object_id')
     cantidad = models.IntegerField(default=1)
     
+class Envio(models.Model):
+    cliente = models.ForeignKey(Cliente, on_delete=models.CASCADE)
+    venta = models.ForeignKey(Venta, on_delete=models.CASCADE)
+    numero_de_envio = models.CharField(max_length=100, unique=True, blank=True, null=True)  
+    fecha_envio = models.DateField(null=True, blank=True)
+    medio = models.CharField(max_length=100, null=True, blank=True)
+    observaciones = models.TextField(null=True, blank=True)
+    enviado = models.BooleanField(default=False)
+
+    def __str__(self):
+        return f"Envío {self.numero_de_envio} para {self.cliente}"

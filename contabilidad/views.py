@@ -1,16 +1,29 @@
 from django.shortcuts import render, redirect
 from .models import *
 from .forms import *
-from django.views.generic import CreateView,UpdateView,View
+from django.views.generic import CreateView,UpdateView,View, FormView, ListView
 from django.urls import reverse_lazy
 from django.shortcuts import get_object_or_404
 from django.views.decorators.csrf import csrf_exempt
 from django.views.decorators.http import require_POST
-from django.http import JsonResponse
+from django.http import HttpRequest, JsonResponse, HttpResponse
 from django.forms import inlineformset_factory
 from django.db.models.functions import TruncMonth
 from datetime import datetime
 from dateutil.relativedelta import relativedelta
+import json
+from django.db import transaction
+from decouple import config
+from google.oauth2.credentials import Credentials
+from google_auth_oauthlib.flow import InstalledAppFlow
+from googleapiclient.discovery import build
+import json
+import os
+import base64
+from email.mime.multipart import MIMEMultipart
+from email.mime.text import MIMEText
+from django.template.loader import render_to_string
+
 
 # Create your views here.
 
@@ -409,7 +422,7 @@ class TiendaView(View):
             precio_total = 0
         
         return render(request, self.template_name, {
-            'stock_etiquetado': stock_etiquetado,
+            
             'stock_empaquetado': stock_empaquetado,
             'items_del_carrito': items_del_carrito,
             'cantidades_productos': cantidades_productos,
@@ -430,23 +443,43 @@ class CreatePreferenceView(APIView):
             return Response({"error": "Carrito no encontrado"}, status=404)
         
         items = []
+        total_compra = 0  # Inicializa el total de la compra
+
         for item in carrito.items.all():
             producto = item.producto
+            subtotal_item = producto.precio * item.cantidad
+            total_compra += subtotal_item  # Suma al total de la compra
+            
             items.append({
-                "title": producto.varietal.nombre + " " + str(item.cantidad) + "u.",
-                "quantity": 1,  # Cada línea representa un producto distinto
-                "unit_price": producto.precio * item.cantidad,
+                "id": producto.id,
+                "title": producto.varietal.nombre,
+                "quantity": item.cantidad, 
+                "unit_price": producto.precio,
             })
         
         sdk = mercadopago.SDK(settings.MERCADOPAGO_ACCESS_TOKEN)
         preference_data = {
             "items": items,
-            "external_reference": str(carrito_id),  # Opcional: referencia para identificar la compra
+            "external_reference": str(carrito_id),  # Referencia para identificar la compra
+            "back_urls": {
+                "success": "https://04e6-190-176-57-166.ngrok-free.app/success/",
+                "failure": "https://04e6-190-176-57-166.ngrok-free.app/failure/",
+                "pending": "https://04e6-190-176-57-166.ngrok-free.app/pending/"
+            },
+            
+            "auto_return": "approved",
         }
         preference_response = sdk.preference().create(preference_data)
         preference_id = preference_response["response"]["id"]
+        print(json.dumps(preference_response, indent=4))
         
-        return Response({"preference_id": preference_id})
+        request.session['venta_detalle'] = {
+            'items': items,  # La lista de ítems que ya tienes
+            'total_compra': total_compra,  # El total calculado de la compra
+            'preference_id': preference_id,  # ID de preferencia para uso futuro si es necesario
+        }
+        
+        return Response({"preference_id": preference_id, "total_compra": total_compra})
 
     
     
@@ -598,3 +631,234 @@ def eliminar_producto(request, item_id):
     item = CartItem.objects.get(id=item_id)
     item.delete()
     return JsonResponse({'mensaje': 'Producto eliminado del carrito'})
+
+
+#-----------------------------webhooks-----------------
+@csrf_exempt
+def mercadopago_webhook(request):
+    if request.method == 'POST':
+        try:
+            data = json.loads(request.body)
+            print("Webhook recibido:", data)
+            # Procesamiento adicional aquí
+        except json.JSONDecodeError as e:
+            print(f"Error al decodificar el JSON: {e}")
+            return JsonResponse({'error': 'Error al decodificar el JSON'}, status=400)
+        except KeyError as e:
+            print(f"Clave no encontrada en el JSON: {e}")
+            return JsonResponse({'error': f'Clave no encontrada: {e}'}, status=400)
+        # Considera capturar otras excepciones según sea necesario
+        
+        return JsonResponse({'status': 'recibido'}, status=200)
+    else:
+        return JsonResponse({'error': 'Método no permitido'}, status=405)
+    
+class VentasEnLineaDashboardView(View):
+    template_name = 'contabilidad/dashboard_ventas.html'
+    
+    def get (self, request):
+        ventas_online = Venta.objects.filter(condicion='Ventas en linea')
+        
+        return render (request, self.template_name)
+    
+class SuccessView(FormView):
+    template_name= 'contabilidad/formulario_envio.html'
+    form_class = EnvioForm
+    success_url = reverse_lazy('index')
+    
+    
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        venta_detalle = self.request.session.get('venta_detalle', {})
+        print(' este es el venta_detalle:', venta_detalle)
+        context['venta_detalle'] = venta_detalle
+        return context
+    
+    def form_valid(self, form):
+        with transaction.atomic():
+            nombre = form.cleaned_data['nombre']
+            apellido = form.cleaned_data['apellido']
+            telefono = form.cleaned_data['telefono']
+            email = form.cleaned_data['email']
+            cuit_cuil = form.cleaned_data['cuit_cuil']
+            calle = form.cleaned_data['calle']
+            numero = form.cleaned_data['numero']
+            departamento = form.cleaned_data['departamento']
+            localidad = form.cleaned_data['localidad']
+            provincia = form.cleaned_data['provincia']
+            codigo_postal = form.cleaned_data['codigo_postal']
+            
+            cliente, created = Cliente.objects.get_or_create(
+            cuit_cuil=cuit_cuil, 
+            telefono=telefono,
+            defaults={  
+                'nombre': nombre, 
+                'apellido': apellido,
+                'direccion': f"{calle} {numero}, {departamento}, {localidad}, {provincia}, CP: {codigo_postal}",
+                'email': email,
+                'tipo': 'minorista',  
+                'observaciones': 'venta en línea',
+
+            }
+        )
+            
+            print("este es el cliente:", cliente)
+            
+            venta_detalle = self.request.session.get('venta_detalle', {})
+            deposito_defecto = Deposito.objects.get(nombre='BODEGA')
+            
+            venta = Venta.objects.create(
+                comprador = cliente,
+                precio_total=venta_detalle['total_compra'],
+                condicion = 'Ventas en linea',
+                deposito = deposito_defecto
+            )
+            
+            print('esta es la nueva venta:', venta)
+            
+            
+            envio = Envio.objects.create(
+                cliente= cliente,
+                venta = venta,
+                numero_de_envio = None
+                
+            )
+            print(' este es el envio creado:', envio)
+            
+            items_venta = venta_detalle['items']
+            
+            for item in items_venta:
+                prod_empaquetado = StockBodegaEmpaquetado.objects.get(id=item['id'])
+                cantidad_vendida = item['quantity']
+                print('cantidad_disponible:' , prod_empaquetado.cantidad_cajas)
+                print('esta es la cantidad vendida:', cantidad_vendida)
+                
+                prod_empaquetado.cantidad_cajas -= cantidad_vendida
+                
+                prod_empaquetado.save()
+                
+                DetalleVenta.objects.create (
+                    venta = venta,
+                    prod_empaquetado = prod_empaquetado,
+                    cantidad = cantidad_vendida,
+                    precio_unitario = item['unit_price']
+                )
+                
+                print('item de venta:', item)
+                
+            
+            print('proceso completado con exito!!!!')
+            
+            
+            
+            return super().form_valid(form)
+    
+    
+
+class EnviosPendientesView(ListView):
+    template_name = 'contabilidad/envios_pendientes.html'
+    model = Envio
+    context_object_name = 'envios'
+
+    def get_queryset(self):
+        # Filtra directamente los envíos pendientes
+        return Envio.objects.filter(enviado=False)
+    
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        envios_pendientes = context['envios']
+        for envio in envios_pendientes:
+            detalles_venta = DetalleVenta.objects.filter(venta=envio.venta)
+            envio.detalles_venta = detalles_venta
+        return context
+    
+class ActualizarEnviosView(UpdateView):
+    model = Envio
+    form_class = EnvioForm_Vista
+    template_name = 'contabilidad/actualizar_estado_envio.html'
+    success_url = reverse_lazy('envios_pendientes')
+
+    def get_object(self, queryset=None):
+        # Este método devuelve la instancia del modelo que va a ser actualizada
+        pk = self.kwargs.get('pk')
+        return get_object_or_404(Envio, pk=pk)
+    
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        envio = self.get_object()
+        detalles_venta = DetalleVenta.objects.filter(venta=envio.venta)
+        
+        context.update({
+            'detalles_venta': detalles_venta,
+            'envio': envio
+        })
+        
+        return context
+
+    def form_valid(self, form):
+        form.save()
+        # Comprobación antes de guardar
+        if form.instance.enviado:  # Si 'enviado' es True en el formulario
+            self.enviar_email_html()  # Llama a la función para enviar el correo
+        
+        return super().form_valid(form)
+
+    def cargar_credenciales(self):
+        # Carga las credenciales y crea el servicio de la API de Gmail
+        creds = Credentials.from_authorized_user_file('token.json')
+        service = build('gmail', 'v1', credentials=creds)
+        print("credenciales obtenidas correctamente")
+        return service
+
+    def enviar_email_html(self):
+        # Cargar servicio Gmail
+        service = self.cargar_credenciales()
+
+        # Preparar y enviar el correo electrónico
+        envio = self.get_object()
+        detalles_venta = DetalleVenta.objects.filter(venta=envio.venta)
+        destinatario = envio.cliente.email
+        asunto = 'Tu pedido de Casimiro está en camino'
+        
+        
+        # Cargar la plantilla y renderizarla con contexto
+        contenido_html = render_to_string('email/confirmacion_envio.html', {'detalles_venta': detalles_venta, 'envio': envio})
+        
+        mensaje = MIMEMultipart('alternative')
+        mensaje['Subject'] = asunto
+        mensaje['From'] = 'winescasimiro@gmail.com'
+        mensaje['To'] = destinatario
+        parte_html = MIMEText(contenido_html, 'html')
+        mensaje.attach(parte_html)
+
+        # Codifica el mensaje en base64
+        raw_mensaje = base64.urlsafe_b64encode(mensaje.as_bytes()).decode()
+
+        # Envía el mensaje
+        try:
+            mensaje = service.users().messages().send(userId='me', body={'raw': raw_mensaje}).execute()
+            print(f'Mensaje enviado con éxito, ID: {mensaje["id"]}')
+        except Exception as e:
+            print(f'Error al enviar el mensaje: {e}')
+    
+    
+    
+    
+class EnviosRealizadosView(ListView):
+    template_name = 'contabilidad/envios_realizados.html'
+    model = Envio
+    context_object_name = 'envios'
+    
+    def get_queryset(self):
+        # Filtra directamente los envíos realizados
+        return Envio.objects.filter(enviado=True)
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        envios_realizados = context['envios']
+        for envio in envios_realizados:
+            detalles_venta = DetalleVenta.objects.filter(venta=envio.venta)
+            envio.detalles_venta = detalles_venta
+        return context
+    
+    

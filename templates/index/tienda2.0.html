@@ -12,6 +12,7 @@
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
     <script src="{% static "/assets/js/main_index.js" %}"></script>
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <script src="https://sdk.mercadopago.com/js/v2"></script>
     <link rel="stylesheet" href="{% static "/assets/styles/bootstrap.min.css" %}">
     <link rel="stylesheet" href="{% static "/assets/styles/style_tienda.css" %}">
     <title>Casimiro Wines - Tienda</title>
@@ -542,14 +543,16 @@
     </script>
 
     <script>
+        // Inicializar MercadoPago con tu Public Key
+        const mp = new MercadoPago('TEST-d3c474b7-b3ec-4fd9-b5ab-1255b01f0f1e', {
+            locale: 'es-AR'
+        });
         $(document).ready(function() {
             $("#boton-pagar").click(function() {
                 $.ajax({
                     url: '/create_preference/',  // Asegúrate de usar la URL correcta
                     method: 'POST',
-                    data: {
-                        // Datos adicionales si son necesarios
-                    },
+                    
                     success: function(response) {
                         var redirectUrl = "https://www.mercadopago.com.ar/checkout/v1/redirect?pref_id=" + response.preference_id;
                         window.location.href = redirectUrl;

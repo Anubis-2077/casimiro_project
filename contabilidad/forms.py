@@ -61,3 +61,25 @@ class StockBodegaEtiquetadoPrecioForm(forms.ModelForm):
 
 StockBodegaEmpaquetadoPrecioFormSet = modelformset_factory(StockBodegaEmpaquetado, form=StockBodegaEmpaquetadoPrecioForm, extra=0)
 StockBodegaEtiquetadoPrecioFormSet = modelformset_factory(StockBodegaEtiquetado, form=StockBodegaEtiquetadoPrecioForm, extra=0)
+
+
+class EnvioForm(forms.Form):
+    
+    nombre = forms.CharField(max_length=100)
+    apellido = forms.CharField(max_length=50, required=False)
+    telefono = forms.CharField(max_length=50)
+    email = forms.EmailField()
+    cuit_cuil = forms.CharField(max_length=50)
+    calle= forms.CharField(max_length=50)
+    numero = forms.CharField(max_length=5)
+    departamento = forms.CharField(max_length=5)
+    localidad = forms.CharField(max_length=50)
+    provincia = forms.CharField(max_length=50)
+    codigo_postal = forms.CharField(max_length=10)
+    
+class EnvioForm_Vista(forms.ModelForm):
+    class Meta:
+        model = Envio
+        fields = '__all__'
+    
+    

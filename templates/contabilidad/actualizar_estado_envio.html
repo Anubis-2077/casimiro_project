@@ -1,0 +1,126 @@
+{% extends "base.html" %}
+{% load widget_tweaks %}
+{% block content %}
+
+<div class="content-wrapper">
+    <!-- Content Header (Page header) -->
+    <section class="content-header">
+      <div class="container-fluid">
+        <div class="row mb-2">
+          <div class="col-sm-6">
+            <h1>Actualizar estado de envio</h1>
+          </div>
+          <div class="col-sm-6">
+            <ol class="breadcrumb float-sm-right">
+              
+             
+            </ol>
+          </div>
+        </div>
+      </div><!-- /.container-fluid -->
+    </section>
+
+    <section>
+        <div class="col-md-12">
+            <!-- general form elements disabled -->
+            <div class="card card-warning">
+              <div class="card-header">
+                <h3 class="card-title">Complete el formulario para actualizar el estado del envio </h3>
+              </div>
+              <!-- /.card-header -->
+              <div class="card-body">
+                <form role="form" method="post" enctype="multipart/form-data">
+                    {% csrf_token %}
+                  <div class="row">
+                    <div class="col-sm-12">
+                      <!-- text input -->
+                      <div class="form-group">
+                        <label>Cliente</label>
+                        <input type="text" class="form-control"  name="" value="{{ envio.cliente.nombre }} {{  envio.cliente.apellido}}">
+                        <input type="text" class="form-control"  name="cliente" value="{{ envio.cliente.id }}" hidden>
+                        <input type="text" name="venta" value="{{ envio.venta.id }}" hidden>
+                      </div>
+                    </div>
+                    <div class="col-sm-12">
+                        <!-- text input -->
+                        <div class="form-group">
+                          <label>Productos</label>
+                          
+                          {% for detalle in detalles_venta %}
+                          <div class="form-control" style="margin-bottom:10px"> 
+                            <strong>LOTE:</strong> {{ detalle.prod_empaquetado.lote }}  <strong>VARIETAL:</strong> {{ detalle.prod_empaquetado.varietal.nombre }} <strong>CANTIDAD:</strong> {{ detalle.cantidad }}<br>
+                        </div>
+                            {% endfor %}
+                          
+                        </div>
+                      </div>
+
+                      <div class="col-sm-12">
+                        <!-- text input -->
+                        <div class="form-group">
+                          <label>Numero de seguimiento de envio</label>
+                          <input type="text" class="form-control" placeholder="agregar numero de seguimiento de envio " name="numero_de_envio" value="{{ envio.numero_de_envio }}">
+                        </div>
+                      </div>
+
+                      <div class="col-sm-12">
+                        <!-- text input -->
+                        <div class="form-group">
+                          <label>Medio de envio</label>
+                          <input type="text" class="form-control" name="medio" value="">
+                        </div>
+                      </div>
+
+
+                      <div class="col-sm-12">
+                        <div class="form-group">
+
+                        <div class="form-check">
+                            <input class="form-check-input" type="checkbox" name="enviado">
+                            <label class="form-check-label"><strong>Enviado?</strong></label>
+                        </div>
+                    </div>
+                    </div>
+
+                      <div class="col-sm-12">
+                        <!-- text input -->
+                        <div class="form-group">
+                          <label>Fecha de envio</label>
+                          <input type="date" class="form-control" name="fecha_envio" value="">
+                        </div>
+                      </div>
+
+
+
+                    
+                  </div>
+                  <div class="row">
+                    <div class="col-sm-12">
+                        <!-- textarea -->
+                        <div class="form-group">
+                            <label>Observaciones</label>
+                            <textarea class="form-control" rows="3" placeholder="Ingrese sus observaciones" name="observaciones">{{ envio.observaciones }}</textarea>
+                        </div>
+                    </div>
+                </div>
+
+                  
+                <button type="submit" class="btn btn-block btn-outline-primary btn-lg">Guardar cambios</button>
+                </div>
+                
+
+                </form>
+              </div>
+              <!-- /.card-body -->
+            </div>
+            <!-- /.card -->
+            
+          </div>
+    </section>
+
+
+{% endblock content %}
+
+
+
+
