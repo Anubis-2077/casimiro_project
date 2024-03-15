@@ -56,7 +56,7 @@
                                 {% for stock in stocks %}
                                 <tr>
                                     <td>{{ stock.lote }}</td>
-                                    <td>{{ stock.varietal }}</td>
+                                    <td>{{ stock.varietal.nombre }}</td>
                                     <td>{{ stock.cantidad_cajas }}</td>
                                     <td>{{ stock.fecha_empaquetado }}</td>
                                 </tr>

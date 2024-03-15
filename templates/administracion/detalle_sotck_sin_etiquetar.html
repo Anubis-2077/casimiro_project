@@ -29,7 +29,7 @@
                     <span class="info-box-icon bg-success"><i class="fa-solid fa-wine-bottle"></i></span>
       
                     <div class="info-box-content ">
-                      <span class="info-box-text">Total stock {{ stock.varietal }}  sin etiquetar</span>
+                      <span class="info-box-text">Total stock sin etiquetar</span>
                       <span class="info-box-number">{{ total_botellas }}</span>
                     </div>
                     <!-- /.info-box-content -->
@@ -56,7 +56,7 @@
                         {% for stock in stocks %}
                         <tr>
                             <td>{{ stock.embotellamiento.contenido.molienda.cargamento.lote }}</td>
-                            <td>{{ stock.varietal }}</td>
+                            <td>{{ stock.varietal.nombre }}</td>
                             <td>{{ stock.cantidad_botellas }}</td>
                             <td>{{ stock.embotellamiento.fecha_envasado }}</td>
                         </tr>

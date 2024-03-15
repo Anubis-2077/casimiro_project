@@ -174,7 +174,8 @@ def obtener_cantidad_disponible(request, molienda_id):
     
 ##### Inicio Tanques/notas   #############################################
         
-class ListaTanquesView(ListView):
+class ListaTanquesView(LoginRequiredMixin,ListView):
+    login_url = '/accounts/login/'
     template_name = 'administracion/listado_tanques.html'
     model = Tanque
     context_object_name = 'tanques'
@@ -187,7 +188,8 @@ class ListaTanquesView(ListView):
             tanque.ultimo_contenido = tanque.contenido_set.order_by('-fecha_ingreso').first()
         return context
         
-class DetalleTanqueView(View):
+class DetalleTanqueView(LoginRequiredMixin, View):
+    login_url = '/accounts/login/'
     template_name = 'administracion/detalle_tanque.html'
     form1 = ContenidoForm
     form2 = MoverContenidoForm
@@ -460,7 +462,10 @@ def obtener_contenidos_tanques(request, contenidoId):
         return HttpResponse("Contenido no encontrado.", status=404)
   
     
-class EditarNotaTareaView(View):
+class EditarNotaTareaView(LoginRequiredMixin,View):
+    
+    """a revisar funcion en forma total"""
+    login_url = '/accounts/login/'
     form = NotaTareasForm
     
     def get(self, request, nota_tarea_id, *args, **kwargs):
@@ -488,7 +493,8 @@ class EditarNotaTareaView(View):
 
 #################  Embotellamiento ##########################
 
-class EmbotellamientoView(FormView):
+class EmbotellamientoView(LoginRequiredMixin, FormView):
+    login_url = '/accounts/login/'
     template_name = 'administracion/embotellamiento.html'
     success_url = reverse_lazy('sin_etiquetar')
     form_class = EmbotellamientoForm
@@ -580,34 +586,29 @@ class EmbotellamientoView(FormView):
         return super().form_invalid(form) 
     
     
-class StockSinEtiquetarView(ListView):
+class StockSinEtiquetarView(LoginRequiredMixin, ListView):
+    login_url = '/accounts/login/'
     """Vista que muestra la lista general del stock sin etiquetar."""
     template_name = 'administracion/stock_sin_etiquetar.html'
     model = StockBodegaSinEtiquetar
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-
-        # Obtiene todos los varietales de la base de datos
         varietales = Varietal.objects.all()
-
-        # Crea un diccionario para almacenar las cantidades de cada varietal
         cantidades = {}
-
-        # Inicializar la suma total de botellas
         total_botellas = 0
 
-        # Obtiene las cantidades de cada varietal para botellas sin etiquetar
         for varietal in varietales:
             cantidad = StockBodegaSinEtiquetar.objects.filter(varietal=varietal, etiquetado=False).aggregate(Sum('cantidad_botellas'))['cantidad_botellas__sum'] or 0
-            cantidades[varietal.nombre] = cantidad  # Usa el nombre del varietal como clave
-            total_botellas += cantidad  # Suma la cantidad de botellas de este varietal al total
+            cantidades[varietal.id] = (varietal.nombre, cantidad)  # Guarda una tupla con el nombre y la cantidad
+            total_botellas += cantidad
 
         context["total_botellas"] = total_botellas    
         context["cantidades"] = cantidades
         return context
  
-class StockDetailView(TemplateView):
+class StockDetailView(LoginRequiredMixin, TemplateView):
+    login_url = '/accounts/login/'
     """ vista que muestra el detalle del stock de cada uno de los varietales sin etiquetar """
     template_name = 'administracion/detalle_sotck_sin_etiquetar.html'
 
@@ -632,7 +633,8 @@ class StockDetailView(TemplateView):
     
 ####################  Etiquetado ########################    
     
-class RegistrarEtiquetadoView(FormView):
+class RegistrarEtiquetadoView(LoginRequiredMixin, FormView):
+    login_url = '/accounts/login/'
     """ vista con el formulario para registrar un etiquetado """
     template_name = 'administracion/stock_etiquetado_form.html'
     success_url = reverse_lazy('stock_etiquetado')
@@ -706,7 +708,8 @@ class RegistrarEtiquetadoView(FormView):
         print("Errores del formulario:", form.errors)
         return super().form_invalid(form)
   
-class StockEtiquetadoLista(ListView):
+class StockEtiquetadoLista(LoginRequiredMixin, ListView):
+    login_url = '/accounts/login/'
     """ vista que muestra el stock etiquetado en general """  
     template_name = 'administracion/stock_etiquetado_lista.html'
     model = StockBodegaEtiquetado
@@ -735,7 +738,8 @@ class StockEtiquetadoLista(ListView):
         print (cantidades)
         return context
 
-class StockBodegaEtiquetadoDetalle(TemplateView):
+class StockBodegaEtiquetadoDetalle(LoginRequiredMixin, TemplateView):
+    login_url = '/accounts/login/'
     """ muestra el detalle del stock etiquetado de cada uno de los varietales """
     template_name = 'administracion/detalle_stock_etiquetado.html'
 
@@ -762,7 +766,8 @@ class StockBodegaEtiquetadoDetalle(TemplateView):
 
 
 
-class RegistrarEmpaquetadoView(FormView):
+class RegistrarEmpaquetadoView(LoginRequiredMixin, FormView):
+    login_url = '/accounts/login/'
     template_name = 'administracion/stock_empaquetado_form.html'
     success_url = reverse_lazy('stock_empaquetado')
     form_class = EmpaquetadoForm
@@ -822,7 +827,8 @@ class RegistrarEmpaquetadoView(FormView):
         print (form.errors)
         return super().form_invalid(form)
 
-class StockEmpaquetadoLista(ListView):
+class StockEmpaquetadoLista(LoginRequiredMixin, ListView):
+    login_url = '/accounts/login/'
     template_name = 'administracion/stock_empaquetado_lista.html'
     model = StockBodegaEmpaquetado
     
@@ -864,7 +870,8 @@ class StockEmpaquetadoLista(ListView):
 
 
 
-class StockEmpaquetadoDetalle(TemplateView):
+class StockEmpaquetadoDetalle(LoginRequiredMixin, TemplateView):
+    login_url = '/accounts/login/'
     template_name = 'administracion/detalle_stock_empaquetado.html'
     model = StockBodegaEmpaquetado
 
@@ -873,6 +880,7 @@ class StockEmpaquetadoDetalle(TemplateView):
 
         # Reemplaza los guiones bajos por espacios en blanco para obtener el nombre original del varietal
         varietal = self.kwargs['varietal'].replace('_', ' ')
+        
         deposito = Deposito.objects.get(nombre='BODEGA')
         # Filtra los objetos StockBodegaEmpaquetado por varietal
         stocks = StockBodegaEmpaquetado.objects.filter(varietal=varietal, deposito=deposito)
@@ -890,10 +898,10 @@ class StockEmpaquetadoDetalle(TemplateView):
     
 # ------------------------------- Depositos--- Bodega!!!!!!! ------------------------------    
 
-    
+@login_required    
 def stock(request):
     return render (request, 'administracion/stock.html')
-
+@login_required
 def stock_bodega(request):
     # Sumar la cantidad total de todos los contenidos
     total_contenido = Contenido.objects.aggregate(total=Sum('cantidad'))
@@ -948,7 +956,7 @@ def stock_bodega(request):
 
 
 #--------------------------Depositos --- Secundarios
-
+@login_required
 def crear_deposito(request):
     if request.method == 'POST':
         form = DepositoForm(request.POST)
@@ -959,11 +967,11 @@ def crear_deposito(request):
         form = DepositoForm()
 
     return render(request, 'depositos/nuevo_deposito.html', {'form': form})
-
+@login_required
 def lista_depositos(request):
     depositos = Deposito.objects.all()
     return render (request, 'depositos/lista_depositos.html', {'depositos':depositos})
-
+@login_required
 def editar_deposito(request, pk):
     deposito = get_object_or_404(Deposito, pk=pk)
     if request.method == 'POST':
@@ -975,7 +983,7 @@ def editar_deposito(request, pk):
         form = DepositoForm(instance=deposito)
 
     return render(request, 'depositos/editar_deposito.html', {'form': form, 'deposito':deposito})
-
+@login_required
 def eliminar_deposito(request, pk):
     deposito = get_object_or_404(Deposito, pk=pk)
     if request.method == 'POST':
@@ -983,12 +991,12 @@ def eliminar_deposito(request, pk):
         return redirect('lista_depositos')
 
     return render(request, 'depositos/confirmar_eliminar.html', {'deposito': deposito})
-
+@login_required
 def detalles_deposito(request,pk):
     deposito = get_object_or_404(Deposito, pk=pk)
 
     return render (request, 'depositos/detalles_deposito.html', {'deposito':deposito})
-
+@login_required
 def get_producto_info(request, producto_id):
     producto = StockBodegaEtiquetado.objects.get(id=producto_id)
         # Accediendo a fecha_envasado a través de la relación con StockBodegaSinEtiquetar y Embotellamiento
@@ -1004,7 +1012,7 @@ def get_producto_info(request, producto_id):
         }
     
     return JsonResponse(data)
-
+@login_required
 def get_producto_info_empaquetado(request, producto_id):
     producto = StockBodegaEmpaquetado.objects.get(id=producto_id)
         # Accediendo a fecha_envasado a través de la relación con StockBodegaSinEtiquetar y Embotellamiento
@@ -1026,7 +1034,7 @@ def get_producto_info_empaquetado(request, producto_id):
 
 #---------------------------Movimiento de stock-------------------------------------------
 
-
+@login_required
 def seleccionar_stock(request, pk):
     # Recuperar el depósito utilizando el pk
     deposito = get_object_or_404(Deposito, pk=pk)
@@ -1034,7 +1042,8 @@ def seleccionar_stock(request, pk):
     # Pasar el depósito a la plantilla
     return render(request, 'depositos/redireccionar.html', {'deposito': deposito})
 
-class DetallesDepositoView(DetailView):
+class DetallesDepositoView(LoginRequiredMixin, DetailView):
+    login_url = 'accounts/login/'
     model = Deposito
     template_name = 'depositos/detalles_deposito.html'
     context_object_name = 'deposito'
@@ -1049,7 +1058,8 @@ class DetallesDepositoView(DetailView):
         
         return context
         
-class MoverStockEtiquetadoView(View):
+class MoverStockEtiquetadoView(LoginRequiredMixin, View):
+    login_url = 'accounts/login/'
     template_name= 'depositos/mover_stock_etiquetado.html'
     
     def get(self, request, *args, **kwargs):
@@ -1103,7 +1113,8 @@ class MoverStockEtiquetadoView(View):
     
 #--------------------------stock empaquetado----------------------------
 
-class MoverStockEmpaquetadoView(View):
+class MoverStockEmpaquetadoView(LoginRequiredMixin, View):
+    login_url = '/accounts/login/'
     template_name= 'depositos/mover_stock_empaquetado.html'
     
     def get(self, request, *args, **kwargs):
@@ -1152,7 +1163,8 @@ class MoverStockEmpaquetadoView(View):
             return render(request, 'depositos/mover_stock_empaquetado.html', {'formset': formset})
             
 
-class HistorialMovimientosView(ListView):
+class HistorialMovimientosView(LoginRequiredMixin, ListView):
+    login_url = '/accounts/login/'
     model = MoverStockEmpaquetado
     template_name = 'depositos/historial_movimientos.html'
     

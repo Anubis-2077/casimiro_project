@@ -53,13 +53,13 @@
                     </tr>
                 </thead>
                 <tbody>
-                    {% for varietal, cantidad in cantidades.items %}
-                    <tr>
-                        <td>{{ varietal }}</td>
-                        <td>{{ cantidad }}</td>
-                        <td><a href="{% url 'stock_detail' varietal|urlify %}">Ver más detalles</a></td>
-                    </tr>
-                    {% endfor %}
+                  {% for varietal_id, datos in cantidades.items %}
+                  <tr>
+                      <td>{{ datos.0 }}</td> <!-- El nombre del varietal está en la primera posición de la tupla -->
+                      <td>{{ datos.1 }}</td> <!-- La cantidad está en la segunda posición de la tupla -->
+                      <td><a href="{% url 'stock_detail' varietal_id %}">Ver más detalles</a></td>
+                  </tr>
+                  {% endfor %}
                 </tbody>
                 
                 
