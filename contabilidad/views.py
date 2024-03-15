@@ -402,7 +402,7 @@ class TiendaView(View):
     
     def get(self, request):
         deposito = Deposito.objects.get(nombre="BODEGA")
-        stock_etiquetado = StockBodegaEtiquetado.objects.filter(deposito__id=deposito.id)
+        
         stock_empaquetado = StockBodegaEmpaquetado.objects.filter(deposito__id=deposito.id)
         
         carrito_id = request.session.get('carrito_id')

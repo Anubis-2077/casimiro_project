@@ -20,9 +20,10 @@ from django.views.decorators.http import require_POST
 from django.contrib.auth.decorators import login_required
 from django.forms import formset_factory
 from itertools import chain
-
+from django.contrib.auth.mixins import LoginRequiredMixin
+from django.db import transaction
 from django.utils.decorators import method_decorator
-
+from django.utils import timezone
 def index(request):
     return render (request, 'index/index.html')
 
@@ -41,9 +42,13 @@ def index_admin(request):
 
 #-------------------------------------- Cosecha Views
 
-class ProveedorView(FormView):
+
+class ProveedorView(LoginRequiredMixin, FormView):
+    """vista para registrar proveedor chequeada"""
     template_name = 'administracion/proveedor_form.html'
     form_class = Proveedorform
+    login_url = '/accounts/login/'
+    redirect_field_name = 'redirect_to'
     success_url= reverse_lazy('proveedores_registrados')
 
     def form_valid(self, form):
@@ -54,13 +59,16 @@ class ProveedorView(FormView):
         print(form.errors)
         return super().form_invalid(form)
         
-    
+@login_required 
 def proveedores_registrados(request):
+    """vista proveedores registrados chequeadas"""
     proveedores = Proveedor.objects.all()
     
     return render (request, 'administracion/proveedores_registrados.html', {'proveedores': proveedores})
    
-class IngCosechaFormView(FormView):
+class IngCosechaFormView(LoginRequiredMixin, FormView):
+    login_url = '/accounts/login/'
+    redirect_field_name = 'redirect_to'
     template_name = 'administracion/ingresar_cosecha.html'
     form_class = CargamentoForm
     success_url = reverse_lazy('cosechas_registradas')
@@ -91,7 +99,9 @@ class IngCosechaFormView(FormView):
         context ["varietales"] = varietales 
         return context 
         
-class CosechasRegistradasView(ListView):
+class CosechasRegistradasView(LoginRequiredMixin, ListView):
+    login_url = '/accounts/login'
+    redirect_field_name = 'redirect_to'
     template_name = 'administracion/cosechas_registradas.html'
     model = Cargamento
     context_object_name = 'cosechas'
@@ -107,22 +117,29 @@ class CosechasRegistradasView(ListView):
 ###### Administracion moliendas ###########    
     
     
-class RegistrarMoliendaView(FormView):
+class RegistrarMoliendaView(LoginRequiredMixin, FormView):
+    login_url = '/accounts/login/'
     template_name = 'administracion/registrar_molienda.html'
     form_class = Moliendaform
     success_url = reverse_lazy ('moliendas_registradas')
     
     
     def form_valid(self, form):
+        # Aquí 'form.save()' devuelve una instancia del modelo Molienda que el formulario crea o actualiza
+        molienda = form.save(commit=False)  # Utiliza commit=False para obtener la instancia sin guardarla todavía
         
+        # Asignar el valor de rendimiento a disponible
+        molienda.disponible = molienda.rendimiento
         
-        form.save()
-        return super().form_valid(form)
+        molienda.save()  # Ahora sí guardamos la instancia en la base de datos
+
+        # Finalmente, redirigir a 'success_url'
+        return HttpResponseRedirect(self.get_success_url())
     
     def form_invalid(self, form):
-        
-        print (form.errors)
+        print(form.errors)
         response = super().form_invalid(form)
+        return response
     
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
@@ -134,11 +151,13 @@ class RegistrarMoliendaView(FormView):
         
         return context
     
-class MoliendasRegistradasView(ListView):
+class MoliendasRegistradasView(LoginRequiredMixin, ListView):
+    login_url = '/accounts/login/'
     template_name = 'administracion/moliendas_registradas.html'
     model = Molienda
     context_object_name = 'moliendas'
     
+   
 def obtener_cantidad_disponible(request, molienda_id):
     molienda = Molienda.objects.get(id=molienda_id)
     contenidos = Contenido.objects.filter(molienda=molienda)
@@ -171,7 +190,7 @@ class ListaTanquesView(ListView):
 class DetalleTanqueView(View):
     template_name = 'administracion/detalle_tanque.html'
     form1 = ContenidoForm
-    form2 = HistorialContenidoForm
+    form2 = MoverContenidoForm
     form3 = NotaTareasForm
     
 
@@ -187,21 +206,10 @@ class DetalleTanqueView(View):
         tareas = NotaTarea.objects.filter(tanque=tanque_select)
         tanque = Tanque.objects.get(numero = numero_tanque)
         tanques = Tanque.objects.all()
-        #moliendas = Molienda.objects.all()
         
-        #moliendas = [molienda for molienda in moliendas if not molienda.contenido_set.filter(embotellado=True).exists()]
         
-        moliendas_no_en_contenido = Molienda.objects.annotate(
-        esta_en_contenido=Exists(
-            Contenido.objects.filter(molienda_id=OuterRef('pk'))
-        )
-        ).filter(esta_en_contenido=False)
-        
-        """moliendas_no_embotelladas = Molienda.objects.annotate(
-        esta_embotellada=Exists(
-            Contenido.objects.filter(molienda_id=OuterRef('pk'), embotellado=False)
-        )
-        ).filter(esta_embotellada=True)"""
+        moliendas_disponibles = Molienda.objects.filter(disponible__gt=0)
+        print(f"moliendas disponibles {moliendas_disponibles}")
         
         contenidos_filtrados = []
         for tanque in tanques:
@@ -209,14 +217,9 @@ class DetalleTanqueView(View):
             if ultimo_contenido and ultimo_contenido.cantidad > 0 and not ultimo_contenido.embotellado:
                 contenidos_filtrados.append(ultimo_contenido)
         
-        
-        
-        
-        
-        
-        
+
         context = {"tanque_detalle": tanque_select,
-                   "molienda": moliendas_no_en_contenido,
+                   "molienda": moliendas_disponibles,
                    "molienda_contenido":contenidos_filtrados,
                    "fecha": fecha_hora_formateada,
                    "form1" : form1_instance,
@@ -237,61 +240,182 @@ class DetalleTanqueView(View):
         
         
         if form_type == 'form1':
-            fecha_hora_actual = datetime.now()
-            fecha_hora_formateada = fecha_hora_actual.strftime("%d/%m/%Y %H:%M:%S")
+            
+                fecha_hora_actual = timezone.now()
+                fecha_hora_formateada = fecha_hora_actual.strftime("%d/%m/%Y %H:%M:%S")
 
-            if form1_instance.is_valid():
-                mover_contenido = request.POST.get('mover_contenido')
-
-                if mover_contenido == 'on':
-                    tanque_id = request.POST.get('tanque')
-                    molienda_id = request.POST.get('molienda')
-                    contenido_origen_id = request.POST.get('contenido_origen')
+                if form1_instance.is_valid():
+                    mover_contenido = request.POST.get('mover_contenido')
                     
-                    try:
-                        tanque = Tanque.objects.get(id=tanque_id)
-                        contenido_origen = Contenido.objects.get(id=contenido_origen_id)
-                        molienda = Molienda.objects.get(id=molienda_id)
-                        
-                        #print(contenido_origen)
-
-                        # Actualizar fecha de salida en el contenido de origen
-                        contenido_origen.fecha_salida = fecha_hora_actual
-                        contenido_origen.save()
-                        
-                        #print("este es el contenido de origen:",contenido_origen)
+                    
+                    if mover_contenido == 'on':
                         
                         
-                        #crear una nueva instancia del contenido en el tanque de origen en donde molienda sea
-                        nuevo_contenido_origen = Contenido.objects.create(
-                                tanque=contenido_origen.tanque,
-                                molienda=molienda,
-                                fecha_ingreso=fecha_hora_actual,
-                                fecha_salida=None,
-                                cantidad=0,  # Siempre es 0 en este caso
-                                mover_contenido=False,
-                                contenido_trasladado=None,
-                                embotellado=False
-                                )
                         
+                        try:
+                            molienda_id = request.POST.get('molienda')
+                            molienda = Molienda.objects.get(id=molienda_id)
+                            numero_tanque = self.kwargs['numero']
+                            print(f"Tanque ID: {numero_tanque}")
+                            tanque = Tanque.objects.get(id=numero_tanque)
+                            cantidad_a_mover = form1_instance.cleaned_data['cantidad']
+                            id_contenido_origen = request.POST.get('contenido_origen')
+                            contenido_origen = Contenido.objects.get(id=id_contenido_origen)
+                            
+                            
+                            
                                                         
-                        nuevo_contenido_origen.save()
+                            if tanque.estado == 'vacio':
+                                print("el tanque esta vacio")
                         
-                        #print("este es el nuevo contenido de origen:",nuevo_contenido_origen)
-                        
-                        #print("esta es la instancia del formulario1:",form1_instance)
-                        # Ahora, puedes guardar la instancia de form1 si es necesario
-                        form1_instance.save()
-                        redirect ('lista_tanques')
+                                with transaction.atomic():
+                                    if cantidad_a_mover == contenido_origen.cantidad:
+                                        # Actualizar el tanque del contenido origen y marcar el tanque original como vacío
+                                        tanque_origen = contenido_origen.tanque
+                                        contenido_origen.tanque = tanque
+                                        
+                                        
+                                        contenido_origen.save()
+
+                                        tanque_origen.estado = 'vacio'
+                                        tanque_origen.save()
+                                        
+                                        tanque.estado = 'en_uso'
+                                        tanque.save()
+                                        print("el codigo pasa por el if")
+                                    
+                                    elif cantidad_a_mover < contenido_origen.cantidad:
+                                        # Restar cantidad a mover del contenido de origen
+                                        contenido_origen.cantidad -= cantidad_a_mover
+                                        contenido_origen.save()
+                                        print('el codigo pasa por el elif')
+                                        
+                                        numero_tanque = self.kwargs['numero']
+                                        print(f"Tanque ID: {numero_tanque}")
+                                        tanque = Tanque.objects.get(id=numero_tanque)
+                                        tanque.estado = 'en_uso'
+                                        tanque.save()
+
+                                        # Crear nueva instancia de Contenido para el tanque destino
+                                        Contenido.objects.create(
+                                            tanque=tanque,
+                                            molienda=contenido_origen.molienda,
+                                            cantidad=cantidad_a_mover,
+                                            fecha_ingreso=fecha_hora_actual,
+                                            fecha_salida=None,
+                                            mover_contenido=False,
+                                            contenido_trasladado=None,
+                                            embotellado=False
+                                            
+                                        )
+                                        
+                                    else:
+                                        #print('este es el contenido de origen:', contenido_origen)
+                                        #print('este es el id:', contenido_origen.id)
+                                        # Lanzar un error si la cantidad a mover es mayor que la permitida
+                                        raise ValueError("La cantidad a mover no puede ser mayor que la cantidad disponible en el origen.")
+                                    
+                            elif tanque.estado == 'en_uso':
+                                print("el tanque esta en uso")
+                                
+                                
+                                try:
+                                    contenido_existente = Contenido.objects.filter(tanque=tanque).order_by('-fecha_ingreso').first()
+                                    id_contenido_origen = request.POST.get('contenido_origen')
+                                    cantidad_a_mover = form1_instance.cleaned_data['cantidad']
+                                    contenido_origen = Contenido.objects.get(id=id_contenido_origen)
+                                    numero_tanque = contenido_origen.tanque.id
+                                    tanque_origen = Tanque.objects.get(id=numero_tanque)
+                                    
+                                    
+                                    print(f"este es el contenido de origen:{contenido_origen}")
+                                    print(f"este es el contenido existente{contenido_existente}")
+                                       
+                                            
+                                    if contenido_origen.molienda.cargamento.varietal.nombre == contenido_existente.molienda.cargamento.varietal.nombre:
+                                                
+
+                                                if cantidad_a_mover < contenido_origen.cantidad:
+                                                    
+                                                    contenido_existente.cantidad += cantidad_a_mover
+                                                    contenido_origen.cantidad -= cantidad_a_mover
+                                                            
+                                                    contenido_origen.save()
+                                                    contenido_existente.save()
+                                                        
+                                                        
+                                                        
+                                                elif cantidad_a_mover == contenido_origen.cantidad:
+                                                    #print('la cantidad a mover es la misma que la de origen')
+                                                    contenido_origen.cantidad = 0
+                                                    #print('esta es la cantidad de origen:' ,contenido_origen.cantidad)
+                                                    #print('esta es la cantidad a mover:', cantidad_a_mover)
+                                                    #print(f"este es el contenido de origenactualizado: {contenido_origen}")
+                                                    tanque_origen.estado = 'vacio'
+                                                    #print('este es el id del tanque de origen:', tanque_origen.id)
+                                                    #print(f"este es el estado del tanque de origen {tanque_origen.estado}")
+                                                    contenido_existente.cantidad += cantidad_a_mover
+                                                    contenido_existente.save()
+                                                    #print(f"este es el contenido existente actualizado: {contenido_existente}")
+                                                    tanque_origen.save()
+                                                    contenido_origen.save()
+                                                    
+                                                    
+                                                    
+                                                elif contenido_existente.id == contenido_origen.id:
+                                                    raise ValidationError("no se puede mover el mismo contenido al mismo tanque")
+                                                else:
+                                                    raise ValueError("no se puede mover mas contenido del disponible")
+                                                
+                                except (Tanque.DoesNotExist, Contenido.DoesNotExist, Molienda.DoesNotExist) as e:
+                                            error_message = f"Error: {str(e)}"
+                                            print('el error es por que no existe')
+                                            print("este es el error:",error_message)
+                                        
+
+                            redirect ('lista_tanques')
+                                
+
+                        except Contenido.DoesNotExist:
+                            print(f"El contenido con el id '{id_contenido_origen}' proporcionado no existe.")
+
+                        except ObjectDoesNotExist:
+                            print("El objeto buscado no existe.")  # Para el caso de tanque sin contenido
+                        except Exception as e:
+                            print(f"Error inesperado: {str(e)}")
+                            
                         
 
-                    except (Tanque.DoesNotExist, Contenido.DoesNotExist, Molienda.DoesNotExist) as e:
-                        error_message = f"Error: {str(e)}"
-                        print("este es el error:",error_message)
-                        return render(request, self.template_name, {'error_message': error_message})
+                    else:
+                        with transaction.atomic():
+                            molienda_id = request.POST.get('molienda')
+                            
+                            cantidad_asignada = form1_instance.cleaned_data['cantidad']
+                            print('esta es la cantidad asignada:', cantidad_asignada)
 
-                else:
-                    form1_instance.save()
+                            try:
+                                molienda = Molienda.objects.get(id=molienda_id)
+                                # Restar la cantidad asignada del disponible en la molienda
+                                molienda.disponible -= cantidad_asignada
+                                molienda.save()
+                                numero_tanque = self.kwargs['numero']
+                                tanque = Tanque.objects.get(id=numero_tanque)
+                                tanque.estado = 'en_uso'
+                                tanque.save()
+                                print(f"este es el estado del tanque de origen:{tanque.estado}")
+
+                                # Guardar la instancia del formulario si es necesario
+                                form1_instance.save()
+                            
+                            except Molienda.DoesNotExist as e:
+                                error_message = f"Error: {str(e)}"
+                                print("este es el error:", error_message)
+                                return render(request, self.template_name, {'error_message': error_message})
+
+                                # Redirección con return
+                        
+                            print(form1_instance.errors)
+                return redirect('lista_tanques')
 
         elif form_type == 'form2':
             # Procesar formulario 2
@@ -307,44 +431,33 @@ class DetalleTanqueView(View):
                 form3_instance.save()
             else:
                 print(form3_instance.errors)
-
-        return redirect(reverse_lazy('lista_tanques'))
+                
+        
+        print('hay errores aca')
+        #return redirect(reverse_lazy('lista_tanques'))
               
     
-def obtener_contenidos_tanques(request, id):
-    contenidos_tanques = []
-    tanques = Tanque.objects.all()
-    molienda = Molienda.objects.get(id=id)  # Obtener la instancia de Molienda
+def obtener_contenidos_tanques(request, contenidoId):
+    try:
+        contenido = Contenido.objects.get(id=contenidoId)
+        
+        # Preparar el diccionario con la información del contenido seleccionado
+        contenido_info = {
+            'contenido_id': contenido.id,
+            'contenido_lote': contenido.molienda.cargamento.lote,
+            'tanque_id': contenido.tanque.id,
+            'tanque': contenido.tanque.numero,
+            'contenido': contenido.molienda.cargamento.varietal.nombre,
+            'cantidad': contenido.cantidad
+        }
+        print('este es el contenido disponible:', contenido)
+        # Retornar la información como JSON
+        return JsonResponse(contenido_info)
+        
 
-    if request.META.get('HTTP_X_REQUESTED_WITH') == 'XMLHttpRequest' and request.GET.get('mover_contenido') == 'true':
-        for tanque in tanques:
-            # Subquery para obtener el ID del último contenido para cada lote
-            subquery = Contenido.objects.filter(
-                molienda__cargamento__lote=OuterRef('molienda__cargamento__lote'),
-                molienda__cargamento__varietal=OuterRef('molienda__cargamento__varietal')
-            ).order_by('-fecha_ingreso').values('id')[:1]
-
-            contenidos = Contenido.objects.filter(
-                tanque=tanque,
-                molienda=molienda,
-                id=Subquery(subquery)
-            )
-            
-            for contenido in contenidos:
-                contenidos_tanques.append({
-                    'contenido_id': contenido.id,
-                    'contenido_lote': contenido.molienda.cargamento.lote,
-                    'tanque_id': tanque.id,
-                    'tanque': tanque.numero,
-                    'contenido': contenido.molienda.cargamento.varietal,
-                    'cantidad': contenido.cantidad
-                })
-    
-    print(contenidos_tanques)
-    return JsonResponse(contenidos_tanques, safe=False)
-    
-    # Añade una respuesta predeterminada aquí
-    return HttpResponse("No se encontraron contenidos de tanques para la molienda seleccionada.")
+    except Contenido.DoesNotExist:
+        # Manejar el caso de que no se encuentre el contenido
+        return HttpResponse("Contenido no encontrado.", status=404)
   
     
 class EditarNotaTareaView(View):

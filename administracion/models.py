@@ -19,7 +19,7 @@ class Varietal(models.Model):
     uva = models.CharField(max_length=50)
     
     def __str__(self):
-        return self.nombre, self.id
+        return f" {self.nombre}, {self.id}"
 
 
 class Cargamento(models.Model):
@@ -42,7 +42,7 @@ class Cargamento(models.Model):
     azucar = models.DecimalField(max_digits=5, decimal_places=2)
     
     def __str__(self):
-        return f"Cargamento lote N° {self.lote}, varietal: {self.varietal}, fecha {self.fecha}"
+        return f"Cargamento lote N° {self.lote}, varietal: {self.varietal.nombre}, fecha {self.fecha}"
 
 class Molienda(models.Model):
     cargamento = models.OneToOneField(Cargamento, on_delete=models.CASCADE, null=False)
@@ -52,23 +52,31 @@ class Molienda(models.Model):
     responsables = models.CharField(max_length=200)
     cantidad_operarios = models.IntegerField()
     rendimiento = models.IntegerField()
+    disponible = models.IntegerField(null=True, blank=True)
     
     
     def embotellado(self):
         return self.contenido_set.filter(embotellado=True).exists()
     
     def __str__(self):
-        return f"Molienda lote N° {self.cargamento.lote}, id:{self.id} varietal: {self.cargamento.varietal}, fecha: {self.fecha_molienda}, rendimiento: {self.rendimiento}"
+        return f"Molienda lote N° {self.cargamento.lote}, id:{self.id} varietal: {self.cargamento.varietal.nombre}, fecha: {self.fecha_molienda}, rendimiento: {self.rendimiento}"
 
 class Tanque(models.Model):
+    ESTADOS = (
+        ('vacio', 'Vacío'),
+        ('en_uso', 'En Uso'),
+        ('en_limpieza', 'En Limpieza'),
+        # Agrega más estados según sea necesario
+    )
+
     numero = models.IntegerField(unique=True)
     volumen = models.IntegerField()
     material = models.CharField(max_length=200)
     qr = models.ImageField(upload_to='qr_tanques/', null=True)
-    
-    
+    estado = models.CharField(max_length=20, choices=ESTADOS, default='vacio')
+
     def __str__(self):
-        return F"Tanque N° {self.numero} de {self.volumen} litros"
+        return F"Tanque N° {self.numero} de {self.volumen} litros, estado: {self.estado}"
 
 class Contenido(models.Model):
     tanque = models.ForeignKey(Tanque, on_delete=models.CASCADE)
@@ -98,18 +106,28 @@ class Contenido(models.Model):
             super().save(*args, **kwargs)
         
     def __str__(self):
-        return f"lote N° { self.molienda.cargamento.lote } varietal: { self.molienda.cargamento.varietal } cantidad: { self.cantidad }"
+        return f"lote N° { self.molienda.cargamento.lote } varietal: { self.molienda.cargamento.varietal.nombre } cantidad: { self.cantidad }, id:{self.id}"
     
     
     
 class HistorialContenido(models.Model):
-    contenido = models.ForeignKey(Contenido, on_delete=models.CASCADE)
-    fecha = models.DateField(auto_now_add=True)
-    notas_cata = models.TextField(blank=True, null=True)
-    correcciones = models.TextField(blank=True, null=True)
-    observaciones = models.TextField(blank=True, null=True)
-    analisis = models.FileField(upload_to='analisis/', blank=True, null=True)
-    insumos = models.TextField(blank=True, null=True)
+    ACCIONES = (
+        ('salida', 'Salida'),
+        ('salida_parcial', 'Salida Parcial'),
+        ('vacio', 'Vacío'),
+        ('llenado', 'Llenado'),
+        ('re_llenado', 'Re-Llenado'),
+    )
+
+    tanque = models.ForeignKey(Tanque, on_delete=models.CASCADE, null=True)
+    contenido = models.ForeignKey(Contenido, on_delete=models.CASCADE, null=True)
+    accion = models.CharField(max_length=20, choices=ACCIONES, null=True)
+    fecha = models.DateTimeField(auto_now_add=True, null=True)  # Cambiado a DateTimeField
+    
+
+    def __str__(self):
+        # Esta representación es solo un ejemplo, ajústala según lo que prefieras
+        return f"{self.accion} en {self.tanque} - {self.fecha.strftime('%Y-%m-%d %H:%M:%S')}"
 
 class NotaTarea(models.Model):
     tanque = models.ForeignKey(Tanque, on_delete=models.CASCADE, null= True, blank=True)
@@ -137,7 +155,7 @@ class Embotellamiento(models.Model):
     observaciones = models.TextField(default=" ")
 
     def __str__(self):
-        return f"Embotellamiento de {self.contenido.molienda.cargamento.varietal}, lote {self.contenido.molienda.cargamento.lote} ({self.fecha_envasado})"
+        return f"Embotellamiento de {self.contenido.molienda.cargamento.varietal.nombre}, lote {self.contenido.molienda.cargamento.lote} ({self.fecha_envasado})"
     
 def get_default_deposito():
     return Deposito.objects.get_or_create(id=3)[0].id

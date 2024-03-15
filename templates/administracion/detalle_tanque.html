@@ -65,11 +65,10 @@
                     {% if contenido.molienda %}
                     <a class="float-right">{% if contenido and contenido.cantidad > 0 and not contenido.embotellado %}
                       <p> {{ contenido.cantidad }}lts</p>
-                  {% else %}
-                      <p>Vacio.</p>
+                  
                   {% endif %} </a>
                     {% else %}
-                    <a class="float-right">
+                    <a class="float-right">{{ tanque_detalle.estado }}
                 {% endif %}</a>
                 </li>
                 
@@ -90,54 +89,16 @@
           <div class="card">
             <div class="card-header p-3">
               <ul class="nav nav-pills">
-                <li class="nav-item"><a class="nav-link active" href="#tareas" data-toggle="tab">Tareas</a></li>
+                
                 <li class="nav-item"><a class="nav-link" href="#notas" data-toggle="tab">Notas</a></li>
-                <li class="nav-item"><a class="nav-link" href="#lineatiempo" data-toggle="tab">Historial contenido</a></li>
+                {% comment %} <li class="nav-item"><a class="nav-link" href="#lineatiempo" data-toggle="tab">Historial contenido</a></li> {% endcomment %}
                 <li class="nav-item"><a class="nav-link" href="#cargacontenido" data-toggle="tab">Cargar contenido</a></li>
-                <li class="nav-item"><a class="nav-link" href="#nuevatarea" data-toggle="tab">Registrar nueva tarea</a></li>
+                
               </ul>
             </div><!-- /.card-header -->
             <div class="card-body">
               <div class="tab-content">
-                <div class="active tab-pane" id="tareas">
-                  
-
-                  <!-- Post -->
-                  
-                  {% for t in tarea %}
-                    {% if not t.realizada %}
-                    <div class="post clearfix">
-                      <div class="user-block">
-                        <span class="">
-                          <strong>{{ t.titulo }}</strong>
-                        </span>
-                        <span class="description">Agendado el {{ t.fecha }}</span>
-                      </div>
-                      <!-- /.user-block -->
-                      <p>
-                        <strong>Tarea:</strong>
-                        {{ t.titulo }}
-                      </p>
-                      <p>
-                        <strong>Notas:</strong>
-                        {{ t.nota }}
-                      </p>
-                      <a href="{% url "editar_nota_tarea" t.id %}" class="btn btn-warning">Registrar tarea completa</a>
-                    </div>
-                    {% endif %}
-                  {% endfor %}
-                  
-                  <!-- /.post -->
-                  
-                  <!-- Post -->
-                  
-                    <!-- /.row -->
-
-                    
-
-                   
-                  <!-- /.post -->
-                </div>
+                
                 <!-- /.tab-pane -->
                 <div class="tab-pane" id="notas">
                   <form class="form-horizontal" method="post" enctype="multipart/form-data">
@@ -195,7 +156,7 @@
                   </form>
                 </div>
 
-                <div class="tab-pane" id="lineatiempo">
+                {% comment %} <div class="tab-pane" id="lineatiempo">
                   <!-- The timeline -->
                   <div class="timeline timeline-inverse">
                     <!-- timeline time label -->
@@ -288,7 +249,7 @@
                       <i class="far fa-clock bg-gray"></i>
                     </div>
                   </div>
-                </div>
+                </div> {% endcomment %}
                 <!-- /.tab-pane -->
 
                 <div class="tab-pane" id="cargacontenido">
@@ -319,12 +280,13 @@
                     <div class="form-group row">
                       <label for="inputName" class="col-sm-2 col-form-label" >Molienda</label>
                       <div class="col-sm-10">
+                        
                         <div class="form-group">
                           <div id="molienda_en_contenido"><select class="custom-select" name="molienda" onchange="obtenerCantidadDisponible(this.value)" >
                             
                             
                             {% for i in molienda_contenido %}
-                              <option value="{{ i.molienda.id }}">Lote:{{ i.molienda.cargamento.lote }},  Varietal: {{ i.molienda.cargamento.varietal }}, Rendimiento: {{ i.molienda.rendimiento }} lts, Tanque origen:{{ i.tanque.numero }}</option>
+                              <option value="{{ i.molienda.id }}" data-contenido-id="{{ i.id }}">Lote:{{ i.molienda.cargamento.lote }},  Varietal: {{ i.molienda.cargamento.varietal }}, cantidad disponible: {{ i.cantidad }} lts, Tanque origen:{{ i.tanque.numero }}, {{ i.id }} </option>
                             {% endfor %}
 
                           </select></div> 
@@ -333,7 +295,7 @@
                               <option selected>Seleccione una molienda</option>
                               
                               {% for i in molienda %}
-                                <option value="{{ i.id }}">Lote:{{ i.cargamento.lote }},  Varietal: {{ i.cargamento.varietal }}, Rendimiento: {{ i.rendimiento }} lts</option>
+                                <option value="{{ i.id }}">Lote:{{ i.cargamento.lote }},  Varietal: {{ i.cargamento.varietal }}, Rendimiento: {{ i.rendimiento }} lts, Disponible: {{ i.disponible }} lts</option>
                               {% endfor %}
 
                             </select></div>
@@ -364,42 +326,50 @@
                             </script>
                             <script>
                               $(document).ready(function() {
-                                  $('#id_mover_contenido').change(function() {
-                                      if ($(this).is(':checked')) {
-                                          var selectedMoliendaId = $('select[name="molienda"]').val(); // Obtener el valor seleccionado del select de molienda
-                                          
-                                          $.ajax({
-                                              url: '/obtener_contenidos_tanques/' + selectedMoliendaId + '/',
-                                              headers: { 'Accept': 'application/json' },
-                                              data: {
-                                                  mover_contenido: true,
-                                                  molienda: selectedMoliendaId  // Pasar el ID de molienda en la solicitud AJAX
-                                              },
-                                              success: function(data) {
-                                                  // Imprimir los datos para verificar su estructura
-                                                  var selectOptions = '';
-                                                  for (var i = 0; i < data.length; i++) {
-                                                      selectOptions += '<option>' + data[i].contenido + ' (Tanque ' + data[i].tanque + ', Cantidad: ' + data[i].cantidad + ' litros)</option>';
-                                                  }
-                                                  $('#contenido-select').html('<select class="custom-select" name="contenido_trasladado">' + selectOptions + '</select>');
-                          
-                                                  // Recupera el contenido_id de la primera opción (asumiendo que solo hay una)
-                                                  var contenidoId = data[0].contenido_id;
-                          
-                                                  // Agrega un campo oculto con el valor de contenido_id
-                                                  $('#contenido-id').append('<input type="number" name="contenido_origen" value="' + contenidoId + '" readonly>');
-                          
-                                                  // Actualiza el campo "Cantidad (lts)" con el valor de contenido.cantidad
-                                                  var cantidad = data[0].cantidad;
-                                                  $('input[name="cantidad"]').val(cantidad);
-                                              }
-                                          });
-                                      } else {
-                                          $('#contenido-select').html('');
-                                      }
-                                  });
-                              });
-                          </script>
+                                // Asegúrate de que esta función se llame correctamente en respuesta al evento onchange del select relevante
+                                function obtenerCantidadDisponible(selectElement) {
+                                  // Accede al option seleccionado
+                                  var selectedOption = selectElement.options[selectElement.selectedIndex];
+                                  // Obtiene el data-contenido-id del option seleccionado
+                                  var contenidoId = selectedOption.getAttribute('data-contenido-id').trim(); // Usa trim() para asegurarte de eliminar espacios extra
+                                  console.log("Contenido ID:", contenidoId); // Para depuración
+                              
+                                  if ($('#id_mover_contenido').is(':checked')) {
+                                      $.ajax({
+                                          url: '/obtener_contenidos_tanques/' + contenidoId + '/', // Asegúrate de que la URL sea correcta
+                                          success: function(data) {
+                                              // Lógica para actualizar el UI basada en la respuesta
+                                              console.log(data); // Imprime la respuesta para depuración
+                                              // Ejemplo de cómo podrías querer actualizar el UI:
+                                              $('#contenido-id').html('<input type="hidden" name="contenido_origen" value="' + contenidoId + '" readonly>');
+                                              // Actualiza otros elementos del UI según sea necesario
+                                          }
+                                      });
+                                  } else {
+                                      $('#contenido-select').html('');
+                                  }
+                              }
+                            
+                                // Este código parece estar intentando llamar a una función que no se ha definido o mostrado previamente
+                                // Si la intención es capturar el cambio en el select de "molienda", asegúrate de que la función llamada sea correcta
+                                $('select[name="molienda"]').change(function() {
+                                    obtenerCantidadDisponible(this); // Asegúrate de llamar a obtenerCantidadDisponible correctamente
+                                });
+                            
+                                // Si el checkbox "id_mover_contenido" cambia, puede que también necesites ajustar el comportamiento aquí
+                                $('#id_mover_contenido').change(function() {
+                                    if (this.checked) {
+                                        // Potencialmente, podrías querer forzar la recarga de la información basada en la selección actual
+                                        var selectElement = $('select[name="molienda"]')[0];
+                                        obtenerCantidadDisponible(selectElement);
+                                    } else {
+                                        $('#contenido-select').html('');
+                                    }
+                                });
+                            });
+                            
+                              </script>
+                              
 
 
                             
@@ -440,50 +410,7 @@
                   </form>
                 </div>
 
-                <div class="tab-pane" id="nuevatarea">
-                  <form class="form-horizontal" method="post" enctype="multipart/form-data">
-                    {% csrf_token %}
-                    <input type="hidden" name="form_type" value="form3">
-                      <div class="form-group row" style="">
-                        <label for="inputEmail" class="col-sm-2 col-form-label">Tanque</label>
-                        <div class="col-sm-10">
-                            <input name="tanque" type="text" class="form-control" value="{{ tanque_detalle.id }}">
-                        </div>
-                      </div>
-                      <div class="form-group row" >
-                        <label for="inputEmail" class="col-sm-2 col-form-label">Fecha de creación</label>
-                        <div class="col-sm-10">
-                          <input name="fecha" type="text" class="form-control" value="{{ fecha }}">
-                        </div>
-                      </div>
-
-                      <div class="form-group row">
-                        <label for="inputEmail" class="col-sm-2 col-form-label">Titulo tarea</label>
-                        <div class="col-sm-10">
-                          <input name="titulo" type="text" class="form-control" value="" placeholder="Ingrese un titulo para la nueva tarea">
-                        </div>
-                      </div>
-
-                      <div class="form-group row">
-                        <label for="inputEmail" class="col-sm-2 col-form-label">Notas</label>
-                        <div class="col-sm-10">
-                          <textarea name="nota" class="form-control" rows="3" placeholder="Notas para el operario"></textarea>
-                        </div>
-                      </div>
-
-                      <div class="form-check" style="margin-bottom:15px !important">
-                        <input type="checkbox" class="form-check-input" name="realizada" id="exampleCheck1">
-                        <label class="form-check-label" for="exampleCheck1">Tarea realizada</label>
-                      </div>
-
-                    
-                    <div class="form-group row">
-                      <div class="offset-sm-2 col-sm-10">
-                        <button type="submit" class="btn btn-block btn-danger btn-lg">Registrar nueva tarea</button>
-                      </div>
-                    </div>
-                  </form>
-                </div>
+                
                 <!-- /.tab-pane -->
               </div>
               <!-- /.tab-content -->

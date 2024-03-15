@@ -47,15 +47,16 @@
                                 <td>{{ tanque.volumen }} Lts</td>
                                 <td>{{ tanque.material }}</td>
                                 <td>
-                                  {% if tanque.ultimo_contenido.molienda.id == 30 %}
-                                      Vacio
-                                  {% elif tanque.ultimo_contenido == None %}
-                                      Vacio
-                                  {% elif tanque.ultimo_contenido.cantidad == 0 %}
-                                    Vacío 
+                                  {% if tanque.estado == 'en_uso' %}
+                                    {% if tanque.ultimo_contenido.cantidad == 0 %}
+                                      Vacio.
+                                    {% else %}
+                                      {{tanque.ultimo_contenido}}
+                                    {% endif %}
                                   {% else %}
-                                      {{ tanque.ultimo_contenido }}
+                                  Vacio.
                                   {% endif %}
+                                  
                                 </td>
                                 <td><a href="{% url "detalle_tanque" tanque.numero %}">detalles del tanque</a></td>
                             </tr>

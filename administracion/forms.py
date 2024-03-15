@@ -43,15 +43,18 @@ class ContenidoForm(forms.ModelForm):
         input_formats=["%d/%m/%Y %H:%M:%S"],
         
     )
-
     class Meta:
         model = Contenido
         fields = ['tanque', 'molienda', 'fecha_ingreso', 'fecha_salida', 'cantidad']
         
-class HistorialContenidoForm(forms.ModelForm):
-    class Meta:
-        model = HistorialContenido
-        fields = '__all__'
+class MoverContenidoForm(forms.Form):
+    
+    tanque = forms.CharField(max_length=100)
+    contenido = forms.CharField(max_length=50, required=False)
+    fecha_ingreso = forms.CharField(max_length=50)
+    fecha_salida = forms.EmailField()
+    cantidad = forms.CharField(max_length=50)
+    
         
 class NotaTareasForm(forms.ModelForm):
     class Meta:

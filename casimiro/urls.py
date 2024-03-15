@@ -6,6 +6,7 @@ from contabilidad.views import *
 from tareas.views import *
 from django.conf.urls.static import static
 
+
 urlpatterns = [
     path('admin/', admin.site.urls),
     path('', index, name="index"),
@@ -15,7 +16,7 @@ urlpatterns = [
     path('accounts/', include('allauth.urls')),
     
     # COSECHA URLS
-    path('administracion/cosecha/registrar_proveedor/',ProveedorView.as_view(), name='registrar_proveedor'),
+    path('administracion/cosecha/registrar_proveedor/', ProveedorView.as_view(), name='registrar_proveedor'),
     path('administracion/cosecha/proveedores_registrados/',proveedores_registrados, name='proveedores_registrados'),
     path('administracion/cosecha/ingresar_cosecha/',IngCosechaFormView.as_view() ,name='ingresar_cosecha'),
     path('administracion/cosecha/cosecheas_registradas/',CosechasRegistradasView.as_view() ,name='cosechas_registradas'),
@@ -24,7 +25,7 @@ urlpatterns = [
     # MOLIENDA URLS
     path('administracion/molienda/registrar_molienda/',RegistrarMoliendaView.as_view() ,name='registrar_molienda'),
     path('administracion/molienda/moliendas_registradas/',MoliendasRegistradasView.as_view() ,name='moliendas_registradas'),
-    path('obtener_cantidad_disponible/<int:molienda_id>/', obtener_cantidad_disponible, name='obtener_cantidad_disponible'),
+    #path('obtener_cantidad_disponible/<int:int>/', obtener_cantidad_disponible, name='obtener_cantidad_disponible'),
 
     
     
@@ -32,7 +33,7 @@ urlpatterns = [
     path('tanques/lista_de_tanques/',ListaTanquesView.as_view() ,name='lista_tanques'),
     path('tanques/detalle_tanque/<int:numero>',DetalleTanqueView.as_view() ,name='detalle_tanque'),
     path('nota_tarea/<int:nota_tarea_id>/editar/', EditarNotaTareaView.as_view(), name='editar_nota_tarea'),
-    path('obtener_contenidos_tanques/<int:id>/', obtener_contenidos_tanques, name='obtener_contenidos_tanques'),
+    path('obtener_contenidos_tanques/<int:contenidoId>/', obtener_contenidos_tanques, name='obtener_contenidos_tanques'),
     
     
     #embotellamiento URls
