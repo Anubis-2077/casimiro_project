@@ -237,7 +237,7 @@ class Deposito(models.Model):
     # Otros campos que necesites
 
     def __str__(self):
-        return self.nombre
+        return f"nombre: {self.nombre}, id: {self.id}"
 
     
 

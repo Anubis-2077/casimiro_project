@@ -337,13 +337,8 @@
 
 
               
-              <li class="nav-item">
-                <a href="#" class="nav-link">
-                  <i class="fa-solid fa-file-invoice-dollar"></i>
-                  <p>Caja</p>
-                </a>
-              </li>
-              
+              {% comment %} deudores y acreedores {% endcomment %}
+              {% comment %} 
               <li class="nav-item has-treeview">
                 <a href="#" class="nav-link">
                   <i class="fa-solid fa-money-check-dollar"></i>
@@ -369,7 +364,7 @@
                   
                   
                 </ul>
-              </li>
+              </li> {% endcomment %}
 
               <li class="nav-item">
                 <a href="{% url "listado_clientes" %}" class="nav-link">

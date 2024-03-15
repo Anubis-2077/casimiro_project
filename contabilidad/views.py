@@ -23,14 +23,18 @@ import base64
 from email.mime.multipart import MIMEMultipart
 from email.mime.text import MIMEText
 from django.template.loader import render_to_string
+from django.contrib.auth.decorators import login_required
+from django.contrib.auth.mixins import LoginRequiredMixin
 
 
 # Create your views here.
 
 
+@login_required
 def registro_deudores (request):
     return render (request, 'contabilidad/registro_deudores.html')
 
+@login_required
 def registro_acreedores (request):
     return render (request, 'contabilidad/registro_acreedores.html')
 
@@ -41,24 +45,29 @@ def registro_acreedores (request):
 
 # ------------------------------------  CONTABILIDAD   ---------------------------------------------
 # ------------------------------------  CLIENTES -------------------------------------
-
+@login_required
 def cliente_list(request):
     listado_clientes = Cliente.objects.all()
     return render (request, 'contabilidad/listado_clientes.html', {'listado_clientes': listado_clientes})
 
-class ClienteCreateView(CreateView):
+class ClienteCreateView(LoginRequiredMixin, CreateView):
+    login_url = 'accounts/login/'
     model = Cliente
     form_class = ClienteForm
     template_name = 'contabilidad/create_cliente.html'
     success_url = reverse_lazy('listado_clientes')  
 
-class ClienteUpdateView(UpdateView):
+class ClienteUpdateView(LoginRequiredMixin, UpdateView):
+    login_url = 'accounts/login/'
     model = Cliente
     form_class = ClienteForm
     template_name = 'contabilidad/create_cliente.html'
     success_url = reverse_lazy('listado_clientes')
     
+    
+    
 
+@login_required
 @csrf_exempt
 @require_POST
 def eliminar_cliente(request, pk):
@@ -70,23 +79,26 @@ def eliminar_cliente(request, pk):
     
 # ------------------------------------  PROVEEDORES -------------------------------------
     
-    
+@login_required  
 def proveedor_list (request):
     listado_proveedores = ProveedorInsumos.objects.all()
     return render (request, 'contabilidad/listado_proveedores.html', {'listado_proveedores': listado_proveedores})
 
-class ProveedorInsumosCreateView(CreateView):
+class ProveedorInsumosCreateView(LoginRequiredMixin, CreateView):
+    login_url = '/accounts/login/'
     model = ProveedorInsumos
     form_class = ProveedorInsumosForm
     template_name = 'contabilidad/create_proveedor.html'
     success_url = reverse_lazy('listado_proveedores')  
 
-class ProveedorInsumosUpdateView(UpdateView):
+class ProveedorInsumosUpdateView(LoginRequiredMixin, UpdateView):
+    login_url = '/accounts/login/'
     model = ProveedorInsumos
     form_class = ProveedorInsumosForm
     template_name = 'contabilidad/create_proveedor.html'
     success_url = reverse_lazy('listado_proveedores')
-    
+
+@login_required    
 @csrf_exempt
 @require_POST
 def eliminar_proveedor(request, pk):
@@ -101,12 +113,13 @@ def eliminar_proveedor(request, pk):
 
 #ACTUALIZAR PRECIOS----------------------------------------------------
 
-
+@login_required
 def actualizar_precios(request):
     return render (request,'contabilidad/actualizar_precios.html')
 
 
-class ActualizarPreciosEmpaquetadoView(View):
+class ActualizarPreciosEmpaquetadoView(LoginRequiredMixin, View):
+    login_url = 'accounts/login'
     template_name = 'contabilidad/actualizar_precios_empaquetado.html'
 
     def get(self, request, *args, **kwargs):
@@ -120,7 +133,7 @@ class ActualizarPreciosEmpaquetadoView(View):
             empaquetado_formset.save()
             
             #print("este es el empaquetado formset: ", empaquetado_formset.cleaned_data)
-            return redirect('index_admin')
+            return redirect('actualizar_precios')
 
         else:
             print("Errores del formset empaquetado:", empaquetado_formset.errors)
@@ -136,7 +149,8 @@ class ActualizarPreciosEmpaquetadoView(View):
     
     
 
-class ActualizarPreciosEtiquetadoView(View):
+class ActualizarPreciosEtiquetadoView(LoginRequiredMixin, View):
+    login_url = 'accounts/login'
     template_name = 'contabilidad/actualizar_precios_etiquetado.html'
 
     def get(self, request, *args, **kwargs):
@@ -152,7 +166,7 @@ class ActualizarPreciosEtiquetadoView(View):
             #print("este es el formset etiquetado: ", etiquetado_formset.cleaned_data)
             
             # Redirigir a alguna URL de éxito
-            return redirect('index_admin')
+            return redirect('actualizar_precios')
 
         else:
             
@@ -176,7 +190,7 @@ class ActualizarPreciosEtiquetadoView(View):
 
 
 #VENTAS---------------------------------------(detalles de ventas)
-
+@login_required
 def seleccion_deposito(request):
     depositos = Deposito.objects.all()
     context ={
@@ -184,6 +198,9 @@ def seleccion_deposito(request):
     }
     return render (request, 'contabilidad/seleccion_deposito.html', context)
 
+
+
+@login_required
 def obtener_detalles_venta(request, producto_id, tipo):
     if tipo == 'etiquetado':
         producto = get_object_or_404(StockBodegaEtiquetado, id=producto_id)
@@ -204,7 +221,7 @@ def obtener_detalles_venta(request, producto_id, tipo):
         
     return JsonResponse(data)
 
-
+@login_required
 def obtener_detalles_venta_sucursal(request, producto_id, tipo):
     if tipo == 'etiquetado':
         producto = get_object_or_404(MoverStockEtiquetado, id=producto_id)
@@ -228,14 +245,22 @@ def obtener_detalles_venta_sucursal(request, producto_id, tipo):
 
 #VENTAS-----------------------------------------------(BODEGA)
 
-class CrearVentaBodegaView(CreateView):
+class CrearVentaBodegaView(LoginRequiredMixin, CreateView):
+    login_url = '/acounts/login/'
     model = Venta
     form_class = VentaForm
     template_name = 'contabilidad/nueva_venta_bodega.html'
-    success_url = reverse_lazy('index_admin')
+    success_url = reverse_lazy('detalle_ventas')
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
+        
+        empaquetados = StockBodegaEmpaquetado.objects.filter(cantidad_cajas__gt=0)
+        etiquetados = StockBodegaEtiquetado.objects.filter(cantidad_botellas__gt=0)
+
+        # Imprimir en la consola del servidor
+        print("Productos Empaquetados:", empaquetados)
+        print("Productos Etiquetados:", etiquetados)
         context['empaquetados'] = StockBodegaEmpaquetado.objects.filter(cantidad_cajas__gt=0)
         context['etiquetados'] = StockBodegaEtiquetado.objects.filter(cantidad_botellas__gt=0)
         context['clientes'] = Cliente.objects.all()
@@ -293,11 +318,12 @@ DetalleVentaFormset = inlineformset_factory(Venta, DetalleVenta, form=DetalleVen
 
 #VENTAS--------------------------------------------------(SUCURSALES)
 
-class CrearVentaSucursalView(CreateView):
+class CrearVentaSucursalView(LoginRequiredMixin, CreateView):
+    login_url = '/acounts/login/'
     model = Venta
     form_class = VentaForm
     template_name = 'contabilidad/nueva_venta_sucursal.html'
-    success_url = reverse_lazy('index_admin')
+    success_url = reverse_lazy('detalle_ventas')
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
@@ -362,7 +388,8 @@ DetalleVentaSucursalFormset = inlineformset_factory(Venta, DetalleVentaSucursal,
 #VENTAS-------------------------------------------------(DETALLES)
 
 
-class DetallesVentasView(View):
+class DetallesVentasView(LoginRequiredMixin, View):
+    login_url = '/accounts/login/'
     def get(self, request, *args, **kwargs):
         ventas_por_mes = Venta.objects.annotate(mes=TruncMonth('fecha_venta')).values('mes').annotate(total=Sum('precio_total')).order_by('mes')
         

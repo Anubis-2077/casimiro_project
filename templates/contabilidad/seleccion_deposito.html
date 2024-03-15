@@ -19,9 +19,10 @@
         </div><!-- /.container-fluid -->
       </section>
       <section>
+        <a href="{% url 'nueva_venta_bodega' %}"  class="btn btn-block btn-info btn-lg" style="">BODEGA</a>
         {% for deposito in depositos %}
-        {% if deposito.nombre == BODEGA %}
-        <a href="{% url "nueva_venta_bodega" pk=deposito.id %}"  class="btn btn-block btn-info btn-lg" style="">{{ deposito.nombre }}</a>
+        {% if deposito.id == 1 %}
+        
         {% else %}
         <a href="{% url "nueva_venta_sucursal" pk=deposito.id %}"  class="btn btn-block btn-info btn-lg" style="">{{ deposito.nombre }}</a>
         {% endif %}

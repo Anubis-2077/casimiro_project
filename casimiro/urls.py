@@ -75,6 +75,10 @@ urlpatterns = [
     path('clientes/nuevo/', ClienteCreateView.as_view(), name='cliente_create'),
     path('clientes/editar/<int:pk>/', ClienteUpdateView.as_view(), name='cliente_update'),
     path('clientes/eliminar/<int:pk>/', eliminar_cliente, name='cliente_delete'),
+    
+    
+    
+    
     path('proveedores_insumos/listado_proveedores/', proveedor_list, name="listado_proveedores"),
     path('proveedores_insumos/nuevo/', ProveedorInsumosCreateView.as_view(), name='proveedor_create'),
     path('proveedores_insumos/editar/<int:pk>/', ProveedorInsumosUpdateView.as_view(), name='proveedor_update'),
@@ -87,7 +91,7 @@ urlpatterns = [
     path('contabilidad/seleccion_deposito/', seleccion_deposito ,name='seleccion_deposito_venta'),
     path('contabilidad/obtener_detalles_venta/<int:producto_id>/<str:tipo>/', obtener_detalles_venta, name="obtener_detalles_venta"),
     path('contabilidad/obtener_detalles_venta_sucursal/<int:producto_id>/<str:tipo>/', obtener_detalles_venta_sucursal, name="obtener_detalles_venta_sucursal"),
-    path('contabilidad/nueva_venta/<int:pk>/', CrearVentaBodegaView.as_view() ,name='nueva_venta_bodega'),
+    path('contabilidad/nueva_venta/1/', CrearVentaBodegaView.as_view() ,name='nueva_venta_bodega'),
     path('contabilidad/nueva_venta_sucursal/<int:pk>/', CrearVentaSucursalView.as_view() ,name='nueva_venta_sucursal'),
     path('registro_deudores/', registro_deudores ,name='registro_deudores'),
     path('registro_acreedores/', registro_acreedores ,name='registro_acreedores'),
