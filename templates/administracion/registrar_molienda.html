@@ -1,4 +1,5 @@
 {% extends "base.html" %}
+{% load widget_tweaks %}
 {% load static %}
 
 
@@ -34,6 +35,7 @@
                           <div class="card-body">
                             <form role="form" method="post" enctype="multipart/form-data">
                                 {% csrf_token %}
+                                {{ insumos_formset.management_form }}
                                 <div class="col-sm-12">
                                     <!-- select -->
                                     <div class="form-group">
@@ -59,15 +61,7 @@
                                     <!-- /.input group -->
                                   </div>
 
-                              <div class="row">
-                                <div class="col-sm-12">
-                                  <!-- text input -->
-                                  <div class="form-group">
-                                    <label>Agregados</label>
-                                    <input name="agregados" type="text" class="form-control" placeholder="Ingrese los agregados utilizados">
-                                  </div>
-                                </div>
-                              </div>
+                              
                               <div class="row">
                                 <div class="col-sm-12">
                                   <!-- textarea -->
@@ -104,7 +98,34 @@
                                   </div>
                                 </div>
                               </div>
-                              
+
+
+
+                              {% for form in insumos_formset %}
+                                <div class="card-body">
+                                  <div class="row">
+                                    <div class="col-sm-12">
+                                      <div class="form-group">
+                                        <label>Nombre insumo</label>
+                                        {{ form.insumo | add_class:"form-control" }}
+                                      </div>
+                                    </div>
+                                  </div>
+
+                                  <div class="row">
+                                    <div class="col-sm-12">
+                                      <div class="form-group">
+                                        <label>Cantidad consumida</label>
+                                        {{ form.cantidad_consumida | add_class:"form-control" }}
+                                      </div>
+                                    </div>
+                                  </div>
+                                  
+                                  
+
+                                </div> <!-- Este cierra el card-body de cada formset -->
+                              {% endfor %}
+                                                        
 
 
                               <button type="submit" class="btn btn-block btn-warning btn-lg">Registrar molienda</button>

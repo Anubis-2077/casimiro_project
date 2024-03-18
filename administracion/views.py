@@ -120,36 +120,51 @@ class CosechasRegistradasView(LoginRequiredMixin, ListView):
 class RegistrarMoliendaView(LoginRequiredMixin, FormView):
     login_url = '/accounts/login/'
     template_name = 'administracion/registrar_molienda.html'
-    form_class = Moliendaform
-    success_url = reverse_lazy ('moliendas_registradas')
-    
-    
-    def form_valid(self, form):
-        # Aquí 'form.save()' devuelve una instancia del modelo Molienda que el formulario crea o actualiza
-        molienda = form.save(commit=False)  # Utiliza commit=False para obtener la instancia sin guardarla todavía
-        
-        # Asignar el valor de rendimiento a disponible
-        molienda.disponible = molienda.rendimiento
-        
-        molienda.save()  # Ahora sí guardamos la instancia en la base de datos
+    form_class = MoliendaForm
+    success_url = reverse_lazy('moliendas_registradas')
 
-        # Finalmente, redirigir a 'success_url'
-        return HttpResponseRedirect(self.get_success_url())
-    
-    def form_invalid(self, form):
-        print(form.errors)
-        response = super().form_invalid(form)
-        return response
-    
     def get_context_data(self, **kwargs):
-        context = super().get_context_data(**kwargs)
+        context = super(RegistrarMoliendaView, self).get_context_data(**kwargs)
+        if self.request.POST:
+            context['insumos_formset'] = ConsumoInsumoFormset(self.request.POST)
+        else:
+            context['insumos_formset'] = ConsumoInsumoFormset()
         cargamentos = Cargamento.objects.exclude(molienda__isnull=False)
-        
-        context ["cargamentos"] = cargamentos
-        
-            
-        
+        context["cargamentos"] = cargamentos
         return context
+
+    def post(self, request, *args, **kwargs):
+        self.object = None
+        form = self.get_form()
+        insumos_formset = ConsumoInsumoFormset(request.POST)
+        
+        if form.is_valid() and insumos_formset.is_valid():
+            return self.both_valid(form, insumos_formset)
+        else:
+            # Aquí corregimos pasando insumos_formset al método form_invalid.
+            return self.form_invalid(form, insumos_formset)
+
+    def both_valid(self, form, insumos_formset):
+        molienda = form.save(commit=False)
+        molienda.disponible = molienda.rendimiento
+        molienda.save()
+
+        # Asegura guardar el formset sin intentar asociarlo a molienda directamente
+        insumos_instances = insumos_formset.save(commit=False)
+        for instance in insumos_instances:
+            insumo = instance.insumo
+            insumo.cantidad -= instance.cantidad_consumida
+            insumo.save()
+            instance.save()
+
+        return HttpResponseRedirect(self.get_success_url())
+
+    def form_invalid(self, form, insumos_formset=None):
+        # Se ajusta para manejar y potencialmente mostrar errores de insumos_formset
+        print('Errores del formulario principal:', form.errors)
+        if insumos_formset:
+            print('Errores del formset:', insumos_formset.errors)
+        return super().form_invalid(form)
     
 class MoliendasRegistradasView(LoginRequiredMixin, ListView):
     login_url = '/accounts/login/'
@@ -193,7 +208,7 @@ class DetalleTanqueView(LoginRequiredMixin, View):
     template_name = 'administracion/detalle_tanque.html'
     form1 = ContenidoForm
     form2 = MoverContenidoForm
-    form3 = NotaTareasForm
+    
     
 
     def get(self, request, *args, **kwargs):
@@ -205,7 +220,7 @@ class DetalleTanqueView(LoginRequiredMixin, View):
         form2_instance = self.form2()
         form3_instance = self.form3()
         contenido = Contenido.objects.filter(tanque=tanque_select).last()
-        tareas = NotaTarea.objects.filter(tanque=tanque_select)
+        
         tanque = Tanque.objects.get(numero = numero_tanque)
         tanques = Tanque.objects.all()
         
@@ -228,7 +243,7 @@ class DetalleTanqueView(LoginRequiredMixin, View):
                    "form2" : form2_instance,
                    "form3" : form3_instance,
                    "contenido" : contenido,
-                   "tarea": tareas,
+                   
                    
                    }
 
@@ -426,14 +441,7 @@ class DetalleTanqueView(LoginRequiredMixin, View):
             else:
                 print(form2_instance.errors)
                 
-                
-        elif form_type =='form3':
-            #procesar formulario 3
-            if form3_instance.is_valid():
-                form3_instance.save()
-            else:
-                print(form3_instance.errors)
-                
+  
         
         print('hay errores aca')
         #return redirect(reverse_lazy('lista_tanques'))
@@ -461,34 +469,6 @@ def obtener_contenidos_tanques(request, contenidoId):
         # Manejar el caso de que no se encuentre el contenido
         return HttpResponse("Contenido no encontrado.", status=404)
   
-    
-class EditarNotaTareaView(LoginRequiredMixin,View):
-    
-    """a revisar funcion en forma total"""
-    login_url = '/accounts/login/'
-    form = NotaTareasForm
-    
-    def get(self, request, nota_tarea_id, *args, **kwargs):
-        nota_tarea = get_object_or_404(NotaTarea, id=nota_tarea_id)
-        form_instance = self.form(instance=nota_tarea)
-        tarea = NotaTarea.objects.get(id=nota_tarea_id)
-        fecha_hora_actual = datetime.now()
-        fecha_hora_formateada = fecha_hora_actual.strftime("%d/%m/%Y %H:%M:%S")
-        return render(request, 'editar_nota_tarea.html', {'form': form_instance, 'nota_tarea_id': nota_tarea_id, 'tarea': tarea, "fecha": fecha_hora_formateada,})
-    
-    def post(self, request, nota_tarea_id, *args, **kwargs):
-        nota_tarea = get_object_or_404(NotaTarea, id=nota_tarea_id)
-        form_instance = self.form(request.POST, instance=nota_tarea)
-        
-        if form_instance.is_valid():
-            form_instance.save()
-            tanque_id=nota_tarea.tanque.id
-            print(tanque_id)
-            return redirect('detalle_tanque', tanque_id)
-        else:
-            print(form_instance.errors)
-        
-        return render(request, 'administracion/editar_nota_tarea.html', {'form': form_instance, 'nota_tarea_id': nota_tarea_id})
     
 
 #################  Embotellamiento ##########################
@@ -1190,10 +1170,115 @@ class HistorialMovimientosView(LoginRequiredMixin, ListView):
         
 
 
-   
+class CrearTareaView(LoginRequiredMixin, FormView):
+    login_url ='/accounts/login'
+    template_name = 'administracion/crear_tarea.html'
+    model = Tarea
+    form_class = TareaForm
+    success_url = reverse_lazy('listado_tareas_pendientes')
+    
+    def form_valid(self, form):
+        tarea = form.save(commit=False)
+        # Establece el campo `creado_por` con el usuario actual
+        # Nota: Cambiado a usar el usuario completo en lugar de email, basado en la definición del modelo
+        tarea.creado_por = self.request.user
+        tarea.save()
+        # Asegúrate de llamar a `save_m2m` si tu formulario tiene campos many-to-many que necesiten guardarse.
+        form.save()
+        print('el formulario se guardo de forma exitosa')
+        return super().form_valid(form)
+    
+    def form_invalid(self, form):
+        if form.errors:
+            for e in form.errors:
+                print(' estos son los errores en el codigo: ', e)
+        return super().form_invalid(form)
+    
+class TareasPendientesView(LoginRequiredMixin, ListView):
+    login_url = 'accounts/login'
+    model = Tarea
+    template_name = 'administracion/tareas_pendientes.html'
+    
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context["tareas_pendientes"] = Tarea.objects.filter(realizada=False)
+        tareas_sin_realizar = Tarea.objects.filter(realizada=False)
+        print(tareas_sin_realizar)
+        return context
+    
+class ActualizarEstadoTarea(LoginRequiredMixin, UpdateView):
+    login_url = '/accounts/login/'      
+    model = Tarea
+    form_class = TareaForm
+    template_name = 'administracion/actualizar_tarea.html'
+    success_url = reverse_lazy('listado_tareas_pendientes')  # Asegúrate de definir esto
 
+    def form_valid(self, form):
+        # Recuperar el ID de la tarea desde self.kwargs y obtener la instancia de Tarea
+        tarea_id = self.kwargs.get('pk')
+        instancia_tarea = get_object_or_404(Tarea, id=tarea_id)
+        
+        tarea = form.save(commit=False)
+        
+        if form.instance.realizada:
+            tarea.completado_por = self.request.user
+            print('tarea realizada por: ', self.request.user)
+            tarea.fecha_realizada = timezone.now()
+
+        # Usar el valor de 'creado_por' de la instancia recuperada manualmente
+        tarea.creado_por = instancia_tarea.creado_por
+        tarea.save()
+
+        return super().form_valid(form)
+    
+class ListadoTareasRealizadas(LoginRequiredMixin, ListView):
+    login_url = 'accounts/login'
+    template_name= 'administracion/tareas_realizadas.html'
+    model = Tarea
+    
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context["tareas_realizadas"] = Tarea.objects.filter(realizada=True)
+        return context
     
     
+class DetallesTareaView(LoginRequiredMixin, TemplateView):
+    login_url ='accounts/login'
+    template_name = 'administracion/tareas_detalles.html'
+    model = Tarea
+    
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        tarea_pk = self.kwargs.get('pk')
+        print('este es el pk: ', tarea_pk)
+        context["tarea"] = Tarea.objects.get(pk=tarea_pk)
+        return context
+    
+
+class CrearInsumoView(FormView):
+    template_name = 'administracion/crear_insumo.html'  # Asegúrate de crear este template
+    form_class = InsumoForm
+    success_url = reverse_lazy('listado_insumos')  # Asume que tienes esta URL definida para el listado de insumos
+
+    def form_valid(self, form):
+        form.save()
+        return super().form_valid(form)
+    
+class ListadoInsumosView(ListView):
+    model = Insumo
+    template_name = 'administracion/listado_insumos.html'  # Asegúrate de crear este template
+    context_object_name = 'insumos'
+    
+class ActualizarInsumoView(UpdateView):
+    model = Insumo
+    form_class = InsumoForm
+    template_name = 'administracion/actualizar_insumo.html'  # Crea este template
+    success_url = reverse_lazy('listado_insumos')  # Redirige aquí después de actualizar un insumo
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['accion'] = 'Actualizar'  # Opcional: Agregar contexto adicional si es necesario
+        return context
     
 
 

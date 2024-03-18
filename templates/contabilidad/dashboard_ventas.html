@@ -1,10 +1,161 @@
 {% extends "base.html" %}
+{% load static %}
 {% block content %}
 
 
 
-<h1>ventas en linea</h1>
+<div class="content-wrapper">
+    <!-- Content Header (Page header) -->
+    <div class="content-header">
+      <div class="container-fluid">
+        <div class="row mb-2">
+          <div class="col-sm-6">
+            <h1 class="m-0 text-dark">Detalle de ventas en linea <h2>{{ totales }}</h2></h1>
+          </div><!-- /.col -->
+          <div class="col-sm-6">
+            <ol class="breadcrumb float-sm-right">
+              <li class="breadcrumb-item"><a href="{% url "index_admin" %}">Home</a></li>
+              <li class="breadcrumb-item active">Detalle de ventas en linea</li>
+            </ol>
+          </div><!-- /.col -->
+        </div><!-- /.row -->
+      </div><!-- /.container-fluid -->
+    </div>
+    <!-- /.content-header -->
 
+    <!-- Main content -->
+    <div class="content">
+      <div class="container-fluid">
+        <div class="row">
+          <div class="col-lg-12">
+            
+
+            <div class="card">
+              <div class="card-header border-0">
+                <h3 class="card-title">Productos vendidos</h3>
+                <div class="card-tools">
+                  <a href="#" class="btn btn-tool btn-sm">
+                    <i class="fas fa-download"></i>
+                  </a>
+                  <a href="#" class="btn btn-tool btn-sm">
+                    <i class="fas fa-bars"></i>
+                  </a>
+                </div>
+              </div>
+              <div class="card-body table-responsive p-0">
+                <table class="table table-striped table-valign-middle">
+                  <thead>
+                  <tr>
+                    <th>Producto</th>
+                    <th>Precio</th>
+                    <th>Cantidad</th>
+                    <th>Cliente</th>
+                    <th>Fecha de venta</th>
+                  </tr>
+                  </thead>
+                  <tbody>
+                    {% for i in detalles %}
+                        <tr>
+                          <td>
+                            {{ i.prod_empaquetado.varietal.nombre }} caja x 6
+                            
+                            
+                          </td>
+                          <td>$ {{ i.precio_unitario }}</td>
+                          <td align="center" >{{ i.cantidad }}</td>
+                          <td>{{ i.venta.comprador.nombre }} {{ i.venta.comprador.apellido }}</td>
+                          <td>{{ i.venta.fecha_venta }}</td>
+                        </tr>
+                    {% endfor %}
+                  </tbody>
+                
+                </table>
+              </div>
+            </div>
+            <!-- /.card -->
+          </div>
+          <!-- /.col-md-6 -->
+          <div class="col-lg-12">
+            <div class="card">
+              <div class="card-header border-0">
+                <div class="d-flex justify-content-between">
+                  <h3 class="card-title">Ventas online ultimos seis meses.</h3>
+                  <a href="javascript:void(0);">Gráfico de ventas.</a>
+                </div>
+              </div>
+              <div class="card-body">
+                <div class="d-flex">
+                  <p class="d-flex flex-column">
+                    <span class="text-bold text-lg">${{total_ventas}}</span>
+                    <span>Total ultimos 6 meses</span>
+                  </p>
+                  
+                </div>
+                
+                <!-- /.d-flex -->
+
+                <div class="position-relative mb-4">
+                  <canvas id="sales-chart" height="200"></canvas>
+                </div>
+
+                <div class="d-flex flex-row justify-content-end">
+                  <span class="mr-2">
+                    <i class="fas fa-square text-primary"></i> Ventas
+                  </span>
+
+                  
+                </div>
+              </div>
+            </div>
+            <!-- /.card -->
+
+            
+          </div>
+          <!-- /.col-md-6 -->
+        </div>
+        <!-- /.row -->
+      </div>
+      <!-- /.container-fluid -->
+    </div>
+    <!-- /.content -->
+  </div>
+  
+
+  <script type="application/json" id="meses-data">{{ meses|json_script:"meses-data" }}</script>
+  <script type="application/json" id="totales-data">{{ totales|json_script:"totales-data" }}</script>
+
+  <script>
+    $(function () {
+      $.ajax({
+          url: '/api/datos-ventas/',  // Asegúrate de que esta URL coincida con la configurada en urls.py
+          method: 'GET',
+          success: function(data) {
+              var meses = data.meses;
+              var totales = data.totales.map(Number); // Asegurarse de convertir a números si es necesario
+              // Ahora puedes usar `meses` y `totales` para construir tu gráfico
+              var $salesChart = $('#sales-chart');
+              var salesChart  = new Chart($salesChart, {
+                  type: 'bar',
+                  data: {
+                      labels: meses,
+                      datasets: [{
+                          label: 'Ventas',
+                          backgroundColor: '#007bff',
+                          borderColor: '#007bff',
+                          data: totales
+                          
+                      }]
+                  },
+                  // opciones...
+              });
+          },
+          error: function(xhr, status, error) {
+              console.error("Error al obtener datos de ventas:", error);
+          }
+      });
+  });
+  
+  </script>
 
 {% endblock content %}
 

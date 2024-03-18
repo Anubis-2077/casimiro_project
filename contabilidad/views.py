@@ -1,7 +1,7 @@
 from django.shortcuts import render, redirect
 from .models import *
 from .forms import *
-from django.views.generic import CreateView,UpdateView,View, FormView, ListView
+from django.views.generic import CreateView,UpdateView,View, FormView, ListView, TemplateView
 from django.urls import reverse_lazy
 from django.shortcuts import get_object_or_404
 from django.views.decorators.csrf import csrf_exempt
@@ -9,7 +9,7 @@ from django.views.decorators.http import require_POST
 from django.http import HttpRequest, JsonResponse, HttpResponse
 from django.forms import inlineformset_factory
 from django.db.models.functions import TruncMonth
-from datetime import datetime
+from datetime import datetime, timedelta
 from dateutil.relativedelta import relativedelta
 import json
 from django.db import transaction
@@ -25,6 +25,7 @@ from email.mime.text import MIMEText
 from django.template.loader import render_to_string
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.mixins import LoginRequiredMixin
+from django.urls import reverse
 
 
 # Create your views here.
@@ -430,7 +431,15 @@ class TiendaView(View):
     def get(self, request):
         deposito = Deposito.objects.get(nombre="BODEGA")
         
-        stock_empaquetado = StockBodegaEmpaquetado.objects.filter(deposito__id=deposito.id)
+        stock_empaquetado = StockBodegaEmpaquetado.objects.filter(cantidad_cajas__gt=0, deposito__id=deposito.id).order_by('-cantidad_cajas')
+
+        varietals_vistos = set()
+        stock_empaquetado_unico = []
+
+        for stock in stock_empaquetado:
+            if stock.varietal.nombre not in varietals_vistos:
+                stock_empaquetado_unico.append(stock)
+                varietals_vistos.add(stock.varietal.nombre)
         
         carrito_id = request.session.get('carrito_id')
         
@@ -450,7 +459,7 @@ class TiendaView(View):
         
         return render(request, self.template_name, {
             
-            'stock_empaquetado': stock_empaquetado,
+            'stock_empaquetado': stock_empaquetado_unico,
             'items_del_carrito': items_del_carrito,
             'cantidades_productos': cantidades_productos,
             'precio_total': precio_total,
@@ -489,9 +498,9 @@ class CreatePreferenceView(APIView):
             "items": items,
             "external_reference": str(carrito_id),  # Referencia para identificar la compra
             "back_urls": {
-                "success": "https://04e6-190-176-57-166.ngrok-free.app/success/",
-                "failure": "https://04e6-190-176-57-166.ngrok-free.app/failure/",
-                "pending": "https://04e6-190-176-57-166.ngrok-free.app/pending/"
+                "success": "https://2e62-190-176-133-181.ngrok-free.app/success/",
+                "failure": "https://2e62-190-176-133-181.ngrok-free.app/failure/",
+                "pending": "https://2e62-190-176-133-181.ngrok-free.app/pending/"
             },
             
             "auto_return": "approved",
@@ -602,14 +611,29 @@ def carrito_detalle(request):
 @require_POST 
 @csrf_exempt
 def incrementar_cantidad(request, item_id):
-    
     item = get_object_or_404(CartItem, id=item_id)
     cart_item_id = item.id
-    item.cantidad += 1
-    item.save()
+
+    # Asumiendo que puedes acceder al producto empaquetado directamente desde el CartItem
+    # Esto podría requerir ajustes según tu estructura de modelos
+    producto_empaquetado = get_object_or_404(StockBodegaEmpaquetado, id=item.object_id)
+    print('esta es la cantidad disponible:' ,producto_empaquetado.cantidad_cajas)
+
+    if item.cantidad < producto_empaquetado.cantidad_cajas:
+        item.cantidad += 1
+        item.save()
+        mensaje = "Cantidad incrementada"
+    else:
+        mensaje = "No se puede incrementar más, stock máximo alcanzado"
+
     carrito = item.carrito
     precio_total_carrito = calcular_precio_total(carrito)
-    return JsonResponse({'nueva_cantidad': item.cantidad, 'precio_total_carrito': precio_total_carrito, 'cart-item-id': cart_item_id})
+    return JsonResponse({
+        'nueva_cantidad': item.cantidad,
+        'precio_total_carrito': precio_total_carrito,
+        'cart_item_id': cart_item_id,
+        'mensaje': mensaje
+    })
 
 @require_POST 
 @csrf_exempt
@@ -655,9 +679,21 @@ def limpiar_carrito(request):
 @require_POST 
 @csrf_exempt
 def eliminar_producto(request, item_id):
+    # Encuentra el ítem en el carrito por su ID y obtén el carrito asociado
     item = CartItem.objects.get(id=item_id)
+    carrito = item.carrito
+    
+    # Elimina el ítem seleccionado
     item.delete()
-    return JsonResponse({'mensaje': 'Producto eliminado del carrito'})
+
+    # Recalcula el precio total del carrito después de la eliminación
+    precio_total_carrito = calcular_precio_total(carrito)
+    print('este es el total:', precio_total_carrito)
+    # Envía la respuesta con el precio total actualizado
+    return JsonResponse({
+        'mensaje': 'Producto eliminado del carrito', 
+        'precio_total_carrito': precio_total_carrito
+    })
 
 
 #-----------------------------webhooks-----------------
@@ -680,13 +716,60 @@ def mercadopago_webhook(request):
     else:
         return JsonResponse({'error': 'Método no permitido'}, status=405)
     
-class VentasEnLineaDashboardView(View):
+class VentasEnLineaDashboardView(LoginRequiredMixin, View):
+    login_url='/accounts/login'
     template_name = 'contabilidad/dashboard_ventas.html'
     
-    def get (self, request):
-        ventas_online = Venta.objects.filter(condicion='Ventas en linea')
+    def get(self, request, *args, **kwargs):
+        context = self.get_context_data(**kwargs)
+        return render(request, self.template_name, context)
+    
+    def get_context_data(self, **kwargs):
+        context = {}
+        # Filtrar DetalleVenta directamente por condición de venta 'Ventas en línea'
+        detalles_ventas_en_linea = DetalleVenta.objects.filter(venta__condicion='online').order_by('-venta__fecha_venta')
+        context["detalles"] = detalles_ventas_en_linea
         
-        return render (request, self.template_name)
+         # Calcular la fecha de 6 meses atrás desde hoy
+        seis_meses_atras = timezone.now() - timedelta(days=6*30)
+
+        # Filtrar las ventas en línea de los últimos 6 meses y sumar el precio_total
+        total_ventas_ultimos_6_meses = Venta.objects.filter(
+            condicion='online',
+            fecha_venta__gte=seis_meses_atras
+        ).aggregate(total=Sum('precio_total'))['total'] or 0  # 'or 0' para manejar el caso de None
+
+        # Pasar el total al contexto
+        context["total_ventas"] = total_ventas_ultimos_6_meses
+        
+        #print(context)
+        return context
+    
+def datos_ventas_json(request):
+    
+    # Calcula la fecha de 6 meses atrás desde hoy
+    seis_meses_atras = datetime.today() - timedelta(days=6*30)
+
+        # Filtra las ventas de los últimos 6 meses y agrúpalas por mes
+    ventas_por_mes = (Venta.objects
+                        .filter(fecha_venta__gte=seis_meses_atras, condicion='online')
+                        .annotate(mes=TruncMonth('fecha_venta'))
+                        .values('mes')
+                        .annotate(total_ventas=Sum('precio_total'))
+                        .order_by('mes'))
+
+    # Preparar los datos para el gráfico
+    meses = [venta['mes'].strftime("%b") for venta in ventas_por_mes]
+    
+    totales = [venta['total_ventas'] for venta in ventas_por_mes]
+    # Asumiendo que tienes una función que calcula los meses y totales
+    
+    data = {
+        'meses': meses,
+        'totales': totales,
+    }
+    return JsonResponse(data)
+    
     
 class SuccessView(FormView):
     template_name= 'contabilidad/formulario_envio.html'
@@ -737,7 +820,7 @@ class SuccessView(FormView):
             venta = Venta.objects.create(
                 comprador = cliente,
                 precio_total=venta_detalle['total_compra'],
-                condicion = 'Ventas en linea',
+                condicion = 'online',
                 deposito = deposito_defecto
             )
             
@@ -770,16 +853,47 @@ class SuccessView(FormView):
                     cantidad = cantidad_vendida,
                     precio_unitario = item['unit_price']
                 )
+                self.request.session['venta_id'] = venta.pk
                 
                 print('item de venta:', item)
-                
+                print('este es el id de la venta: ', venta.pk)
+                limpiar_carrito(self.request)
             
             print('proceso completado con exito!!!!')
             
-            
-            
             return super().form_valid(form)
+            
+    def get_success_url(self):
+        # Obtener el pk de la venta de la sesión
+        venta_id = self.request.session.get('venta_id')
+        if venta_id:
+            print('todo ejecutado con exito')
+            return reverse('pagina_exito', args=[venta_id])
+        else:
+            print('no recuperamos el venta id')
+            return reverse('index')
+            
+            
+        
+class PaginaExitoView(TemplateView):
+    template_name= 'contabilidad/success.html'  # Asegúrate de que el nombre del template esté correcto
     
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        # Obtener el valor del pk de los kwargs
+        venta_id = self.kwargs.get('pk')
+        
+        # Utilizar el pk para filtrar DetalleVenta y obtener la Venta
+        if venta_id is not None:
+            detalles_ventas_en_linea = DetalleVenta.objects.filter(venta__id=venta_id)
+            venta = Venta.objects.get(id=venta_id)
+            context["detalles_venta"] = detalles_ventas_en_linea
+            context["venta"] = venta
+        else:
+            # Manejar el caso en que no se proporcione un pk o no se encuentre
+            context["mensaje_error"] = "Venta no encontrada"
+        
+        return context
     
 
 class EnviosPendientesView(ListView):
@@ -834,7 +948,7 @@ class ActualizarEnviosView(UpdateView):
         # Carga las credenciales y crea el servicio de la API de Gmail
         creds = Credentials.from_authorized_user_file('token.json')
         service = build('gmail', 'v1', credentials=creds)
-        print("credenciales obtenidas correctamente")
+        #print("credenciales obtenidas correctamente")
         return service
 
     def enviar_email_html(self):

@@ -18,7 +18,7 @@ SECRET_KEY = 'django-insecure-wyug&1mcz$^d@#gg8)tc!hd%m06261o-^7r)t_5*_)__q=n*2_
 DEBUG = True
 
 ALLOWED_HOSTS = [
-    '8deb-190-176-47-36.ngrok-free.app',
+    '2e62-190-176-133-181.ngrok-free.app',
     '127.0.0.1',
     'localhost',
 ]
@@ -26,7 +26,7 @@ ALLOWED_HOSTS = [
 APPEND_SLASH=False
 
 CSRF_TRUSTED_ORIGINS = [
-    'https://8deb-190-176-47-36.ngrok-free.app/',
+    'https://2e62-190-176-133-181.ngrok-free.app',
 ]
 
 
@@ -76,6 +76,7 @@ TEMPLATES = [
                 'django.template.context_processors.request',
                 'django.contrib.auth.context_processors.auth',
                 'django.contrib.messages.context_processors.messages',
+                'administracion.context_processors.notificaciones'
                 
             ],
         },
@@ -124,7 +125,7 @@ AUTH_PASSWORD_VALIDATORS = [
 
 LANGUAGE_CODE = 'es-us'
 
-TIME_ZONE = 'UTC'
+TIME_ZONE = 'America/Argentina/Buenos_Aires'
 
 USE_I18N = True
 
@@ -152,6 +153,8 @@ DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
 
 #Allauth config
+
+
 
 AUTHENTICATION_BACKENDS = [
     'django.contrib.auth.backends.ModelBackend',

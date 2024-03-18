@@ -4,6 +4,8 @@ from datetime import datetime
 from django.core.exceptions import ValidationError
 from django.db.models import Sum
 from django.contrib.auth.models import User
+from django.conf import settings
+
 
 class Proveedor(models.Model):
     razon_social = models.CharField(max_length=200)
@@ -47,7 +49,6 @@ class Cargamento(models.Model):
 class Molienda(models.Model):
     cargamento = models.OneToOneField(Cargamento, on_delete=models.CASCADE, null=False)
     fecha_molienda = models.DateField(null=True)
-    agregados = models.TextField(blank=True)
     observaciones = models.TextField(blank=True)
     responsables = models.CharField(max_length=200)
     cantidad_operarios = models.IntegerField()
@@ -129,17 +130,18 @@ class HistorialContenido(models.Model):
         # Esta representación es solo un ejemplo, ajústala según lo que prefieras
         return f"{self.accion} en {self.tanque} - {self.fecha.strftime('%Y-%m-%d %H:%M:%S')}"
 
-class NotaTarea(models.Model):
-    tanque = models.ForeignKey(Tanque, on_delete=models.CASCADE, null= True, blank=True)
+class Tarea(models.Model):
     titulo = models.CharField(max_length=100, null=True, blank=True)
-    nota = models.TextField(null= True, blank=True)
-    notas_operario = models.TextField(null= True, blank=True)
-    fecha = models.DateTimeField(null= True, blank=True)
+    nota = models.TextField(null=True, blank=True)
+    notas_operario = models.TextField(null=True, blank=True)
+    fecha = models.DateTimeField(auto_now_add=True, null=True)
     realizada = models.BooleanField(default=False)
-    fecha_realizada = models.DateTimeField( null=True, blank=True)
-    
-    def __str__(self) :
-        return f" { self.titulo} de fecha {self.fecha}"
+    fecha_realizada = models.DateTimeField(null=True, blank=True)
+    creado_por = models.ForeignKey(settings.AUTH_USER_MODEL, related_name='tareas_creadas', on_delete=models.SET_NULL, null=True, blank=True)
+    completado_por = models.ForeignKey(settings.AUTH_USER_MODEL, related_name='tareas_completadas', on_delete=models.SET_NULL, null=True, blank=True)
+
+    def __str__(self):
+        return f"{self.titulo} de fecha {self.fecha}"
 
 
 
@@ -261,3 +263,23 @@ class MoverStockEmpaquetado(models.Model):
     def __str__(self):
         
         return f"Id: {self.id} Lote: {self.stock.lote}, Varietal: {self.stock.varietal}, Cantidad: {self.cantidad}, Fecha: {self.fecha_movimiento}"
+
+
+class Insumo(models.Model):
+    nombre = models.CharField(max_length=100)
+    cantidad = models.DecimalField(max_digits=10, decimal_places=2)
+    descripcion = models.TextField(blank=True, null=True)
+    unidad_medida = models.CharField(max_length=50)
+    costo_unitario = models.DecimalField(max_digits=10, decimal_places=2, blank=True, null=True)
+
+    def __str__(self):
+        return self.nombre
+    
+    
+class ConsumoInsumo(models.Model):
+    
+    insumo = models.ForeignKey('Insumo', on_delete=models.CASCADE)
+    cantidad_consumida = models.DecimalField(max_digits=10, decimal_places=2)
+
+    def __str__(self):
+        return f"{self.insumo.nombre} en {self.tarea}"

@@ -32,7 +32,7 @@ urlpatterns = [
     #TANQUE URLS
     path('tanques/lista_de_tanques/',ListaTanquesView.as_view() ,name='lista_tanques'),
     path('tanques/detalle_tanque/<int:numero>',DetalleTanqueView.as_view() ,name='detalle_tanque'),
-    path('nota_tarea/<int:nota_tarea_id>/editar/', EditarNotaTareaView.as_view(), name='editar_nota_tarea'),
+    
     path('obtener_contenidos_tanques/<int:contenidoId>/', obtener_contenidos_tanques, name='obtener_contenidos_tanques'),
     
     
@@ -110,14 +110,31 @@ urlpatterns = [
      
     path('contabilidad/ventas_en_linea/', VentasEnLineaDashboardView.as_view(), name="ventas_en_linea"),
     path('success/', SuccessView.as_view(), name="success"),
+    path('success_confirm/<int:pk>/', PaginaExitoView.as_view(), name='pagina_exito'),
+    path('api/datos-ventas/', datos_ventas_json, name='datos-ventas-json'),
     
     path('contabilidad/envios_pendientes/', EnviosPendientesView.as_view(), name='envios_pendientes'),
-    path('contabilidad/envios/actualizar_estado/<int:pk>', ActualizarEnviosView.as_view(), name='actualizar_estado'),
-    path('contabilidad/envios_realizados', EnviosRealizadosView.as_view(), name='envios_realizados'),
+    path('contabilidad/envios/actualizar_estado/<int:pk>/', ActualizarEnviosView.as_view(), name='actualizar_estado'),
+    path('contabilidad/envios_realizados/', EnviosRealizadosView.as_view(), name='envios_realizados'),
     
     
     #---------------------------------------tareas---------------------------------------------
-    path('nueva_tarea/', nueva_tarea ,name='nueva_tarea'),
-    path('tareas_realizadas/', tareas_realizadas ,name='tareas_realizadas'),
-    path('listado_tareas/', listado_tareas ,name='listado_tareas'),
+    path('administracion/nueva_tarea/', CrearTareaView.as_view() ,name='nueva_tarea'),
+    path('administracion/tareas_realizadas/', ListadoTareasRealizadas.as_view() ,name='listado_tareas_realizadas'),
+    path('administracion/tareas_pendientes', TareasPendientesView.as_view() ,name='listado_tareas_pendientes'),
+    path('administracion/actualizar_tarea/<int:pk>', ActualizarEstadoTarea.as_view(), name='actualizar_tarea'),
+    path('administracion/detalles_tarea/<int:pk>',DetallesTareaView.as_view(), name='detalles_tarea' ),
+    
+    #-----------------------------insumos----------------------------------
+    path('administracion/agregar_insumo/',CrearInsumoView.as_view(), name='crear_inusmo'),
+    path('administracion/lista_insumos/',ListadoInsumosView.as_view(), name='listado_insumos'),
+    path('insumos/actualizar/<int:pk>/', ActualizarInsumoView.as_view(), name='actualizar_insumo'),
+    
+    
+    
+    
+    
+    
 ] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
+
+

@@ -58,27 +58,33 @@
       <li class="nav-item dropdown">
         <a class="nav-link" data-toggle="dropdown" href="#">
           <i class="far fa-bell"></i>
-          <span class="badge badge-warning navbar-badge">15</span>
+          <span class="badge badge-warning navbar-badge">{% if nuevas_notificaciones %}
+            {{nuevas_notificaciones}}
+            {% else %}
+            0
+            {% endif %}</span>
         </a>
         <div class="dropdown-menu dropdown-menu-lg dropdown-menu-right">
-          <span class="dropdown-item dropdown-header">15 Notifications</span>
+          <span class="dropdown-item dropdown-header">{{nuevas_notificaciones}} Notificaciones pendientes.</span>
           <div class="dropdown-divider"></div>
-          <a href="#" class="dropdown-item">
-            <i class="fas fa-envelope mr-2"></i> 4 new messages
-            <span class="float-right text-muted text-sm">3 mins</span>
+          {% if tareas %}
+            <a href="{% url "listado_tareas_pendientes" %}" class="dropdown-item">
+              <i class="fa-solid fa-list-check"></i>  {{ numero_tareas }} Tareas sin realizar.
+              
+            </a>
+          
+          {% endif %}
+          
+          <div class="dropdown-divider"></div>
+          {% if envios %}
+          <a href="{% url "envios_pendientes" %}" class="dropdown-item">
+            <i class="fas fa-users mr-2"></i> {{numero_envios}}  Envios sin realizar.
+            
           </a>
-          <div class="dropdown-divider"></div>
-          <a href="#" class="dropdown-item">
-            <i class="fas fa-users mr-2"></i> 8 friend requests
-            <span class="float-right text-muted text-sm">12 hours</span>
-          </a>
-          <div class="dropdown-divider"></div>
-          <a href="#" class="dropdown-item">
-            <i class="fas fa-file mr-2"></i> 3 new reports
-            <span class="float-right text-muted text-sm">2 days</span>
-          </a>
-          <div class="dropdown-divider"></div>
-          <a href="#" class="dropdown-item dropdown-footer">See All Notifications</a>
+          
+          {% endif %}
+          
+          
         </div>
       </li>
       
@@ -394,7 +400,7 @@
             <ul class="nav nav-treeview">
 
               <li class="nav-item">
-                <a href="#" class="nav-link">
+                <a href="{% url "nueva_tarea" %}" class="nav-link">
                   <i class="fa-solid fa-square-plus"></i>
                   <p>Nueva Tarea</p>
                 </a>
@@ -402,20 +408,52 @@
               
 
               <li class="nav-item">
-                <a href="#" class="nav-link">
+                <a href="{% url "listado_tareas_pendientes" %}" class="nav-link">
                   <i class="fa-solid fa-clock"></i>
                   <p>Tareas pendientes</p>
                 </a>
               </li>
               <li class="nav-item">
-                <a href="#" class="nav-link">
+                <a href="{% url "listado_tareas_realizadas" %}" class="nav-link">
                   <i class="fa-solid fa-check"></i>
                   <p>Tareas realizadas</p>
                 </a>
               </li>
+
               
               
             </ul>
+            <li class="nav-item has-treeview">
+              <a href="#" class="nav-link">
+                <i class="fa-solid fa-flask"></i>
+                <p>
+                  Insumos
+                  <i class="right fas fa-angle-left"></i>
+                </p>
+              </a>
+              <ul class="nav nav-treeview">
+  
+                <li class="nav-item">
+                  <a href="{% url "crear_inusmo" %}" class="nav-link">
+                    <i class="fa-solid fa-plus"></i>
+                    <p>Agregar insumo</p>
+                  </a>
+                </li>
+                
+  
+                <li class="nav-item">
+                  <a href="{% url "listado_insumos" %}" class="nav-link">
+                    <i class="fa-solid fa-list"></i>
+                    <p>Listado insumos</p>
+                  </a>
+                </li>
+                <li class="nav-item">
+                  <a href="" class="nav-link">
+                    <i class="fab fa-uniregistry"></i>
+                    <p>Historial de movimientos</p>
+                  </a>
+                </li>
+            
           </li>
         </ul>
 
@@ -468,6 +506,8 @@
 <script src="{% static "js/Chart.min.js" %}"></script>
 
 <script src="{% static "js/summernote-bs4.min.js" %}"></script>
+
+<script src="{% static "js/moment.min.js" %}"></script>
 
 <script src="{% static "js/tempusdominus-bootstrap-4.min.js" %}"></script>
 

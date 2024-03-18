@@ -1,7 +1,7 @@
 from django import forms
 from administracion.models import *
 from allauth.account.forms import LoginForm
-from django.forms import formset_factory
+from django.forms.models import modelformset_factory
 from django.core.exceptions import ValidationError, ObjectDoesNotExist
 
 class CustomLoginForm(LoginForm):
@@ -33,7 +33,7 @@ class CargamentoForm(forms.ModelForm):
         model = Cargamento
         fields = '__all__'
         
-class Moliendaform (forms.ModelForm):
+class MoliendaForm (forms.ModelForm):
     class Meta:
         model= Molienda
         fields = '__all__'
@@ -56,10 +56,16 @@ class MoverContenidoForm(forms.Form):
     cantidad = forms.CharField(max_length=50)
     
         
-class NotaTareasForm(forms.ModelForm):
+class TareaForm(forms.ModelForm):
     class Meta:
-        model = NotaTarea
+        model = Tarea
         fields = '__all__'
+        
+    def __init__(self, *args, **kwargs):
+        super(TareaForm, self).__init__(*args, **kwargs)
+        self.fields['creado_por'].widget.attrs['disabled'] = True
+        # Si deseas también agregar la clase form-control puedes hacerlo aquí
+        self.fields['creado_por'].widget.attrs['class'] = 'form-control'
         
         
 class EmbotellamientoForm(forms.ModelForm):
@@ -153,3 +159,13 @@ class MoverStockEmpaquetadoForm(forms.ModelForm):
 
         return cleaned_data
                 
+ConsumoInsumoFormset = modelformset_factory(
+    ConsumoInsumo,
+    fields=( 'insumo', 'cantidad_consumida'),
+    extra=6,
+)
+
+class InsumoForm(forms.ModelForm):
+    class Meta:
+        model = Insumo
+        fields = '__all__'

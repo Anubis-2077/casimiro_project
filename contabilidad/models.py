@@ -98,11 +98,15 @@ class Venta(models.Model):
     ('Tarjeta de credito', 'Tarjeta de credito'), 
     ('Debito automatico', 'Debito automatico'), 
     ('Donacion', 'Donacion'), 
-    ('Ventas en linea', 'Ventas en linea'), 
+    ('online', 'online'), 
     ('Transferencia', 'Transferencia')
 ])
     fecha_venta = models.DateTimeField(auto_now_add=True)
     deposito = models.ForeignKey(Deposito, on_delete = models.CASCADE, null=True, blank=True)
+    
+    
+    def __str__(self) :
+        return f"comprador {self.comprador.nombre} {self.comprador.apellido} {self.id}"
 
 class DetalleVenta(models.Model):
     venta = models.ForeignKey(Venta, related_name='detalles', on_delete=models.CASCADE)

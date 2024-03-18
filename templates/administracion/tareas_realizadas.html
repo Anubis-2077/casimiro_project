@@ -1,0 +1,71 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="content-wrapper">
+    <!-- Content Header (Page header) -->
+    <section class="content-header">
+      <div class="container-fluid">
+        <div class="row mb-2">
+          <div class="col-sm-6">
+            <h1>Tareas realizadas</h1>
+          </div>
+          <div class="col-sm-6">
+            <ol class="breadcrumb float-sm-right">
+              <li class="breadcrumb-item"><a href="{% url "index_admin" %}">Inicio</a></li>
+              <li class="breadcrumb-item active">Listado tareas realizadas</li>
+            </ol>
+          </div>
+        </div>
+      </div><!-- /.container-fluid -->
+    </section>
+    <section class="content">
+        <div class="container-fluid">
+           
+        
+
+        <div class="card">
+            <div class="card-header">
+              <h3 class="card-title">Tareas realizadas</h3>
+            </div>
+            <!-- /.card-header -->
+            <div class="card-body">
+              <table id="example1" class="table table-bordered table-striped">
+                <thead>
+                    <tr>
+                        <th>Titulo</th>
+                        <th>Creador</th>
+                        <th>Fecha creación</th>
+                        <th>Realizador</th>
+                        <th>Fecha realización</th>
+                        <th>Más detalles</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for tarea in tareas_realizadas %}
+                    <tr>
+                        <td>{{ tarea.titulo }}</td>
+                        <td>{{ tarea.creado_por }}</td>
+                        <td>{{ tarea.fecha }}</td>
+                        <td>{{ tarea.completado_por }}</td>
+                        <td>{{ tarea.fecha_realizada }}</td>
+                        <td><a class="btn btn-block btn-outline-success btn-sm" href="{% url 'detalles_tarea' tarea.id %}">+ detalles</a></td>
+
+                        
+                    </tr>
+                    {% endfor %}
+                </tbody>
+                
+                
+              </table>
+            </div>
+            <!-- /.card-body -->
+          </div>
+    </section>
+</div>
+
+
+
+{% endblock content %}
+
+
+

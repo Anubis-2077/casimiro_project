@@ -454,7 +454,7 @@
                                                 <button class="btn btn-secondary btn-decremento" id="decrementar" data-item-id="${cart_item_id}">-</button>
                                                 <input type="text" id="cantidad-${cart_item_id}" class="form-control cantidad-input" value="${response.cantidad_actual}" style="width: 60px; display: inline-block; text-align: center;">
                                                 <button class="btn btn-secondary btn-incremento" id="incrementar" data-item-id="${cart_item_id}">+</button>
-                                                <button class="btn btn-danger eliminar-producto" data-item-id="${cart_item_id}">Eliminar</button>
+                                                <button class="btn btn-danger eliminar-producto eliminar" data-item-id="${cart_item_id}" id="eliminar">Eliminar</button>
                                             </div>
                                           </div>
                                         </div>
@@ -489,9 +489,13 @@
                         success: function(response) {
                             $(`#cantidad-${itemId}`).val(response.nueva_cantidad);
                             $('#precio-total-carrito').text(`$ ${response.precio_total_carrito}`);
+                            if (response.mensaje !== "Cantidad incrementada") {
+                                alert(response.mensaje); // Muestra un mensaje si el stock máximo fue alcanzado
+                            }
                         }
                     });
                 });
+            
             
                 // Decrementar la cantidad
                 $(document).on('click', '#decrementar', function() {
@@ -508,20 +512,27 @@
                 });
                 
             
-                // Eliminar un ítem
-                $('.eliminar').click(function() {
-                    var itemId = $(this).data('cart-item-id');
+                $(document).on('click', '.eliminar-producto', function() {
+                    var itemId = $(this).data('item-id'); // Asegúrate de que este data-attribute exista y sea único para cada elemento
                     $.ajax({
-                        url: `/eliminar-producto/${itemId}/`,
+                        url: `/eliminar-producto/${itemId}/`, // La URL para eliminar el producto del carrito
                         method: 'POST',
                         headers: {'X-CSRFToken': getCookie('csrftoken')},
                         success: function(response) {
                             // Suponiendo que cada ítem está en un contenedor con un ID específico
-                            $(`#item-${itemId}`).remove();
+                            $(`#contenido-${itemId}`).remove();
+                            
+                            $('#precio-total-carrito').text(`$ ${response.precio_total_carrito}`); // Ajusta este selector según tu estructura HTML
+                        },
+                        error: function(xhr, status, error) {
+                            console.error("Error al eliminar el producto: ", status, error);
                         }
                     });
                 });
             });
+            
+
+            
         
             // Función auxiliar para obtener el valor de una cookie por nombre
             // Es necesaria para el CSRF token en solicitudes POST
@@ -541,6 +552,8 @@
             }
         
     </script>
+
+    
 
     <script>
         // Inicializar MercadoPago con tu Public Key
