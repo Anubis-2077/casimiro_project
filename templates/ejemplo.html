@@ -1,33 +1,91 @@
-class RegistrarMoliendaView(LoginRequiredMixin, FormView):
+class EmbotellamientoView(LoginRequiredMixin, FormView):
     login_url = '/accounts/login/'
-    template_name = 'administracion/registrar_molienda.html'
-    form_class = Moliendaform
-    success_url = reverse_lazy ('moliendas_registradas')
-    
-    
-    def form_valid(self, form):
-        # Aquí 'form.save()' devuelve una instancia del modelo Molienda que el formulario crea o actualiza
-        molienda = form.save(commit=False)  # Utiliza commit=False para obtener la instancia sin guardarla todavía
-        
-        # Asignar el valor de rendimiento a disponible
-        molienda.disponible = molienda.rendimiento
-        
-        molienda.save()  # Ahora sí guardamos la instancia en la base de datos
-
-        # Finalmente, redirigir a 'success_url'
-        return HttpResponseRedirect(self.get_success_url())
-    
-    def form_invalid(self, form):
-        print(form.errors)
-        response = super().form_invalid(form)
-        return response
+    template_name = 'administracion/embotellamiento.html'
+    success_url = reverse_lazy('sin_etiquetar')
+    form_class = EmbotellamientoForm
     
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        cargamentos = Cargamento.objects.exclude(molienda__isnull=False)
-        
-        context ["cargamentos"] = cargamentos
-        
+        fecha_hora_actual = datetime.now()
+        fecha_hora_formateada = fecha_hora_actual.strftime("%Y-%m-%d %H:%M:%S")
+        # Obtener la lista de tanques disponibles
+        tanques = Tanque.objects.all()
+
+        #print("este es el valor/formato de fecha_hoy:")
+        #print(fecha_hora_formateada)
+        contenidos_filtrados = []
+        for tanque in tanques:
+            # Obtener el último contenido asociado a cada tanque
+            ultimo_contenido = Contenido.objects.filter(tanque=tanque).order_by('-fecha_ingreso').first()
             
-        
+            # Si el contenido existe y su cantidad es mayor a 0, añadirlo a la lista
+            if ultimo_contenido and ultimo_contenido.cantidad > 0 and ultimo_contenido.embotellado == False:
+                contenidos_filtrados.append(ultimo_contenido)
+
+
+        context["contenidos"] = contenidos_filtrados
+        context["fecha_hoy"] = fecha_hora_formateada
+        context ["contenidos_id"] = Contenido.objects.all()
         return context
+
+    
+
+    def form_valid(self, form):
+        # Recupera el ID del contenido seleccionado
+        contenido_id = form.cleaned_data['contenido'].id 
+
+        # Actualiza el campo 'embotellado' en el objeto Contenido
+        contenido = Contenido.objects.get(pk=contenido_id)
+        # Cantidad máxima de botellas basada en los litros disponibles
+        max_botellas = contenido.cantidad / 0.75  # Asumiendo que cada botella es de 750ml
+
+        numero_botellas_emb = form.cleaned_data['cantidad_botellas']  # Asumiendo que este campo existe en tu formulario
+
+        if numero_botellas_emb > max_botellas:
+            form.add_error('cantidad_botellas', 'No puedes embotellar más botellas de las disponibles.')
+            return self.form_invalid(form)
+
+        # Actualizar la cantidad restante en el tanque
+        litros_restantes = contenido.cantidad - (numero_botellas_emb * 0.75)
+        if litros_restantes > 0.74:
+        # Si queda más de 0.74 litros, actualizar la cantidad
+            contenido.cantidad = litros_restantes
+            #print("este es el contenido:", contenido)
+            contenido.save()
+        else:
+            # Si no quedan litros, marcar el contenido como embotellado
+            
+            contenido.embotellado = True
+            contenido.cantidad = 0
+           #print("este es el contenido pasando por el else:" ,contenido)
+            contenido.save()
+            #print("el contenido se modifico:")
+            #print(contenido)
+            #print(contenido.embotellado)
+        
+        # Crea una nueva instancia de Embotellamiento
+        embotellamiento = form.save(commit=False)
+        embotellamiento.contenido = contenido  # Asocia el contenido al embotellamiento
+        embotellamiento.save()
+
+        # Crea una nueva instancia de StockBodega
+        stock_bodega = StockBodegaSinEtiquetar.objects.create(
+        embotellamiento=embotellamiento,
+        cantidad_botellas=form.cleaned_data['cantidad_botellas'],  
+        varietal=contenido.molienda.cargamento.varietal,  
+        lote=contenido.molienda.cargamento.lote, 
+        etiquetado=False,
+        deposito=Deposito.objects.get(nombre="BODEGA")  
+    )
+        #print("este es el stock bodega:",stock_bodega)
+        stock_bodega.save()
+
+        return super().form_valid(form)
+        
+    
+    def form_invalid(self, form):
+        
+        print ("el formulario es invalido")
+        print (form.errors)
+        print(form.cleaned_data)
+        return super().form_invalid(form) 

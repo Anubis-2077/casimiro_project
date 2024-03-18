@@ -126,9 +126,9 @@ class RegistrarMoliendaView(LoginRequiredMixin, FormView):
     def get_context_data(self, **kwargs):
         context = super(RegistrarMoliendaView, self).get_context_data(**kwargs)
         if self.request.POST:
-            context['insumos_formset'] = ConsumoInsumoFormset(self.request.POST)
+            context['insumos_formset'] = ConsumoInsumoFormset(queryset=ConsumoInsumo.objects.none())
         else:
-            context['insumos_formset'] = ConsumoInsumoFormset()
+            context['insumos_formset'] = ConsumoInsumoFormset(queryset=ConsumoInsumo.objects.none())
         cargamentos = Cargamento.objects.exclude(molienda__isnull=False)
         context["cargamentos"] = cargamentos
         return context
@@ -218,7 +218,7 @@ class DetalleTanqueView(LoginRequiredMixin, View):
         fecha_hora_formateada = fecha_hora_actual.strftime("%d/%m/%Y %H:%M:%S")
         form1_instance = self.form1()
         form2_instance = self.form2()
-        form3_instance = self.form3()
+
         contenido = Contenido.objects.filter(tanque=tanque_select).last()
         
         tanque = Tanque.objects.get(numero = numero_tanque)
@@ -241,7 +241,6 @@ class DetalleTanqueView(LoginRequiredMixin, View):
                    "fecha": fecha_hora_formateada,
                    "form1" : form1_instance,
                    "form2" : form2_instance,
-                   "form3" : form3_instance,
                    "contenido" : contenido,
                    
                    
@@ -252,7 +251,7 @@ class DetalleTanqueView(LoginRequiredMixin, View):
     def post(self, request,  *args, **kwargs):
         form1_instance = self.form1(request.POST, request.FILES)
         form2_instance = self.form2(request.POST, request.FILES)
-        form3_instance = self.form3(request.POST, request.FILES)
+        
         form_type = request.POST.get('form_type')
         
         
@@ -476,19 +475,22 @@ def obtener_contenidos_tanques(request, contenidoId):
 class EmbotellamientoView(LoginRequiredMixin, FormView):
     login_url = '/accounts/login/'
     template_name = 'administracion/embotellamiento.html'
-    success_url = reverse_lazy('sin_etiquetar')
     form_class = EmbotellamientoForm
-    
-    def get_context_data(self, **kwargs):
-        context = super().get_context_data(**kwargs)
-        fecha_hora_actual = datetime.now()
-        fecha_hora_formateada = fecha_hora_actual.strftime("%Y-%m-%d %H:%M:%S")
-        # Obtener la lista de tanques disponibles
-        tanques = Tanque.objects.all()
+    success_url = reverse_lazy('sin_etiquetar')  # Asegúrate de que esta URL está definida en tus urls.py
 
-        #print("este es el valor/formato de fecha_hoy:")
-        #print(fecha_hora_formateada)
+    def get_context_data(self, **kwargs):
+        context = super(EmbotellamientoView, self).get_context_data(**kwargs)
+        if self.request.POST:
+            context['insumos_formset'] = ConsumoInsumoFormset(self.request.POST)
+        else:
+            context['insumos_formset'] = ConsumoInsumoFormset(queryset=ConsumoInsumo.objects.none())
+
+
+        fecha_hora_actual = datetime.now()
+        context["fecha_hoy"] = fecha_hora_actual.strftime("%Y-%m-%d %H:%M:%S")
+        
         contenidos_filtrados = []
+        tanques = Tanque.objects.all()
         for tanque in tanques:
             # Obtener el último contenido asociado a cada tanque
             ultimo_contenido = Contenido.objects.filter(tanque=tanque).order_by('-fecha_ingreso').first()
@@ -496,16 +498,21 @@ class EmbotellamientoView(LoginRequiredMixin, FormView):
             # Si el contenido existe y su cantidad es mayor a 0, añadirlo a la lista
             if ultimo_contenido and ultimo_contenido.cantidad > 0 and ultimo_contenido.embotellado == False:
                 contenidos_filtrados.append(ultimo_contenido)
-
-
-        context["contenidos"] = contenidos_filtrados
-        context["fecha_hoy"] = fecha_hora_formateada
-        context ["contenidos_id"] = Contenido.objects.all()
+        context["contenidos"] = context["contenidos"] = contenidos_filtrados
         return context
 
-    
+    def post(self, request, *args, **kwargs):
+        self.object = None
+        form = self.get_form()
+        insumos_formset = ConsumoInsumoFormset(request.POST)
+        
+        if form.is_valid() and insumos_formset.is_valid():
+            return self.both_valid(form, insumos_formset)
+        else:
+            # Ajuste aquí: pasar insumos_formset al contexto cuando sea inválido.
+            return self.render_to_response(self.get_context_data(form=form, insumos_formset=insumos_formset))
 
-    def form_valid(self, form):
+    def both_valid(self, form, insumos_formset):
         # Recupera el ID del contenido seleccionado
         contenido_id = form.cleaned_data['contenido'].id 
 
@@ -532,11 +539,11 @@ class EmbotellamientoView(LoginRequiredMixin, FormView):
             
             contenido.embotellado = True
             contenido.cantidad = 0
-           #print("este es el contenido pasando por el else:" ,contenido)
+            print("este es el contenido pasando por el else:" ,contenido)
             contenido.save()
-            #print("el contenido se modifico:")
-            #print(contenido)
-            #print(contenido.embotellado)
+            print("el contenido se modifico:")
+            print(contenido)
+            print(contenido.embotellado)
         
         # Crea una nueva instancia de Embotellamiento
         embotellamiento = form.save(commit=False)
@@ -555,15 +562,26 @@ class EmbotellamientoView(LoginRequiredMixin, FormView):
         #print("este es el stock bodega:",stock_bodega)
         stock_bodega.save()
 
-        return super().form_valid(form)
+        # Guarda cada instancia del formset
+        insumos_instances = insumos_formset.save(commit=False)
+        for instance in insumos_instances:
+            instance.save()  # Guarda el consumo de insumo
+            insumo = instance.insumo
+            insumo.cantidad -= instance.cantidad_consumida
+            insumo.save()
+
+        # Aquí continua tu lógica para manejar el objeto Embotellamiento y actualizar Contenido
+
+        return HttpResponseRedirect(self.get_success_url())
+
+    def form_invalid(self, form, insumos_formset = None):
         
-    
-    def form_invalid(self, form):
-        
-        print ("el formulario es invalido")
-        print (form.errors)
-        print(form.cleaned_data)
-        return super().form_invalid(form) 
+        # Considera añadir manejo para el formset inválido si es necesario
+        print("El formulario es inválido")
+        print(form.errors)
+        if insumos_formset:
+            print('Errores del formset:', insumos_formset.errors)
+        return super().form_invalid(form)
     
     
 class StockSinEtiquetarView(LoginRequiredMixin, ListView):

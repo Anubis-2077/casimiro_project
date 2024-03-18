@@ -149,10 +149,7 @@ class Embotellamiento(models.Model):
     contenido = models.ForeignKey(Contenido, on_delete=models.CASCADE)
     fecha_envasado = models.DateTimeField()
     cantidad_botellas = models.PositiveIntegerField(null=True)
-    tipo_botella = models.CharField(max_length=255)
-    cantidad_corchos = models.PositiveIntegerField()
-    tipo_de_corchos= models.CharField(max_length=255)
-    insumos = models.TextField(null=True, blank=True)  # Puedes usar TextField para una lista de insumos
+    
     operarios = models.TextField(default=" ")  # Puedes usar TextField para una lista de operarios
     observaciones = models.TextField(default=" ")
 
