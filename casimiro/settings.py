@@ -105,7 +105,7 @@ DATABASES = {
     #}
     
     'default':dj_database_url.config(
-        default='postgresql://postgres:postgres@localhost/postgres',
+        default='postgres://casimiro_user:9yH9rSyJMvaY0AuhgCSoepYIkZ50Dc8q@dpg-cntldqcf7o1s73e8qkkg-a/casimiro',
         
     )
 }
