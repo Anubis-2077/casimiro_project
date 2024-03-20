@@ -8,6 +8,7 @@ __pycache__/
 /media
 /staticfiles
 /static/assets/img
+/static
 
 
 *.log

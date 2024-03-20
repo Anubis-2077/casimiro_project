@@ -5,6 +5,9 @@ from administracion.views import *
 from contabilidad.views import *
 from tareas.views import *
 from django.conf.urls.static import static
+from django.conf.urls import handler404
+
+handler404 = 'administracion.views.not_found'
 
 
 urlpatterns = [
@@ -12,6 +15,7 @@ urlpatterns = [
     path('', index, name="index"),
     path('tienda/', TiendaView.as_view(), name='tienda'),
     path('index_admin/',index_admin, name='index_admin'),
+    path('404-not-found/', not_found, name='not_found'),
 
     path('accounts/', include('allauth.urls')),
     

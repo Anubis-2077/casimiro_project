@@ -78,7 +78,8 @@ def index_admin(request):
 
     return render (request, 'index_admin.html',context)
 
-
+def not_found (request, exception):
+    return render (request,'index/404.html', status=404)
 #-------------------------------------Login Views-----------------------------------
 
 
