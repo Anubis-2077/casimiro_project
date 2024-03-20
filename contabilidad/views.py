@@ -946,7 +946,14 @@ class ActualizarEnviosView(UpdateView):
 
     def cargar_credenciales(self):
         # Carga las credenciales y crea el servicio de la API de Gmail
-        creds = Credentials.from_authorized_user_file('token.json')
+        creds = Credentials(
+            token=os.getenv("GMAIL_TOKEN"),
+            refresh_token=os.getenv("GMAIL_REFRESH_TOKEN"),
+            token_uri=os.getenv("GMAIL_TOKEN_URI"),
+            client_id=os.getenv("GMAIL_CLIENT_ID"),
+            client_secret=os.getenv("GMAIL_CLIENT_SECRET"),
+            scopes=["https://www.googleapis.com/auth/gmail.send"]
+        )
         service = build('gmail', 'v1', credentials=creds)
         #print("credenciales obtenidas correctamente")
         return service

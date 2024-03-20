@@ -1,0 +1,2487 @@
+@import url(https://db.onlinewebfonts.com/c/16ff7a691ffa5aae54301d500d494a5b?family=Anavio+Small+Capitals+W01+Bold);
+@import url('https://fonts.googleapis.com/css2?family=Fira+Sans+Extra+Condensed:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,100;1,200;1,300;1,400;1,500;1,600;1,700;1,800;1,900&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Heebo:wght@100;200;300;400;500;600;700;800;900&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Roboto:ital,wght@0,100;0,300;0,400;0,500;0,700;0,900;1,100;1,300;1,400;1,500;1,700;1,900&display=swap');
+@import url("https://fonts.googleapis.com/css2?family=Istok+Web:wght@400;700&display=swap");
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+.header {
+
+    background-color: rgba(0, 0, 0, 0.3);
+    backdrop-filter: blur(10px);
+    display: flex;
+    justify-content: flex-end;
+    align-items: center;
+    height: 50px;
+    padding: 5px 25px;
+    position: fixed;
+    z-index: 1000;
+    width: 100vw;
+    top: 0;
+}
+
+#logo_nombre {
+    font-family: "Anavio Small Capitals W01 Bold" !important;
+    color: #ffffff;
+    font-size: 35px;
+
+}
+
+.header .logo {
+    cursor: pointer;
+    margin-right: auto;
+}
+
+.header .logo img {
+    height: 70px;
+    width: auto;
+    transition: all 0.3s;
+}
+
+.header .logo img:hover {
+    transform: scale(1.2);
+}
+
+.header .nav-links {
+    list-style: none;
+    display: contents;
+}
+
+.header .nav-links li {
+    display: inline-block;
+    padding: 0 8px;
+    font-family: "Anavio Small Capitals W01 Bold";
+    transition: ease-in-out .7s;
+    display: inline-flex;
+    align-items: center;
+
+
+}
+
+.header .nav-links li:hover {
+    transform: scale(1.1);
+}
+
+.header .nav-links a {
+    font-size: 700;
+    color: #eceff1;
+    text-decoration: none;
+    transition: ease-in-out 1s;
+    align-items: center;
+
+
+}
+
+.header .nav-links li a:hover {
+    color: #781009;
+}
+
+.header .btn button {
+    margin-left: 40px;
+    
+    color: #ffffff;
+    padding: 9px 25px;
+    background: #781009;
+    border: none;
+    border-radius: 50px;
+    cursor: pointer;
+    transition: all 0.3s ease 0s;
+    font-size: 18px;
+    transition: all ease-in-out 1s;
+}
+
+.header .btn button:hover {
+
+    transform: scale(1.1);
+}
+
+.tienda_main {
+    position: absolute;
+    top: 10% !important;
+    width: 100%;
+    overflow: hidden;
+}
+
+
+/* --------------------main---------------------------------- */
+
+body {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 100vh;
+    background-color: #212121;
+
+}
+
+.main_container {
+    display: grid;
+    grid-template-columns: repeat(5, 1fr);
+    grid-template-rows: repeat(4, auto);
+    gap: 20px;
+    width: 95vw;
+    padding: 20px;
+    padding-top: 10%;
+    justify-content: center; /* Centra el contenido horizontalmente */
+    align-items: center; /* Centra el contenido verticalmente */
+    overflow: hidden;
+    position: relative;
+}
+
+
+/* Rose */
+
+
+
+
+.card-rose {
+    display: flex;
+    position: absolute;
+    flex-direction: column;
+    border: 1px solid #ccc;
+    width: 220px !important;
+    /* Ancho deseado */
+    height: 420px !important;
+    /* Alto deseado */
+    margin: 10px;
+    /* Espacio entre las tarjetas */
+    text-align: center;
+    background-color: #fff;
+}
+
+.card-rose img {
+    max-width: 100%;
+    height: 100%;
+    /* Asegura que la imagen no se desborde de la tarjeta */
+}
+
+.contentBox {
+    flex-grow: 1;
+    /* Hace que este div ocupe el espacio restante vertical */
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    /* Espacia uniformemente el contenido verticalmente */
+}
+
+.card-rose:nth-child(1) {
+    grid-column: 1 / span 1;
+    /* Ocupa 1 columna */
+    grid-row: 1 / span 1;
+    /* Ocupa 1 fila */
+}
+
+
+
+
+
+
+
+
+.card-rose {
+    position: relative;
+    width: 320px;
+    height: 480px;
+    background: #191919;
+    border-radius: 20px;
+    overflow: hidden;
+    background-color: #000000 !important;
+}
+
+.card-rose::before {
+    content: "";
+    position: absolute;
+    top: -50%;
+    width: 100%;
+    height: 100%;
+    background: #940A6C;
+    transform: skewY(345deg);
+    transition: 0.5s;
+}
+
+.card-rose:hover::before {
+    top: -70%;
+    transform: skewY(390deg);
+}
+
+.card-rose::after {
+    content: "Rosé";
+    justify-content: center;
+    font-family: "Anavio Small Capitals W01 Bold";
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    font-weight: 600;
+    font-size: 6em;
+    color: rgba(107, 101, 101, 0.121);
+}
+
+.card-rose .imgBox {
+    position: relative;
+    width: 100%;
+    height: 60%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    padding-top: 20px;
+    z-index: 1;
+}
+
+/*
+.card .imgBox img {
+    max-width: 100%;
+    
+    transition: .5s;
+}
+
+.card:hover .imgBox img {
+    max-width: 50%;
+      
+}
+*/
+.card-rose .contentBox {
+    position: relative;
+    padding: 20px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    flex-direction: column;
+    z-index: 2;
+}
+
+.card-rose .contentBox h3 {
+    font-size: 18px;
+    color: white;
+    font-weight: 500;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+}
+
+.card-rose .contentBox .price {
+    font-size: 24px;
+    color: white;
+    font-weight: 700;
+    letter-spacing: 1px;
+}
+
+.card-rose .contentBox .buy {
+    position: relative;
+    top: 100px;
+    opacity: 0;
+    padding: 5px 5px;
+    margin-top: 15px;
+    color: #000000;
+    text-decoration: none;
+    background: #940A6C;
+    border-radius: 30px;
+    text-transform: none;
+    letter-spacing: 1px;
+    transition: 0.8s;
+    color: #000000;
+}
+
+
+
+.card-rose:hover .contentBox .buy {
+    top: 0;
+    opacity: 1;
+}
+
+.mouse {
+    height: 300px;
+    width: auto;
+}
+
+/* Cabernet Franc */
+
+.card-cabernet-franc {
+    display: flex;
+    position: absolute;
+    flex-direction: column;
+    border: 1px solid #ccc;
+    width: 220px !important;
+    /* Ancho deseado */
+    height: 420px !important;
+    /* Alto deseado */
+    margin: 10px;
+    /* Espacio entre las tarjetas */
+    text-align: center;
+    background-color: #fff;
+}
+
+.card-cabernet-franc img {
+    max-width: 100%;
+    height: 100%;
+    /* Asegura que la imagen no se desborde de la tarjeta */
+}
+
+.card-cabernet-franc {
+    position: relative;
+    width: 320px;
+    height: 480px;
+    background: #191919;
+    border-radius: 20px;
+    overflow: hidden;
+    background-color: #000000 !important;
+}
+
+.card-cabernet-franc::before {
+    content: "";
+    position: absolute;
+    top: -50%;
+    width: 100%;
+    height: 100%;
+    background: #0d04448f;
+    transform: skewY(345deg);
+    transition: 0.5s;
+}
+
+.card-cabernet-franc:hover::before {
+    top: -70%;
+    transform: skewY(390deg);
+}
+
+.card-cabernet-franc::after {
+    content: "Franc";
+    justify-content: center;
+    font-family: "Anavio Small Capitals W01 Bold";
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    font-weight: 600;
+    font-size: 6em;
+    color: rgba(107, 101, 101, 0.121);
+}
+
+.card-cabernet-franc .imgBox {
+    position: relative;
+    width: 100%;
+    height: 60%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    padding-top: 20px;
+    z-index: 1;
+}
+
+/*
+  .card .imgBox img {
+      max-width: 100%;
+      
+      transition: .5s;
+  }
+  
+  .card:hover .imgBox img {
+      max-width: 50%;
+        
+  }
+  */
+.card-cabernet-franc .contentBox {
+    position: relative;
+    padding: 20px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    flex-direction: column;
+    z-index: 2;
+}
+
+.card-cabernet-franc .contentBox h3 {
+    font-size: 18px;
+    color: white;
+    font-weight: 500;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+}
+
+.card-cabernet-franc .contentBox .price {
+    font-size: 24px;
+    color: white;
+    font-weight: 700;
+    letter-spacing: 1px;
+}
+
+.card-cabernet-franc .contentBox .buy {
+    position: relative;
+    top: 100px;
+    opacity: 0;
+    padding: 5px 5px;
+    margin-top: 15px;
+    color: #000000;
+    text-decoration: none;
+    background: #0d0444;
+    border-radius: 30px;
+    text-transform: none;
+    letter-spacing: 1px;
+    transition: 0.8s;
+    color: #000000;
+}
+
+
+
+.card-cabernet-franc:hover .contentBox .buy {
+    top: 0;
+    opacity: 1;
+}
+
+
+/* cabernet sauvignon */
+
+.card-cs {
+    display: flex;
+    position: absolute;
+    flex-direction: column;
+    border: 1px solid #ccc;
+    width: 220px !important;
+    /* Ancho deseado */
+    height: 420px !important;
+    /* Alto deseado */
+    margin: 10px;
+    /* Espacio entre las tarjetas */
+    text-align: center;
+    background-color: #fff;
+}
+
+.card-cs img {
+    max-width: 100%;
+    height: 100%;
+    /* Asegura que la imagen no se desborde de la tarjeta */
+}
+
+.card-cs {
+    position: relative;
+    width: 320px;
+    height: 480px;
+    background: #191919;
+    border-radius: 20px;
+    overflow: hidden;
+    background-color: #000000 !important;
+}
+
+.card-cs::before {
+    content: "";
+    position: absolute;
+    top: -50%;
+    width: 100%;
+    height: 100%;
+    background: #4803148f;
+    transform: skewY(345deg);
+    transition: 0.5s;
+}
+
+.card-cs:hover::before {
+    top: -70%;
+    transform: skewY(390deg);
+}
+
+.card-cs::after {
+    content: "Cabernet";
+    justify-content: center;
+    font-family: "Anavio Small Capitals W01 Bold";
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    font-weight: 600;
+    font-size: 6em;
+    color: rgba(107, 101, 101, 0.121);
+}
+
+.card-cs .imgBox {
+    position: relative;
+    width: 100%;
+    height: 60%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    padding-top: 20px;
+    z-index: 1;
+}
+
+/*
+  .card .imgBox img {
+      max-width: 100%;
+      
+      transition: .5s;
+  }
+  
+  .card:hover .imgBox img {
+      max-width: 50%;
+        
+  }
+  */
+.card-cs .contentBox {
+    position: relative;
+    padding: 20px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    flex-direction: column;
+    z-index: 2;
+}
+
+.card-cs .contentBox h3 {
+    font-size: 18px;
+    color: white;
+    font-weight: 500;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+}
+
+.card-cs .contentBox .price {
+    font-size: 24px;
+    color: white;
+    font-weight: 700;
+    letter-spacing: 1px;
+}
+
+.card-cs .contentBox .buy {
+    position: relative;
+    top: 100px;
+    opacity: 0;
+    padding: 5px 5px;
+    margin-top: 15px;
+    color: #000000;
+    text-decoration: none;
+    background: #480314;
+    border-radius: 30px;
+    text-transform: none;
+    letter-spacing: 1px;
+    transition: 0.8s;
+    color: #000000;
+}
+
+
+
+.card-cs:hover .contentBox .buy {
+    top: 0;
+    opacity: 1;
+}
+
+/* extra brut */
+.card-eb {
+    display: flex;
+    position: absolute;
+    flex-direction: column;
+    border: 1px solid #ccc;
+    width: 220px !important;
+    /* Ancho deseado */
+    height: 420px !important;
+    /* Alto deseado */
+    margin: 10px;
+    /* Espacio entre las tarjetas */
+    text-align: center;
+    background-color: #fff;
+}
+
+.card-eb img {
+    max-width: 100%;
+    height: 100%;
+    /* Asegura que la imagen no se desborde de la tarjeta */
+}
+
+.card-eb {
+    position: relative;
+    width: 320px;
+    height: 480px;
+    background: #191919;
+    border-radius: 20px;
+    overflow: hidden;
+    background-color: #000000 !important;
+}
+
+.card-eb::before {
+    content: "";
+    position: absolute;
+    top: -50%;
+    width: 100%;
+    height: 100%;
+    background: #dfd13588;
+    transform: skewY(345deg);
+    transition: 0.5s;
+}
+
+.card-eb:hover::before {
+    top: -70%;
+    transform: skewY(390deg);
+}
+
+.price{
+    font-family: "Anavio Small Capitals W01 Bold";
+    font-size: 15px !important;
+}
+
+.card-eb::after {
+    content: "Extra";
+    justify-content: center;
+    font-family: "Anavio Small Capitals W01 Bold";
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    font-weight: 600;
+    font-size: 6em;
+    color: rgba(107, 101, 101, 0.121);
+}
+
+.card-eb .imgBox {
+    position: relative;
+    width: 100%;
+    height: 60%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    padding-top: 20px;
+    z-index: 1;
+}
+
+
+.card-eb .contentBox {
+    position: relative;
+    padding: 20px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    flex-direction: column;
+    z-index: 2;
+}
+
+.card-eb .contentBox h3 {
+    font-size: 18px;
+    color: white;
+    font-weight: 500;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+}
+
+.card-eb .contentBox .price {
+    font-size: 24px;
+    color: white;
+    font-weight: 700;
+    letter-spacing: 1px;
+}
+
+.card-eb .contentBox .buy {
+    position: relative;
+    top: 100px;
+    opacity: 0;
+    padding: 5px 5px;
+    margin-top: 15px;
+    color: #000000;
+    text-decoration: none;
+    background: #dfd13588;
+    border-radius: 30px;
+    text-transform: none;
+    letter-spacing: 1px;
+    transition: 0.8s;
+    color: #000000;
+}
+
+
+
+.card-eb:hover .contentBox .buy {
+    top: 0;
+    opacity: 1;
+}
+
+/* gran reserva */
+
+.card-rm {
+    display: flex;
+    position: absolute;
+    flex-direction: column;
+    border: 1px solid #ccc;
+    width: 220px !important;
+    /* Ancho deseado */
+    height: 420px !important;
+    /* Alto deseado */
+    margin: 10px;
+    /* Espacio entre las tarjetas */
+    text-align: center;
+    background-color: #fff;
+}
+
+.card-rm img {
+    max-width: 100%;
+    height: 100%;
+    /* Asegura que la imagen no se desborde de la tarjeta */
+}
+
+.card-rm {
+    position: relative;
+    width: 320px;
+    height: 480px;
+    background: #191919;
+    border-radius: 20px;
+    overflow: hidden;
+    background-color: #000000 !important;
+}
+
+.card-rm::before {
+    content: "";
+    position: absolute;
+    top: -50%;
+    width: 100%;
+    height: 100%;
+    background: #750505;
+    transform: skewY(345deg);
+    transition: 0.5s;
+}
+
+.card-rm:hover::before {
+    top: -70%;
+    transform: skewY(390deg);
+}
+
+.card-rm::after {
+    content: "Reserva";
+    justify-content: center;
+    font-family: "Anavio Small Capitals W01 Bold";
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    font-weight: 600;
+    font-size: 6em;
+    color: rgba(107, 101, 101, 0.121);
+}
+
+.card-rm .imgBox {
+    position: relative;
+    width: 100%;
+    height: 60%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    padding-top: 20px;
+    z-index: 1;
+}
+
+
+.card-rm .contentBox {
+    position: relative;
+    padding: 20px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    flex-direction: column;
+    z-index: 2;
+}
+
+.card-rm .contentBox h3 {
+    font-size: 18px;
+    color: white;
+    font-weight: 500;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+}
+
+.card-rm .contentBox .price {
+    font-size: 24px;
+    color: white;
+    font-weight: 700;
+    letter-spacing: 1px;
+}
+
+.card-rm .contentBox .buy {
+    position: relative;
+    top: 100px;
+    opacity: 0;
+    padding: 5px 5px;
+    margin-top: 15px;
+    color: #000000;
+    text-decoration: none;
+    background: #750505;
+    border-radius: 30px;
+    text-transform: none;
+    letter-spacing: 1px;
+    transition: 0.8s;
+    color: #000000;
+}
+
+
+
+.card-rm:hover .contentBox .buy {
+    top: 0;
+    opacity: 1;
+}
+
+/* malbec OAK */
+
+.card-malbec-oak {
+    display: flex;
+    position: absolute;
+    flex-direction: column;
+    border: 1px solid #ccc;
+    width: 220px !important;
+    /* Ancho deseado */
+    height: 420px !important;
+    /* Alto deseado */
+    margin: 10px;
+    /* Espacio entre las tarjetas */
+    text-align: center;
+    background-color: #fff;
+}
+
+.card-malbec-oak img {
+    max-width: 100%;
+    height: 100%;
+    /* Asegura que la imagen no se desborde de la tarjeta */
+}
+
+.card-malbec-oak {
+    position: relative;
+    width: 320px;
+    height: 480px;
+    background: #191919;
+    border-radius: 20px;
+    overflow: hidden;
+    background-color: #000000 !important;
+}
+
+.card-malbec-oak::before {
+    content: "";
+    position: absolute;
+    top: -50%;
+    width: 100%;
+    height: 100%;
+    background: #723610;
+    transform: skewY(345deg);
+    transition: 0.5s;
+}
+
+.card-malbec-oak:hover::before {
+    top: -70%;
+    transform: skewY(390deg);
+}
+
+.card-malbec-oak::after {
+    content: "Oak";
+    justify-content: center;
+    font-family: "Anavio Small Capitals W01 Bold";
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    font-weight: 600;
+    font-size: 6em;
+    color: rgba(107, 101, 101, 0.121);
+}
+
+.card-malbec-oak .imgBox {
+    position: relative;
+    width: 100%;
+    height: 60%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    padding-top: 20px;
+    z-index: 1;
+}
+
+
+.card-malbec-oak .contentBox {
+    position: relative;
+    padding: 20px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    flex-direction: column;
+    z-index: 2;
+}
+
+.card-malbec-oak .contentBox h3 {
+    font-size: 18px;
+    color: white;
+    font-weight: 500;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+}
+
+.card-malbec-oak .contentBox .price {
+    font-size: 24px;
+    color: white;
+    font-weight: 700;
+    letter-spacing: 1px;
+}
+
+.card-malbec-oak .contentBox .buy {
+    position: relative;
+    top: 100px;
+    opacity: 0;
+    padding: 5px 5px;
+    margin-top: 15px;
+    color: #000000;
+    text-decoration: none;
+    background: #723610;
+    border-radius: 30px;
+    text-transform: none;
+    letter-spacing: 1px;
+    transition: 0.8s;
+    color: #000000;
+}
+
+
+
+.card-malbec-oak:hover .contentBox .buy {
+    top: 0;
+    opacity: 1;
+}
+
+/* malbec */
+.card-malbec-reserva {
+    display: flex;
+    position: absolute;
+    flex-direction: column;
+    border: 1px solid #ccc;
+    width: 220px !important;
+    /* Ancho deseado */
+    height: 420px !important;
+    /* Alto deseado */
+    margin: 10px;
+    /* Espacio entre las tarjetas */
+    text-align: center;
+    background-color: #fff;
+}
+
+.card-malbec-reserva img {
+    max-width: 100%;
+    height: 100%;
+    /* Asegura que la imagen no se desborde de la tarjeta */
+}
+
+.card-malbec-reserva {
+    position: relative;
+    width: 320px;
+    height: 480px;
+    background: #191919;
+    border-radius: 20px;
+    overflow: hidden;
+    background-color: #000000 !important;
+}
+
+.card-malbec-reserva::before {
+    content: "";
+    position: absolute;
+    top: -50%;
+    width: 100%;
+    height: 100%;
+    background: #B67316;
+    transform: skewY(345deg);
+    transition: 0.5s;
+}
+
+.card-malbec-reserva:hover::before {
+    top: -70%;
+    transform: skewY(390deg);
+}
+
+.card-malbec-reserva::after {
+    content: "Malbec";
+    justify-content: center;
+    font-family: "Anavio Small Capitals W01 Bold";
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    font-weight: 600;
+    font-size: 6em;
+    color: rgba(107, 101, 101, 0.121);
+}
+
+.card-malbec-reserva .imgBox {
+    position: relative;
+    width: 100%;
+    height: 60%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    padding-top: 20px;
+    z-index: 1;
+}
+
+
+.card-malbec-reserva .contentBox {
+    position: relative;
+    padding: 20px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    flex-direction: column;
+    z-index: 2;
+}
+
+.card-malbec-reserva .contentBox h3 {
+    font-size: 18px;
+    color: white;
+    font-weight: 500;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+}
+
+.card-malbec-reserva .contentBox .price {
+    font-size: 24px;
+    color: white;
+    font-weight: 700;
+    letter-spacing: 1px;
+}
+
+.card-malbec-reserva .contentBox .buy {
+    position: relative;
+    top: 100px;
+    opacity: 0;
+    padding: 5px 5px;
+    margin-top: 15px;
+    color: #000000;
+    text-decoration: none;
+    background: #B67316;
+    border-radius: 30px;
+    text-transform: none;
+    letter-spacing: 1px;
+    transition: 0.8s;
+    color: #000000;
+}
+
+
+
+.card-malbec-reserva:hover .contentBox .buy {
+    top: 0;
+    opacity: 1;
+}
+
+
+/* syrah */
+.card-syrah {
+    display: flex;
+    position: absolute;
+    flex-direction: column;
+    border: 1px solid #ccc;
+    width: 220px !important;
+    /* Ancho deseado */
+    height: 420px !important;
+    /* Alto deseado */
+    margin: 10px;
+    /* Espacio entre las tarjetas */
+    text-align: center;
+    background-color: #fff;
+}
+
+.card-syrah img {
+    max-width: 100%;
+    height: 100%;
+    /* Asegura que la imagen no se desborde de la tarjeta */
+}
+
+.card-syrah {
+    position: relative;
+    width: 320px;
+    height: 480px;
+    background: #191919;
+    border-radius: 20px;
+    overflow: hidden;
+    background-color: #000000 !important;
+}
+
+.card-syrah::before {
+    content: "";
+    position: absolute;
+    top: -50%;
+    width: 100%;
+    height: 100%;
+    background: #410974;
+    transform: skewY(345deg);
+    transition: 0.5s;
+}
+
+.card-syrah:hover::before {
+    top: -70%;
+    transform: skewY(390deg);
+}
+
+.card-syrah::after {
+    content: "Syrah";
+    justify-content: center;
+    font-family: "Anavio Small Capitals W01 Bold";
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    font-weight: 600;
+    font-size: 6em;
+    color: rgba(107, 101, 101, 0.121);
+}
+
+.card-syrah .imgBox {
+    position: relative;
+    width: 100%;
+    height: 60%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    padding-top: 20px;
+    z-index: 1;
+}
+
+
+.card-syrah .contentBox {
+    position: relative;
+    padding: 20px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    flex-direction: column;
+    z-index: 2;
+}
+
+.card-syrah .contentBox h3 {
+    font-size: 18px;
+    color: white;
+    font-weight: 500;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+}
+
+.card-syrah .contentBox .price {
+    font-size: 24px;
+    color: white;
+    font-weight: 700;
+    letter-spacing: 1px;
+}
+
+.card-syrah .contentBox .buy {
+    position: relative;
+    top: 100px;
+    opacity: 0;
+    padding: 5px 5px;
+    margin-top: 15px;
+    color: #000000;
+    text-decoration: none;
+    background: #410974;
+    border-radius: 30px;
+    text-transform: none;
+    letter-spacing: 1px;
+    transition: 0.8s;
+    color: #000000;
+}
+
+
+
+.card-syrah:hover .contentBox .buy {
+    top: 0;
+    opacity: 1;
+}
+
+/* moscatel de alejandria */
+.card-mos {
+    display: flex;
+    position: absolute;
+    flex-direction: column;
+    border: 1px solid #ccc;
+    width: 220px !important;
+    /* Ancho deseado */
+    height: 420px !important;
+    /* Alto deseado */
+    margin: 10px;
+    /* Espacio entre las tarjetas */
+    text-align: center;
+    background-color: #fff;
+}
+
+.card-mos img {
+    max-width: 100%;
+    height: 100%;
+    /* Asegura que la imagen no se desborde de la tarjeta */
+}
+
+.card-mos {
+    position: relative;
+    width: 320px;
+    height: 480px;
+    background: #191919;
+    border-radius: 20px;
+    overflow: hidden;
+    background-color: #000000 !important;
+}
+
+.card-mos::before {
+    content: "";
+    position: absolute;
+    top: -50%;
+    width: 100%;
+    height: 100%;
+    background: #b76e39;
+    transform: skewY(345deg);
+    transition: 0.5s;
+}
+
+.card-mos:hover::before {
+    top: -70%;
+    transform: skewY(390deg);
+}
+
+.card-mos::after {
+    content: "Alejandría";
+    justify-content: center;
+    font-family: "Anavio Small Capitals W01 Bold";
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    font-weight: 600;
+    font-size: 6em;
+    color: rgba(107, 101, 101, 0.121);
+}
+
+.card-mos .imgBox {
+    position: relative;
+    width: 100%;
+    height: 60%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    padding-top: 20px;
+    z-index: 1;
+}
+
+
+.card-mos .contentBox {
+    position: relative;
+    padding: 20px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    flex-direction: column;
+    z-index: 2;
+}
+
+.card-mos .contentBox h3 {
+    font-size: 18px;
+    color: white;
+    font-weight: 500;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+}
+
+.card-mos .contentBox .price {
+    font-size: 24px;
+    color: white;
+    font-weight: 700;
+    letter-spacing: 1px;
+}
+
+.card-mos .contentBox .buy {
+    position: relative;
+    top: 100px;
+    opacity: 0;
+    padding: 5px 5px;
+    margin-top: 15px;
+    color: #000000;
+    text-decoration: none;
+    background: #b76e39;
+    border-radius: 30px;
+    text-transform: none;
+    letter-spacing: 1px;
+    transition: 0.8s;
+    color: #000000;
+}
+
+
+
+.card-mos:hover .contentBox .buy {
+    top: 0;
+    opacity: 1;
+}
+
+/* blanc de blancs */
+
+.card-bdb {
+    display: flex;
+    position: absolute;
+    flex-direction: column;
+    border: 1px solid #ccc;
+    width: 220px !important;
+    /* Ancho deseado */
+    height: 420px !important;
+    /* Alto deseado */
+    margin: 10px;
+    /* Espacio entre las tarjetas */
+    text-align: center;
+    background-color: #fff;
+}
+
+.card-bdb img {
+    max-width: 100%;
+    height: 100%;
+    /* Asegura que la imagen no se desborde de la tarjeta */
+}
+
+.card-bdb {
+    position: relative;
+    width: 320px;
+    height: 480px;
+    background: #191919;
+    border-radius: 20px;
+    overflow: hidden;
+    background-color: #000000 !important;
+}
+
+.card-bdb::before {
+    content: "";
+    position: absolute;
+    top: -50%;
+    width: 100%;
+    height: 100%;
+    background: #98BCE1;
+    transform: skewY(345deg);
+    transition: 0.5s;
+}
+
+.card-bdb:hover::before {
+    top: -70%;
+    transform: skewY(390deg);
+}
+
+.card-bdb::after {
+    content: "Blancs";
+    justify-content: center;
+    font-family: "Anavio Small Capitals W01 Bold";
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    font-weight: 600;
+    font-size: 6em;
+    color: rgba(107, 101, 101, 0.121);
+}
+
+.card-bdb .imgBox {
+    position: relative;
+    width: 100%;
+    height: 60%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    padding-top: 20px;
+    z-index: 1;
+}
+
+
+.card-bdb .contentBox {
+    position: relative;
+    padding: 20px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    flex-direction: column;
+    z-index: 2;
+}
+
+.card-bdb .contentBox h3 {
+    font-size: 18px;
+    color: white;
+    font-weight: 500;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+}
+
+.card-bdb .contentBox .price {
+    font-size: 24px;
+    color: white;
+    font-weight: 700;
+    letter-spacing: 1px;
+}
+
+.card-bdb .contentBox .buy {
+    position: relative;
+    top: 100px;
+    opacity: 0;
+    padding: 5px 5px;
+    margin-top: 15px;
+    color: #000000;
+    text-decoration: none;
+    background: #98BCE1;
+    border-radius: 30px;
+    text-transform: none;
+    letter-spacing: 1px;
+    transition: 0.8s;
+    color: #000000;
+}
+
+
+
+.card-bdb:hover .contentBox .buy {
+    top: 0;
+    opacity: 1;
+}
+
+/* blanco dulce */
+
+.card-vbd {
+    display: flex;
+    position: absolute;
+    flex-direction: column;
+    border: 1px solid #ccc;
+    width: 220px !important;
+    /* Ancho deseado */
+    height: 420px !important;
+    /* Alto deseado */
+    margin: 10px;
+    /* Espacio entre las tarjetas */
+    text-align: center;
+    background-color: #fff;
+}
+
+.card-vbd img {
+    max-width: 100%;
+    height: 100%;
+    /* Asegura que la imagen no se desborde de la tarjeta */
+}
+
+.card-vbd {
+    position: relative;
+    width: 320px;
+    height: 480px;
+    background: #191919;
+    border-radius: 20px;
+    overflow: hidden;
+    background-color: #000000 !important;
+}
+
+.card-vbd::before {
+    content: "";
+    position: absolute;
+    top: -50%;
+    width: 100%;
+    height: 100%;
+    background: #EBF264;
+    transform: skewY(345deg);
+    transition: 0.5s;
+}
+
+.card-vbd:hover::before {
+    top: -70%;
+    transform: skewY(390deg);
+}
+
+.card-vbd::after {
+    content: "Dulce";
+    justify-content: center;
+    font-family: "Anavio Small Capitals W01 Bold";
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    font-weight: 600;
+    font-size: 6em;
+    color: rgba(107, 101, 101, 0.121);
+}
+
+.card-vbd .imgBox {
+    position: relative;
+    width: 100%;
+    height: 60%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    padding-top: 20px;
+    z-index: 1;
+}
+
+
+.card-vbd .contentBox {
+    position: relative;
+    padding: 20px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    flex-direction: column;
+    z-index: 2;
+}
+
+.card-vbd .contentBox h3 {
+    font-size: 18px;
+    color: white;
+    font-weight: 500;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+}
+
+.card-vbd .contentBox .price {
+    font-size: 24px;
+    color: white;
+    font-weight: 700;
+    letter-spacing: 1px;
+}
+
+.card-vbd .contentBox .buy {
+    position: relative;
+    top: 100px;
+    opacity: 0;
+    padding: 5px 5px;
+    margin-top: 15px;
+    color: #000000;
+    text-decoration: none;
+    background: #EBF264;
+    border-radius: 30px;
+    text-transform: none;
+    letter-spacing: 1px;
+    transition: 0.8s;
+    color: #000000;
+}
+
+
+
+.card-vbd:hover .contentBox .buy {
+    top: 0;
+    opacity: 1;
+}
+
+/* bonarda reserva */
+
+.card-br {
+    display: flex;
+    position: absolute;
+    flex-direction: column;
+    border: 1px solid #ccc;
+    width: 220px !important;
+    /* Ancho deseado */
+    height: 420px !important;
+    /* Alto deseado */
+    margin: 10px;
+    /* Espacio entre las tarjetas */
+    text-align: center;
+    background-color: #fff;
+}
+
+.card-br img {
+    max-width: 100%;
+    height: 100%;
+    /* Asegura que la imagen no se desborde de la tarjeta */
+}
+
+.card-br {
+    position: relative;
+    width: 320px;
+    height: 480px;
+    background: #191919;
+    border-radius: 20px;
+    overflow: hidden;
+    background-color: #000000 !important;
+}
+
+.card-br::before {
+    content: "";
+    position: absolute;
+    top: -50%;
+    width: 100%;
+    height: 100%;
+    background: #7D1A30;
+    transform: skewY(345deg);
+    transition: 0.5s;
+}
+
+.card-br:hover::before {
+    top: -70%;
+    transform: skewY(390deg);
+}
+
+.card-br::after {
+    content: "Bonarda";
+    justify-content: center;
+    font-family: "Anavio Small Capitals W01 Bold";
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    font-weight: 600;
+    font-size: 6em;
+    color: rgba(107, 101, 101, 0.121);
+}
+
+.card-br .imgBox {
+    position: relative;
+    width: 100%;
+    height: 60%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    padding-top: 20px;
+    z-index: 1;
+}
+
+
+.card-br .contentBox {
+    position: relative;
+    padding: 20px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    flex-direction: column;
+    z-index: 2;
+}
+
+.card-br .contentBox h3 {
+    font-size: 18px;
+    color: white;
+    font-weight: 500;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+}
+
+.card-br .contentBox .price {
+    font-size: 24px;
+    color: white;
+    font-weight: 700;
+    letter-spacing: 1px;
+}
+
+.card-br .contentBox .buy {
+    position: relative;
+    top: 100px;
+    opacity: 0;
+    padding: 5px 5px;
+    margin-top: 15px;
+    color: #000000;
+    text-decoration: none;
+    background: #7D1A30;
+    border-radius: 30px;
+    text-transform: none;
+    letter-spacing: 1px;
+    transition: 0.8s;
+    color: #000000;
+}
+
+
+
+.card-br:hover .contentBox .buy {
+    top: 0;
+    opacity: 1;
+}
+
+/* Semillon */
+
+.card-semillon-reserva {
+    display: flex;
+    position: absolute;
+    flex-direction: column;
+    border: 1px solid #ccc;
+    width: 220px !important;
+    /* Ancho deseado */
+    height: 420px !important;
+    /* Alto deseado */
+    margin: 10px;
+    /* Espacio entre las tarjetas */
+    text-align: center;
+    background-color: #fff;
+}
+
+.card-semillon-reserva img {
+    max-width: 100%;
+    height: 100%;
+    /* Asegura que la imagen no se desborde de la tarjeta */
+}
+
+.card-semillon-reserva {
+    position: relative;
+    width: 320px;
+    height: 480px;
+    background: #191919;
+    border-radius: 20px;
+    overflow: hidden;
+    background-color: #000000 !important;
+}
+
+.card-semillon-reserva::before {
+    content: "";
+    position: absolute;
+    top: -50%;
+    width: 100%;
+    height: 100%;
+    background: #C66211;
+    transform: skewY(345deg);
+    transition: 0.5s;
+}
+
+.card-semillon-reserva:hover::before {
+    top: -70%;
+    transform: skewY(390deg);
+}
+
+.card-semillon-reserva::after {
+    content: "Semillon";
+    justify-content: center;
+    font-family: "Anavio Small Capitals W01 Bold";
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    font-weight: 600;
+    font-size: 6em;
+    color: rgba(107, 101, 101, 0.121);
+}
+
+.card-semillon-reserva .imgBox {
+    position: relative;
+    width: 100%;
+    height: 60%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    padding-top: 20px;
+    z-index: 1;
+}
+
+
+.card-semillon-reserva .contentBox {
+    position: relative;
+    padding: 20px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    flex-direction: column;
+    z-index: 2;
+}
+
+.card-semillon-reserva .contentBox h3 {
+    font-size: 18px;
+    color: white;
+    font-weight: 500;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+}
+
+.card-semillon-reserva .contentBox .price {
+    font-size: 24px;
+    color: white;
+    font-weight: 700;
+    letter-spacing: 1px;
+}
+
+.card-semillon-reserva .contentBox .buy {
+    position: relative;
+    top: 100px;
+    opacity: 0;
+    padding: 5px 5px;
+    margin-top: 15px;
+    color: #000000;
+    text-decoration: none;
+    background: #C66211;
+    border-radius: 30px;
+    text-transform: none;
+    letter-spacing: 1px;
+    transition: 0.8s;
+    color: #000000;
+}
+
+
+
+.card-semillon-reserva:hover .contentBox .buy {
+    top: 0;
+    opacity: 1;
+}
+
+
+/* Gran reserva malbec */
+
+.card-grm {
+    display: flex;
+    position: absolute;
+    flex-direction: column;
+    border: 1px solid #ccc;
+    width: 220px !important;
+    /* Ancho deseado */
+    height: 420px !important;
+    /* Alto deseado */
+    margin: 10px;
+    /* Espacio entre las tarjetas */
+    text-align: center;
+    background-color: #fff;
+}
+
+.card-grm img {
+    max-width: 100%;
+    height: 100%;
+    /* Asegura que la imagen no se desborde de la tarjeta */
+}
+
+.card-grm {
+    position: relative;
+    width: 320px;
+    height: 480px;
+    background: #191919;
+    border-radius: 20px;
+    overflow: hidden;
+    background-color: #000000 !important;
+}
+
+.card-grm::before {
+    content: "";
+    position: absolute;
+    top: -50%;
+    width: 100%;
+    height: 100%;
+    background: #F3E8DF;
+    transform: skewY(345deg);
+    transition: 0.5s;
+}
+
+.card-grm:hover::before {
+    top: -70%;
+    transform: skewY(390deg);
+}
+
+.card-grm::after {
+    content: "Reserva";
+    justify-content: center;
+    font-family: "Anavio Small Capitals W01 Bold";
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    font-weight: 600;
+    font-size: 6em;
+    color: rgba(107, 101, 101, 0.121);
+}
+
+.card-grm .imgBox {
+    position: relative;
+    width: 100%;
+    height: 60%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    padding-top: 20px;
+    z-index: 1;
+}
+
+
+.card-grm .contentBox {
+    position: relative;
+    padding: 20px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    flex-direction: column;
+    z-index: 2;
+}
+
+.card-grm .contentBox h3 {
+    font-size: 18px;
+    color: white;
+    font-weight: 500;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+}
+
+.card-grm .contentBox .price {
+    font-size: 24px;
+    color: white;
+    font-weight: 700;
+    letter-spacing: 1px;
+}
+
+.card-grm .contentBox .buy {
+    position: relative;
+    top: 100px;
+    opacity: 0;
+    padding: 5px 5px;
+    margin-top: 15px;
+    color: #000000;
+    text-decoration: none;
+    background: #F3E8DF;
+    border-radius: 30px;
+    text-transform: none;
+    letter-spacing: 1px;
+    transition: 0.8s;
+    color: #000000;
+}
+
+
+
+.card-grm:hover .contentBox .buy {
+    top: 0;
+    opacity: 1;
+}
+
+/* Sauvignon blanc */
+
+.card-sb {
+    display: flex;
+    position: absolute;
+    flex-direction: column;
+    border: 1px solid #ccc;
+    width: 220px !important;
+    /* Ancho deseado */
+    height: 420px !important;
+    /* Alto deseado */
+    margin: 10px;
+    /* Espacio entre las tarjetas */
+    text-align: center;
+    background-color: #fff;
+}
+
+.card-sb img {
+    max-width: 100%;
+    height: 100%;
+    /* Asegura que la imagen no se desborde de la tarjeta */
+}
+
+.card-sb {
+    position: relative;
+    width: 320px;
+    height: 480px;
+    background: #191919;
+    border-radius: 20px;
+    overflow: hidden;
+    background-color: #000000 !important;
+}
+
+.card-sb::before {
+    content: "";
+    position: absolute;
+    top: -50%;
+    width: 100%;
+    height: 100%;
+    background: #ADD855;
+    transform: skewY(345deg);
+    transition: 0.5s;
+}
+
+.card-sb:hover::before {
+    top: -70%;
+    transform: skewY(390deg);
+}
+
+.card-sb::after {
+    content: "Sauvignon";
+    justify-content: center;
+    font-family: "Anavio Small Capitals W01 Bold";
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    font-weight: 600;
+    font-size: 6em;
+    color: rgba(107, 101, 101, 0.121);
+}
+
+.card-sb .imgBox {
+    position: relative;
+    width: 100%;
+    height: 60%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    padding-top: 20px;
+    z-index: 1;
+}
+
+
+.card-sb .contentBox {
+    position: relative;
+    padding: 20px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    flex-direction: column;
+    z-index: 2;
+}
+
+.card-sb .contentBox h3 {
+    font-size: 18px;
+    color: white;
+    font-weight: 500;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+}
+
+.card-sb .contentBox .price {
+    font-size: 24px;
+    color: white;
+    font-weight: 700;
+    letter-spacing: 1px;
+}
+
+.card-sb .contentBox .buy {
+    position: relative;
+    top: 100px;
+    opacity: 0;
+    padding: 5px 5px;
+    margin-top: 15px;
+    color: #000000;
+    text-decoration: none;
+    background: #ADD855;
+    border-radius: 30px;
+    text-transform: none;
+    letter-spacing: 1px;
+    transition: 0.8s;
+    color: #000000;
+}
+
+
+
+.card-sb:hover .contentBox .buy {
+    top: 0;
+    opacity: 1;
+}
+
+/* Torrontes Riojano */
+
+.card-torr {
+    display: flex;
+    position: absolute;
+    flex-direction: column;
+    border: 1px solid #ccc;
+    width: 220px !important;
+    /* Ancho deseado */
+    height: 420px !important;
+    /* Alto deseado */
+    margin: 10px;
+    /* Espacio entre las tarjetas */
+    text-align: center;
+    background-color: #fff;
+}
+
+.card-torr img {
+    max-width: 100%;
+    height: 100%;
+    /* Asegura que la imagen no se desborde de la tarjeta */
+}
+
+.card-torr {
+    position: relative;
+    width: 320px;
+    height: 480px;
+    background: #191919;
+    border-radius: 20px;
+    overflow: hidden;
+    background-color: #000000 !important;
+}
+
+.card-torr::before {
+    content: "";
+    position: absolute;
+    top: -50%;
+    width: 100%;
+    height: 100%;
+    background: #be6e39;
+    transform: skewY(345deg);
+    transition: 0.5s;
+}
+
+.card-torr:hover::before {
+    top: -70%;
+    transform: skewY(390deg);
+}
+
+.card-torr::after {
+    content: "Riojano";
+    justify-content: center;
+    font-family: "Anavio Small Capitals W01 Bold";
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    font-weight: 600;
+    font-size: 6em;
+    color: rgba(107, 101, 101, 0.121);
+}
+
+.card-torr .imgBox {
+    position: relative;
+    width: 100%;
+    height: 60%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    padding-top: 20px;
+    z-index: 1;
+}
+
+
+.card-torr .contentBox {
+    position: relative;
+    padding: 20px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    flex-direction: column;
+    z-index: 2;
+}
+
+.card-torr .contentBox h3 {
+    font-size: 18px;
+    color: white;
+    font-weight: 500;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+}
+
+.card-torr .contentBox .price {
+    font-size: 24px;
+    color: white;
+    font-weight: 700;
+    letter-spacing: 1px;
+}
+
+.card-torr .contentBox .buy {
+    position: relative;
+    top: 100px;
+    opacity: 0;
+    padding: 5px 5px;
+    margin-top: 15px;
+    color: #000000;
+    text-decoration: none;
+    background: #be6e39;
+    border-radius: 30px;
+    text-transform: none;
+    letter-spacing: 1px;
+    transition: 0.8s;
+    color: #000000;
+}
+
+
+
+.card-torr:hover .contentBox .buy {
+    top: 0;
+    opacity: 1;
+}
+
+/* Torrontes Sanjuanino */
+
+.card-torrsj {
+    display: flex;
+    position: absolute;
+    flex-direction: column;
+    border: 1px solid #ccc;
+    width: 220px !important;
+    /* Ancho deseado */
+    height: 420px !important;
+    /* Alto deseado */
+    margin: 10px;
+    /* Espacio entre las tarjetas */
+    text-align: center;
+    background-color: #fff;
+}
+
+.card-torrsj img {
+    max-width: 100%;
+    height: 100%;
+    /* Asegura que la imagen no se desborde de la tarjeta */
+}
+
+.card-torrsj {
+    position: relative;
+    width: 320px;
+    height: 480px;
+    background: #191919;
+    border-radius: 20px;
+    overflow: hidden;
+    background-color: #000000 !important;
+}
+
+.card-torrsj::before {
+    content: "";
+    position: absolute;
+    top: -50%;
+    width: 100%;
+    height: 100%;
+    background: #40817B;
+    transform: skewY(345deg);
+    transition: 0.5s;
+}
+
+.card-torrsj:hover::before {
+    top: -70%;
+    transform: skewY(390deg);
+}
+
+.card-torrsj::after {
+    content: "Sanjuanino";
+    justify-content: center;
+    font-family: "Anavio Small Capitals W01 Bold";
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    font-weight: 600;
+    font-size: 6em;
+    color: rgba(107, 101, 101, 0.121);
+}
+
+.card-torrsj .imgBox {
+    position: relative;
+    width: 100%;
+    height: 60%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    padding-top: 20px;
+    z-index: 1;
+}
+
+
+.card-torrsj .contentBox {
+    position: relative;
+    padding: 20px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    flex-direction: column;
+    z-index: 2;
+}
+
+.card-torrsj .contentBox h3 {
+    font-size: 18px;
+    color: white;
+    font-weight: 500;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+}
+
+.card-torrsj .contentBox .price {
+    font-size: 24px;
+    color: white;
+    font-weight: 700;
+    letter-spacing: 1px;
+}
+
+.card-torrsj .contentBox .buy {
+    position: relative;
+    top: 100px;
+    opacity: 0;
+    padding: 5px 5px;
+    margin-top: 15px;
+    color: #000000;
+    text-decoration: none;
+    background: #40817B;
+    border-radius: 30px;
+    text-transform: none;
+    letter-spacing: 1px;
+    transition: 0.8s;
+    color: #000000;
+}
+
+
+
+.card-torrsj:hover .contentBox .buy {
+    top: 0;
+    opacity: 1;
+}
+
+/* Semillon Reserva */
+
+.card-semillon-reservares {
+    display: flex;
+    position: absolute;
+    flex-direction: column;
+    border: 1px solid #ccc;
+    width: 220px !important;
+    /* Ancho deseado */
+    height: 420px !important;
+    /* Alto deseado */
+    margin: 10px;
+    /* Espacio entre las tarjetas */
+    text-align: center;
+    background-color: #fff;
+}
+
+.card-semillon-reservares img {
+    max-width: 100%;
+    height: 100%;
+    /* Asegura que la imagen no se desborde de la tarjeta */
+}
+
+.card-semillon-reservares {
+    position: relative;
+    width: 320px;
+    height: 480px;
+    background: #191919;
+    border-radius: 20px;
+    overflow: hidden;
+    background-color: #000000 !important;
+}
+
+.card-semillon-reservares::before {
+    content: "";
+    position: absolute;
+    top: -50%;
+    width: 100%;
+    height: 100%;
+    background: #53331a;
+    transform: skewY(345deg);
+    transition: 0.5s;
+}
+
+.card-semillon-reservares:hover::before {
+    top: -70%;
+    transform: skewY(390deg);
+}
+
+.card-semillon-reservares::after {
+    content: "Reserva";
+    justify-content: center;
+    font-family: "Anavio Small Capitals W01 Bold";
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    font-weight: 600;
+    font-size: 6em;
+    color: rgba(107, 101, 101, 0.121);
+}
+
+.card-semillon-reservares .imgBox {
+    position: relative;
+    width: 100%;
+    height: 60%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    padding-top: 20px;
+    z-index: 1;
+}
+
+
+.card-semillon-reservares .contentBox {
+    position: relative;
+    padding: 20px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    flex-direction: column;
+    z-index: 2;
+}
+
+.card-semillon-reservares .contentBox h3 {
+    font-size: 18px;
+    color: white;
+    font-weight: 500;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+}
+
+.card-semillon-reservares .contentBox .price {
+    font-size: 24px;
+    color: white;
+    font-weight: 700;
+    letter-spacing: 1px;
+}
+
+.card-semillon-reservares .contentBox .buy {
+    position: relative;
+    top: 100px;
+    opacity: 0;
+    padding: 5px 5px;
+    margin-top: 15px;
+    color: #000000;
+    text-decoration: none;
+    background: #53331a;
+    border-radius: 30px;
+    text-transform: none;
+    letter-spacing: 1px;
+    transition: 0.8s;
+    color: #000000;
+}
+
+
+
+.card-semillon-reservares:hover .contentBox .buy {
+    top: 0;
+    opacity: 1;
+}
+
+
+/* ---------------------paginator----------------- */
+
+
+@import url('https://rsms.me/inter/inter.css');
+
+
+
+
+
+
+
+
+.hide {
+    display: none;
+    visibility: hidden;
+    height: 0;
+}
+
+.pagination\:container {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin: 30px 50px;
+}
+
+.arrow\:text {
+    display: block;
+    vertical-align: middle;
+    font-size: 13px;
+    vertical-align: middle;
+}
+
+.pagination\:number {
+    --size: 32px;
+    --margin: 10px;
+    margin: 0 var(--margin);
+    border-radius: 6px;
+    background: #202020;
+    max-width: auto;
+    min-width: var(--size);
+    height: var(--size);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    padding: 0 6px;
+    background-color: #434343;
+}
+
+.pagination\:number :hover {
+    color: #fff;
+
+}
+
+.pagination\:active {
+    background: lighten(#5e5e5e, 3%);
+    position: relative;
+}
+
+
+#myAside {
+    position: fixed; /* Posicionamiento fijo respecto al viewport */
+    top: 0;
+    left: 0; /* Ajusta para que comience desde el lado izquierdo */
+    width: 40% !important;
+    height: 100%;
+    background-color: #580404;
+    background-image: linear-gradient(315deg, #580404 0%, #20030b 50%, #FF0000 100%);
+    width: auto;
+    z-index: 1050; /* Asegúrate de que esté por encima de la mayoría de los elementos */
+    overflow-y: auto; /* Para contenido largo */
+    overflow-x: hidden;
+    transition: transform 0.3s ease; /* Suaviza la transición */
+    transform: translateX(-100%); /* Oculta el aside inicialmente */
+    
+}
+
+#backdrop {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.5); /* Fondo semi-transparente */
+    z-index: 1040; /* Detrás del aside pero por encima de otros contenidos */
+}
+
+.cantidad-producto {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.checkout-button-container .checkout-button{
+    width: 90% !important;
+    margin-bottom: 25px;
+    
+}
+
+.total-carrito{
+    font-family: "Anavio Small Capitals W01 Bold";
+    color:#FFFFFF;
+    padding:25px;
+    font-size: 30px;
+}
