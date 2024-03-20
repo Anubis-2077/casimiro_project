@@ -279,4 +279,17 @@ class ConsumoInsumo(models.Model):
     cantidad_consumida = models.DecimalField(max_digits=10, decimal_places=2)
 
     def __str__(self):
-        return f"{self.insumo.nombre} en {self.tarea}"
+        return f"{self.insumo.nombre} cantidad consumida {self.cantidad_consumida}"
+    
+    
+
+class NotasDeCata(models.Model):
+    tanque = models.ForeignKey(Tanque, on_delete=models.CASCADE)
+    cargamento = models.ForeignKey(Cargamento, on_delete=models.CASCADE)
+    fecha = models.DateField(auto_now_add=True)
+    notas_de_cata = models.TextField(blank=True, null=True)
+    correcciones = models.TextField(blank=True, null=True)
+    observaciones = models.TextField(blank=True, null=True)
+    usuario = models.ForeignKey(settings.AUTH_USER_MODEL, related_name='usuario_notas', on_delete=models.SET_NULL, null=True, blank=True)
+    
+    

@@ -1,5 +1,6 @@
 {% extends "base.html" %}
 {% load static %}
+{% load widget_tweaks %}
 
 
 {% block content %}
@@ -90,7 +91,8 @@
             <div class="card-header p-3">
               <ul class="nav nav-pills">
                 
-                <li class="nav-item"><a class="nav-link" href="#notas" data-toggle="tab">Notas</a></li>
+                <li class="nav-item"><a class="nav-link" href="#notas" data-toggle="tab">Agregar Nota</a></li>
+                <li class="nav-item"><a class="nav-link" href="#notastanque" data-toggle="tab">Notas Tanque</a></li>
                 {% comment %} <li class="nav-item"><a class="nav-link" href="#lineatiempo" data-toggle="tab">Historial contenido</a></li> {% endcomment %}
                 <li class="nav-item"><a class="nav-link" href="#cargacontenido" data-toggle="tab">Cargar contenido</a></li>
                 
@@ -103,50 +105,52 @@
                 <div class="tab-pane" id="notas">
                   <form class="form-horizontal" method="post" enctype="multipart/form-data">
                     {% csrf_token %}
+                    <input type="hidden" name="form_type" value="form3">
+
 
                     <div class="form-group row" {% comment %} style="display:none" {% endcomment %}>
-                      <label for="inputEmail" class="col-sm-2 col-form-label">Tanque</label>
+                      <label for="text" class="col-sm-2 col-form-label">Tanque</label>
                       <div class="col-sm-10">
-                          <input name="tanque" type="text" class="form-control" value="{{ tanque_detalle.id }}">
+                        
+                        <input name="tanque" type="text" class="form-control" value="{{ tanque_detalle.id }}" readonly>
+                      </div>
+                    </div>
+
+                    <div class="form-group row" {% comment %} style="display:none" {% endcomment %}>
+                      <label for="text" class="col-sm-2 col-form-label">Fecha</label>
+                      <div class="col-sm-10">
+                        <input name="fecha_ingreso" type="text" class="form-control" value="{{ fecha }}" readonly>
                       </div>
                     </div>
                     <div class="form-group row" {% comment %} style="display:none" {% endcomment %}>
-                      <label for="inputEmail" class="col-sm-2 col-form-label">Fecha</label>
+                      <label for="inputEmail" class="col-sm-2 col-form-label">Cargamento</label>
                       <div class="col-sm-10">
-                        <input name="fecha_ingreso" type="text" class="form-control" value="{{ fecha }}">
+                        <input name="cargamento" type="text" class="form-control" value="{{ contenido.molienda.cargamento.id }}" readonly>
                       </div>
                     </div>
                     <div class="form-group row">
                       <label for="inputEmail" class="col-sm-2 col-form-label">Notas de cata</label>
                       <div class="col-sm-10">
-                        <textarea name="notas_cata" class="form-control" rows="3" placeholder="Notas de cata"></textarea>
+                        {{form3.notas_de_cata | add_class:"form-control"}}
+                        
                       </div>
                     </div>
                     <div class="form-group row">
                       <label for="inputName2" class="col-sm-2 col-form-label">Correcciones</label>
                       <div class="col-sm-10">
-                        <textarea name="correcciones" class="form-control" rows="3" placeholder="Ingrese correcciones"></textarea>
+                        {{form3.correcciones | add_class:"form-control"}}
+                        
                       </div>
                     </div>
                     <div class="form-group row">
                       <label for="inputExperience" class="col-sm-2 col-form-label">Observaciones</label>
                       <div class="col-sm-10">
-                        <textarea name="observaciones" class="form-control" rows="3" placeholder="Ingrese observaciones"></textarea>
+                        {{form3.observaciones | add_class:"form-control"}}
+                        
                       </div>
                     </div>
-                    <div class="form-group row">
-                      <label for="inputSkills" class="col-sm-2 col-form-label">Adjuntar Analisis</label>
-                      <div class="col-sm-10">
-                        <input name="analisis" type="file" class="custom-file-input" id="customFile">
-                        <label class="custom-file-label" for="customFile">Elija un archivo</label>
-                      </div>
-                    </div>
-                    <div class="form-group row">
-                        <label for="inputEmail" class="col-sm-2 col-form-label">Insumos consumidos</label>
-                        <div class="col-sm-10">
-                            <input name="insumos" type="text" class="form-control" placeholder="Enter ...">
-                        </div>
-                      </div>
+                    
+                    
 
                     <div class="form-group row">
                       <div class="offset-sm-2 col-sm-10">
@@ -154,6 +158,97 @@
                       </div>
                     </div>
                   </form>
+                </div>
+
+                <div class="tab-pane" id="notastanque">
+                  {% if notas_tanque %}
+                  
+                  <section class="content">
+
+                    <!-- Default box -->
+                    <div class="card">
+                      <div class="card-header">
+                        <h3 class="card-title">Notas tanque numero {{tanque_detalle.id}}</h3>
+              
+                        <div class="card-tools">
+                          <button type="button" class="btn btn-tool" data-card-widget="collapse" data-toggle="tooltip" title="Collapse">
+                            <i class="fas fa-minus"></i></button>
+                          <button type="button" class="btn btn-tool" data-card-widget="remove" data-toggle="tooltip" title="Remove">
+                            <i class="fas fa-times"></i></button>
+                        </div>
+                      </div>
+                      <div class="card-body">
+                        <div class="row">
+                          <div class="col-12 col-md-12 col-lg-12 order-2 order-md-1">
+                            
+                            <div class="row">
+                              <div class="col-12">
+                                <h4>Notas recientes</h4>
+                                {% for nota in notas_tanque  %}
+                                <div class="post">
+                                  <div class="user-block">
+                                    
+                                    <span class="username">
+                                      Usuario: {{nota.usuario}}
+                                    </span>
+                                    <span class="description">{{nota.fecha}}</span>
+                                  </div>
+                                  <!-- /.user-block -->
+                                  <h5><strong>Lote:</strong></h5>
+                                  <p class="form-control" readonly>
+                                    {{ nota.cargamento.lote}} 
+                                  </p>
+
+                                  <h5><strong>Varietal:</strong></h5>
+                                  <p class="form-control" readonly>
+                                    {{ nota.cargamento.varietal.nombre}} 
+                                  </p>
+
+
+
+                                  <h5><strong>Notas de cata:</strong></h5>
+                                  <p class="form-control" readonly>
+                                    {{ nota.notas_de_cata}}
+                                  </p>
+
+                                  <h5><strong>Correcciones:</strong></h5>
+                                  <p class="form-control" readonly>
+                                    {{ nota.correcciones}}
+                                  </p>
+
+                                  <h5><strong>Observaciones:</strong></h5>
+                                  <p class="form-control" readonly>
+                                    {{ nota.observaciones}}
+                                  </p>
+            
+                                  
+                                </div>
+                                
+                                {% endfor %}
+                                  
+              
+                                  
+              
+                                  
+                              </div>
+                            </div>
+                          </div>
+                          
+                        </div>
+                      </div>
+                      <!-- /.card-body -->
+                    </div>
+                    <!-- /.card -->
+              
+                  </section>
+                  
+                  
+                  
+                  {% else %}
+                  <h3>No hay notas disponibles.</h3>
+                  {% endif %}
+                  
+                  
                 </div>
 
                 {% comment %} <div class="tab-pane" id="lineatiempo">

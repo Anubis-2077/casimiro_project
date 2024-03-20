@@ -169,3 +169,9 @@ class InsumoForm(forms.ModelForm):
     class Meta:
         model = Insumo
         fields = '__all__'
+        
+
+class NotasDeCataForm(forms.ModelForm):
+    class Meta:
+        model = NotasDeCata
+        fields = '__all__'

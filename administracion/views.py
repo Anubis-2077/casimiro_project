@@ -2,10 +2,11 @@ from typing import Any
 from django.shortcuts import render, redirect, HttpResponseRedirect
 from django.views.generic import FormView, ListView, View, TemplateView, DetailView
 from administracion.forms import *
+from contabilidad.views import Venta, Cliente
 from django.urls import reverse_lazy
 import string
 import random
-from datetime import datetime 
+from datetime import datetime, timedelta
 from django.shortcuts import get_object_or_404
 from django.http import HttpRequest, HttpResponse, JsonResponse
 from django.db.models import Q
@@ -34,7 +35,48 @@ def index(request):
 @login_required
 def index_admin(request):
     
-    return render (request, 'index_admin.html')
+    resultado_sin_etiquetar = StockBodegaSinEtiquetar.objects.aggregate(total_botellas=Sum('cantidad_botellas'))
+    total_botellas_sin_etiquetar = resultado_sin_etiquetar['total_botellas']
+    
+    resultado_etiquetado = StockBodegaEtiquetado.objects.aggregate(total_botellas=Sum('cantidad_botellas'))
+    total_botellas_etiquetado = resultado_etiquetado['total_botellas']
+
+    resultado_empaquetado = StockBodegaEmpaquetado.objects.aggregate(total_cajas=Sum('cantidad_cajas'))
+    total_botellas_empaquetado = resultado_empaquetado['total_cajas'] * 6
+    
+    total_bodega = total_botellas_sin_etiquetar + total_botellas_empaquetado + total_botellas_etiquetado
+    
+    # Obtener la fecha y hora actual
+    ahora = timezone.now()
+
+    # Calcular la fecha de hace 6 meses
+    hace_6_meses = ahora - timedelta(days=6*30)
+
+    # Convertir esa fecha a una cadena en formato ISO 8601
+    fecha_en_cadena = hace_6_meses.isoformat()
+    
+    ventas_web = Venta.objects.filter(condicion='online', fecha_venta__gte=fecha_en_cadena).aggregate(total=Sum('precio_total'))['total']
+    
+    litros_en_tanque = Contenido.objects.aggregate(total_litros=Sum('cantidad'))
+    total_litros_tanque = litros_en_tanque ['total_litros']
+    
+    insumos_escasos = Insumo.objects.filter(cantidad__lte = 50).count()
+    
+    tareas=Tarea.objects.all().order_by('-fecha')[:6]
+    
+    clientes=Cliente.objects.all()
+    
+    context = {
+        'total_bodega': total_bodega,
+        'ventas_web':ventas_web,
+        'total_litros_en_tanque': total_litros_tanque,
+        'insumos_escasos':insumos_escasos,
+        'tareas':tareas,
+        'clientes':clientes
+    }
+    
+
+    return render (request, 'index_admin.html',context)
 
 
 #-------------------------------------Login Views-----------------------------------
@@ -208,6 +250,7 @@ class DetalleTanqueView(LoginRequiredMixin, View):
     template_name = 'administracion/detalle_tanque.html'
     form1 = ContenidoForm
     form2 = MoverContenidoForm
+    form3 = NotasDeCataForm
     
     
 
@@ -218,11 +261,13 @@ class DetalleTanqueView(LoginRequiredMixin, View):
         fecha_hora_formateada = fecha_hora_actual.strftime("%d/%m/%Y %H:%M:%S")
         form1_instance = self.form1()
         form2_instance = self.form2()
+        form3_instance = self.form3()
 
         contenido = Contenido.objects.filter(tanque=tanque_select).last()
         
         tanque = Tanque.objects.get(numero = numero_tanque)
         tanques = Tanque.objects.all()
+        notas_tanque= NotasDeCata.objects.filter(tanque=tanque).order_by('-fecha')
         
         
         moliendas_disponibles = Molienda.objects.filter(disponible__gt=0)
@@ -241,7 +286,9 @@ class DetalleTanqueView(LoginRequiredMixin, View):
                    "fecha": fecha_hora_formateada,
                    "form1" : form1_instance,
                    "form2" : form2_instance,
+                   "form3": form3_instance,
                    "contenido" : contenido,
+                   "notas_tanque": notas_tanque
                    
                    
                    }
@@ -251,6 +298,7 @@ class DetalleTanqueView(LoginRequiredMixin, View):
     def post(self, request,  *args, **kwargs):
         form1_instance = self.form1(request.POST, request.FILES)
         form2_instance = self.form2(request.POST, request.FILES)
+        form3_instance = self.form3(request.POST, request.FILES)
         
         form_type = request.POST.get('form_type')
         
@@ -439,11 +487,22 @@ class DetalleTanqueView(LoginRequiredMixin, View):
                 form2_instance.save()
             else:
                 print(form2_instance.errors)
+        
+        elif form_type == 'form3':
+            if form3_instance.is_valid():
+                # Asignamos el usuario a la instancia del modelo, no al formulario directamente
+                modelo = form3_instance.save(commit=False)  # Guardamos la instancia del modelo sin enviar a la BD
+                modelo.usuario = request.user  # Asignamos el usuario
+                modelo.save()  # Ahora sí, guardamos en la BD
+            else:
+                print('hay errores en el form 3')
+                print(form3_instance.errors)
+                
                 
   
         
         print('hay errores aca')
-        #return redirect(reverse_lazy('lista_tanques'))
+        return redirect(reverse_lazy('lista_tanques'))
               
     
 def obtener_contenidos_tanques(request, contenidoId):
@@ -642,68 +701,132 @@ class RegistrarEtiquetadoView(LoginRequiredMixin, FormView):
         #print("Cargando la vista RegistrarEtiquetadoView")
         return super().get(request, *args, **kwargs)
 
-    def post(self, request, *args, **kwargs):
-        #print("Formulario enviado en RegistrarEtiquetadoView")
-        return super().post(request, *args, **kwargs)
+    
+        
 
     def get_context_data(self, **kwargs):
+        context = super(RegistrarEtiquetadoView, self).get_context_data(**kwargs)
         #print("Preparando el contexto para RegistrarEtiquetadoView")
-        context = super().get_context_data(**kwargs)
+        if self.request.POST:
+            context['insumos_formset'] = ConsumoInsumoFormset(self.request.POST)
+        else:
+            context['insumos_formset'] = ConsumoInsumoFormset(queryset=ConsumoInsumo.objects.none())
+        
         fecha_hora_formateada = datetime.today().strftime("%Y-%m-%d %H:%M")
         context["stock_embotellados"] = StockBodegaSinEtiquetar.objects.filter(etiquetado=False)
         context["fecha_hoy"] = fecha_hora_formateada
         return context
+    
+    
+    def post(self, request, *args, **kwargs):
+        self.object = None
+        form = self.get_form()
+        insumos_formset = ConsumoInsumoFormset(request.POST)
+        
+        #print("POST data:", request.POST)  # Verificar los datos enviados por el usuario
+        print("Formset is valid:", insumos_formset.is_valid())  # Verificar si el formset es válido
+        
+        if form.is_valid() and insumos_formset.is_valid():
+            print("Ambos form y formset son válidos")
+            return self.both_valid(form, insumos_formset)
+        else:
+            print("Form o formset inválido")
+            if not insumos_formset.is_valid():
+                print("Errores en el formset:", insumos_formset.errors)
+            # Ajuste aquí: pasar insumos_formset al contexto cuando sea inválido.
+            return self.render_to_response(self.get_context_data(form=form, insumos_formset=insumos_formset))
 
-    def form_valid(self, form):
-        print("Formulario válido en RegistrarEtiquetadoView")
+
+    def both_valid(self, form, insumos_formset):
+        print("En both_valid - procesando form y formset")
         cantidad_botellas = form.cleaned_data.get('cantidad_botellas')
-        stock_id = form.cleaned_data.get('stock').id
-        try:
-                # Recupera el ID del stock sin etiquetar seleccionado
-                stock_id = form.cleaned_data['stock'].id
+        stock_id = form.cleaned_data.get('stock').id  # Obtiene el ID directamente del formulario
+        with transaction.atomic():
+            try:
+                # Recupera directamente el stock sin etiquetar seleccionado usando el ID obtenido del formulario
                 stock = StockBodegaSinEtiquetar.objects.get(pk=stock_id)
 
-                #Restar la cantidad etiquetada a la cantidad embotellada
-                stock.cantidad_botellas = stock.cantidad_botellas - cantidad_botellas
+                if stock.cantidad_botellas >= cantidad_botellas:
+                    # Restar la cantidad etiquetada a la cantidad embotellada
+                    stock.cantidad_botellas -= cantidad_botellas
+                    
+                    # Marca el stock sin etiquetar como etiquetado si no quedan botellas
+                    if stock.cantidad_botellas == 0:
+                        stock.etiquetado = True
+                        stock.cantidad_botellas = 0
+                    
+                    stock.save()  # Guarda los cambios en el stock
+
+                    # Crea la nueva instancia de BotellaEtiquetada con los datos actualizados
+                    botella_etiquetada = StockBodegaEtiquetado.objects.create(
+                        stock=stock,
+                        fecha_etiquetado=timezone.now(),
+                        cantidad_botellas=cantidad_botellas,
+                        varietal=stock.varietal,  
+                        lote=stock.lote,         
+                        empaquetado=False,       
+                        observaciones="",        
+                        deposito=Deposito.objects.get(nombre="BODEGA")  
+                    )
+                    botella_etiquetada.save()
+
+                else:
+                    # Si la cantidad de botellas a etiquetar excede la cantidad disponible, agrega un error al formulario
+                    form.add_error('cantidad_botellas', 'No se puede etiquetar más de lo disponible')
+                    return self.form_invalid(form)
                 
-                # Marca el stock sin etiquetar como etiquetado
-                if stock.cantidad_botellas == 0:
-                    print("el codigo pasa por aca")
-                    stock.etiquetado = True
-                    stock.cantidad_botellas = 0
-                print("el codigo esta pasando por el try")
-                print("este es el stock etiquetado:",stock.etiquetado)
-                print("este es el stock sin etiquetar:",stock)
-                stock.save()  # Guardar el objeto modificado en la base de datos
+            except StockBodegaSinEtiquetar.DoesNotExist:
+                raise Http404("El stock sin etiquetar no existe")
+            
+            
+            insumos_instances = insumos_formset.save(commit=False)
+            print("Instancias de InsumoFormset a ser guardadas:", insumos_instances)
 
-                # Crea una nueva instancia de BotellaEtiquetada
+            # Bandera para rastrear si hay errores relacionados con la cantidad de insumos
+            hay_error_en_cantidad = False
+
+            for instance in insumos_instances:
+                print(f"Procesando instancia de insumo: {instance.insumo.nombre}, cantidad consumida: {instance.cantidad_consumida}")
                 
-                botella_etiquetada = StockBodegaEtiquetado.objects.create(
-                    stock=stock,
-                    fecha_etiquetado=datetime.now(),  # O la fecha que corresponda
-                    cantidad_botellas=cantidad_botellas,
-                    varietal=stock.varietal,  
-                    lote=stock.lote,         
-                    empaquetado=False,       
-                    observaciones="",        
-                    deposito=Deposito.objects.get(nombre="BODEGA")  
-                )
-                print("este es el nuevos tock etiquetado:",botella_etiquetada)
-                botella_etiquetada.save()  # Guardar el objeto en la base de datos
+                # Aquí se corrige la comparación para usar la cantidad disponible del insumo
+                if instance.insumo.cantidad >= instance.cantidad_consumida:
+                    insumo = instance.insumo
+                    insumo.cantidad -= instance.cantidad_consumida
+                    print(f"Nueva cantidad de {insumo.nombre}: {insumo.cantidad}")
+                    insumo.save()
+                else:
+                    # Si no hay suficiente insumo, se marca que hay un error
+                    hay_error_en_cantidad = True
+                    # Aquí terminamos el loop porque ya encontramos un error
+                    break
 
-                return super().form_valid(form)
-        except StockBodegaSinEtiquetar.DoesNotExist:
-            print("StockBodegaSinEtiquetar no encontrado")
-            raise Http404("El stock sin etiquetar no existe")
+            # Si hubo un error en las cantidades de insumo, se maneja aquí
+            if hay_error_en_cantidad:
+                # Aquí no podemos usar form.add_error para el formset directamente.
+                # Necesitas manejar este error de forma que se muestre adecuadamente al usuario.
+                # Por ejemplo, puedes usar el sistema de mensajes de Django para mostrar un error general,
+                # o agregar un error no específico de campo con form.add_error(None, 'Mensaje de error')
+                form.add_error(None, 'No hay suficiente cantidad de insumos disponibles para realizar esta operación. Consulte el stock.')
+                return self.form_invalid(form)
 
-        else:
-            raise ValidationError("No puede etiquetar más de lo disponible")
+            # Si llegamos aquí, significa que no hubo problemas con las cantidades de insumo y podemos proceder.
+            # Guardamos las instancias del formset después de hacer todas las verificaciones.
+            for instance in insumos_instances:
+                instance.save()
 
-        return super().form_valid(form)
+            return super().form_valid(form)
 
-    def form_invalid(self, form):
-        print("Formulario inválido en RegistrarEtiquetadoView")
-        print("Errores del formulario:", form.errors)
+            # Aquí continua tu lógica para manejar el objeto Embotellamiento y actualizar Contenido
+
+            return HttpResponseRedirect(self.get_success_url())
+
+    def form_invalid(self, form, insumos_formset = None):
+        
+        # Considera añadir manejo para el formset inválido si es necesario
+        print("El formulario es inválido")
+        print(form.errors)
+        if insumos_formset:
+            print('Errores del formset:', insumos_formset.errors)
         return super().form_invalid(form)
   
 class StockEtiquetadoLista(LoginRequiredMixin, ListView):
@@ -771,54 +894,128 @@ class RegistrarEmpaquetadoView(LoginRequiredMixin, FormView):
     form_class = EmpaquetadoForm
 
     def get_context_data(self, **kwargs):
-        context = super().get_context_data(**kwargs)
-        fecha_hora_formateada = datetime.today().strftime("%Y-%m-%d %H:%M")
+        context = super(RegistrarEmpaquetadoView, self).get_context_data(**kwargs)
+        #print("Preparando el contexto para RegistrarEtiquetadoView")
+        if self.request.POST:
+            context['insumos_formset'] = ConsumoInsumoFormset(self.request.POST)
+        else:
+            context['insumos_formset'] = ConsumoInsumoFormset(queryset=ConsumoInsumo.objects.none())
+        
+        fecha_hora_formateada = timezone.now().strftime("%Y-%m-%d %H:%M")
         context["stock_etiquetados"] = StockBodegaEtiquetado.objects.filter(empaquetado=False)
         context["fecha_hoy"] = fecha_hora_formateada
         return context
-
-    def form_valid(self, form):
+    
+    def post(self, request, *args, **kwargs):
+        self.object = None
+        form = self.get_form()
+        insumos_formset = ConsumoInsumoFormset(request.POST)
+        
+        #print("POST data:", request.POST)  # Verificar los datos enviados por el usuario
+        print("Formset is valid:", insumos_formset.is_valid())  # Verificar si el formset es válido
+        
+        if form.is_valid() and insumos_formset.is_valid():
+            print("Ambos form y formset son válidos")
+            return self.both_valid(form, insumos_formset)
+        else:
+            print("Form o formset inválido")
+            if not insumos_formset.is_valid():
+                print("Errores en el formset:", insumos_formset.errors)
+            # Ajuste aquí: pasar insumos_formset al contexto cuando sea inválido.
+            return self.render_to_response(self.get_context_data(form=form, insumos_formset=insumos_formset))
+        
+        
+        
+        
+    def both_valid(self, form, insumos_formset):
+        print("En both_valid - procesando form y formset")
         cantidad_cajas = form.cleaned_data.get('cantidad_cajas')
         stock_id = form.cleaned_data['stock'].id
         stock = StockBodegaEtiquetado.objects.get(pk=stock_id)
         cantidad_disponible = stock.cantidad_botellas
-
         
+        with transaction.atomic():
+            try:
+                if stock.cantidad_botellas >= cantidad_cajas * 6:
+                    stock.cantidad_botellas -= cantidad_cajas * 6
+                    stock.empaquetado = stock.cantidad_botellas <= 0
+                    stock.save()
+                    #print("este es el stock: ",stock)
+                    """ if cantidad_disponible >= cantidad_cajas * 6:
+                        stock.cantidad_botellas -= cantidad_cajas * 6
+                        if stock.cantidad_botellas <= 0:
+                            stock.empaquetado = True """
+                    
+                    #stock.save()
+                    
+                    deposito_defecto = Deposito.objects.get(nombre="BODEGA")
+                    
+                    fecha_empaquetado_actual = timezone.now()
+                    stock_empaquetado = StockBodegaEmpaquetado.objects.create(
+                    stock=stock,
+                    cantidad_cajas=cantidad_cajas,
+                    empaquetado=stock.empaquetado,
+                    varietal=stock.varietal,
+                    lote=stock.lote,
+                    fecha_empaquetado=fecha_empaquetado_actual,
+                    deposito=deposito_defecto
+                )
+                    #print("este es el stock empaquetado: ",stock_empaquetado)
+                    
+                    stock_empaquetado.save()
+                    print('form procesado con exito')
+                    
+                
+                else:
+                    raise ValidationError("No puede empaquetar más de lo disponible")
+                    return self.form_invalid(form)
+                
+            except StockBodegaSinEtiquetar.DoesNotExist:
+                raise Http404("El stock sin etiquetar no existe")
+            
+            
+            insumos_instances = insumos_formset.save(commit=False)
+            print("Instancias de InsumoFormset a ser guardadas:", insumos_instances)
 
-        
-        if stock.cantidad_botellas >= cantidad_cajas * 6:
-            stock.cantidad_botellas -= cantidad_cajas * 6
-            stock.empaquetado = stock.cantidad_botellas <= 0
-            stock.save()
-            #print("este es el stock: ",stock)
-            """ if cantidad_disponible >= cantidad_cajas * 6:
-                stock.cantidad_botellas -= cantidad_cajas * 6
-                if stock.cantidad_botellas <= 0:
-                    stock.empaquetado = True """
-            
-            #stock.save()
-            
-            deposito_defecto = Deposito.objects.get(nombre="BODEGA")
-            
-            fecha_empaquetado_actual = timezone.now()
-            stock_empaquetado = StockBodegaEmpaquetado.objects.create(
-            stock=stock,
-            cantidad_cajas=cantidad_cajas,
-            empaquetado=stock.empaquetado,
-            varietal=stock.varietal,
-            lote=stock.lote,
-            fecha_empaquetado=fecha_empaquetado_actual,
-            deposito=deposito_defecto
-        )
-            #print("este es el stock empaquetado: ",stock_empaquetado)
-            
-            stock_empaquetado.save()
+            # Bandera para rastrear si hay errores relacionados con la cantidad de insumos
+            hay_error_en_cantidad = False
+
+            for instance in insumos_instances:
+                print(f"Procesando instancia de insumo: {instance.insumo.nombre}, cantidad consumida: {instance.cantidad_consumida}")
+                
+                # Aquí se corrige la comparación para usar la cantidad disponible del insumo
+                if instance.insumo.cantidad >= instance.cantidad_consumida:
+                    insumo = instance.insumo
+                    insumo.cantidad -= instance.cantidad_consumida
+                    print(f"Nueva cantidad de {insumo.nombre}: {insumo.cantidad}")
+                    insumo.save()
+                else:
+                    # Si no hay suficiente insumo, se marca que hay un error
+                    hay_error_en_cantidad = True
+                    # Aquí terminamos el loop porque ya encontramos un error
+                    break
+
+            # Si hubo un error en las cantidades de insumo, se maneja aquí
+            if hay_error_en_cantidad:
+                # Aquí no podemos usar form.add_error para el formset directamente.
+                # Necesitas manejar este error de forma que se muestre adecuadamente al usuario.
+                # Por ejemplo, puedes usar el sistema de mensajes de Django para mostrar un error general,
+                # o agregar un error no específico de campo con form.add_error(None, 'Mensaje de error')
+                form.add_error(None, 'No hay suficiente cantidad de insumos disponibles para realizar esta operación. Consulte el stock.')
+                return self.form_invalid(form)
+
+            # Si llegamos aquí, significa que no hubo problemas con las cantidades de insumo y podemos proceder.
+            # Guardamos las instancias del formset después de hacer todas las verificaciones.
+            for instance in insumos_instances:
+                instance.save()
 
             return super().form_valid(form)
+
+            # Aquí continua tu lógica para manejar el objeto Embotellamiento y actualizar Contenido
+
+            return HttpResponseRedirect(self.get_success_url())
         
-        else:
-            raise ValidationError("No puede empaquetar más de lo disponible")
-            return self.form_invalid(form)
+    
         
     def form_invalid(self, form):
         print ("el formulario es invalido")

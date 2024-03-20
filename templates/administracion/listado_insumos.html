@@ -43,7 +43,12 @@
                     {% for insumo in insumos %}
                     <tr>
                         <td>{{ insumo.nombre }}</td>
+                        {% if insumo.cantidad < 20 %}
+                        <td style="background-color:red; color:white"><strong>{{ insumo.cantidad }}</strong></td>
+                        {% else %}
                         <td>{{ insumo.cantidad }}</td>
+                        {% endif %}
+                        
                         <td>{{ insumo.descripcion }}</td>
                         <td>{{ insumo.unidad_medida }}</td>
                         <td>$ {{ insumo.costo_unitario }}</td>

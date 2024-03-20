@@ -17,6 +17,8 @@ def notificaciones(request):
     numero_de_envios = nuevos_envios.count()
     
     nuevas_notificaciones = numero_de_envios + numero_de_tareas
+    
+    
 
 
     return {

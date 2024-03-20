@@ -49,7 +49,8 @@
                                 </thead>
                                 <tbody>
                                     {% for deposito in depositos %}
-                                    <tr>
+                                      {% if deposito.nombre != 'BODEGA' %}
+                                      <tr>
                                         <td>{{deposito.id}}</td>
                                         <td>{{deposito.nombre}}</td>
                                         <td>{{deposito.ubicacion}}</td>
@@ -59,6 +60,10 @@
                                         <td > <a href="{% url 'eliminar_deposito' pk=deposito.id %}" class="btn btn-danger"><i class="fa-solid fa-trash"> </i>Eliminar deposito</a></td>
                                         
                                       </tr>
+                                      
+                                      
+                                      {% endif %}
+                                    
                                     
                                     
                                     {% endfor %}
