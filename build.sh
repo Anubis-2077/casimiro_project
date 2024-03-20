@@ -4,11 +4,16 @@ set -o errexit
 
 cd casimiro
 
-# Modify this line as needed for your package manager (pip, poetry, etc.)
+# Install dependencies
 pip install -r requirements.txt
 
-# Convert static asset files
+# Collect static files
 python manage.py collectstatic --no-input
 
-# Apply any outstanding database migrations
+# Apply database migrations
 python manage.py migrate
+
+# Create superuser
+python create_superuser.py
+
+echo "Superuser created with email: codexweb.sj@gmail.com and password: 123"
