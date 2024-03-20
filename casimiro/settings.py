@@ -20,7 +20,7 @@ DEBUG = True#'RENDER' not in os.environ
 
 
 ALLOWED_HOSTS = [
-    
+    'casimiro-project.onrender.com'
 ]
 
 RENDER_EXTERNAL_HOSTNAME = os.environ.get('RENDER_EXTERNAL_HOSTNAME')
@@ -30,7 +30,7 @@ if RENDER_EXTERNAL_HOSTNAME:
 APPEND_SLASH=False
 
 CSRF_TRUSTED_ORIGINS = [
-    'https://2e62-190-176-133-181.ngrok-free.app',
+    'https://casimiro-project.onrender.com',
 ]
 
 
