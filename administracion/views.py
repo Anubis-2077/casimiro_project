@@ -25,6 +25,9 @@ from django.contrib.auth.mixins import LoginRequiredMixin
 from django.db import transaction
 from django.utils.decorators import method_decorator
 from django.utils import timezone
+
+
+
 def index(request):
     return render (request, 'index/index.html')
 
