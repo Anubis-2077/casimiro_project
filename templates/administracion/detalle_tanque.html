@@ -48,7 +48,7 @@
                 </li>
                 <li class="list-group-item">
                  <b>Contenido</b> <a class="float-right">
-                  {% if contenido and contenido.cantidad > 0 and not contenido.embotellado %}
+                  {% if contenido and contenido.cantidad > 0 and not contenido.embotellado  %}
                   <p> {{ contenido.molienda.cargamento.varietal }}</p>
               {% else %}
                   <p>Vacio.</p>

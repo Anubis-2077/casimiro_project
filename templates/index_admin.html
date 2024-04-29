@@ -39,7 +39,14 @@
             <!-- small box -->
             <div class="small-box bg-success">
               <div class="inner">
-                <h3>$ {{ventas_web}}<sup style="font-size: 20px"></sup></h3>
+                <h3>$ 
+                  {% if ventas_web == None %}
+                  0
+                  {% else %}
+                  {{ventas_web}}
+                  {% endif %}
+                  
+                  <sup style="font-size: 20px"></sup></h3>
 
                 <p>Ventas web últimos 6 meses</p>
               </div>
@@ -69,7 +76,15 @@
             <!-- small box -->
             <div class="small-box bg-danger">
               <div class="inner">
-                <h3>{{total_litros_en_tanque}}</h3>
+                <h3>
+                  {% if total_litros_en_tanque == None %}
+                  0
+                  {% else %}
+                  {{total_litros_en_tanque}}
+                  {% endif %}
+                  
+                  
+                  </h3>
 
                 <p>Total litros en tanque</p>
               </div>

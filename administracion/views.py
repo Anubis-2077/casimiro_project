@@ -39,13 +39,26 @@ def index(request):
 def index_admin(request):
     
     resultado_sin_etiquetar = StockBodegaSinEtiquetar.objects.aggregate(total_botellas=Sum('cantidad_botellas'))
-    total_botellas_sin_etiquetar = resultado_sin_etiquetar['total_botellas']
+    if resultado_sin_etiquetar == None:
+        total_botellas_sin_etiquetar = resultado_sin_etiquetar['total_botellas']
+    else:
+        total_botellas_sin_etiquetar = 0
     
     resultado_etiquetado = StockBodegaEtiquetado.objects.aggregate(total_botellas=Sum('cantidad_botellas'))
-    total_botellas_etiquetado = resultado_etiquetado['total_botellas']
+    if resultado_etiquetado == None:
+        total_botellas_etiquetado = resultado_etiquetado['total_botellas']
+    else:
+        total_botellas_etiquetado = 0
 
     resultado_empaquetado = StockBodegaEmpaquetado.objects.aggregate(total_cajas=Sum('cantidad_cajas'))
-    total_botellas_empaquetado = resultado_empaquetado['total_cajas'] * 6
+    if resultado_empaquetado == None:
+        total_botellas_empaquetado = resultado_empaquetado['total_cajas'] * 6
+    else:
+        total_botellas_empaquetado = 0
+        
+       
+
+    
     
     total_bodega = total_botellas_sin_etiquetar + total_botellas_empaquetado + total_botellas_etiquetado
     
@@ -58,7 +71,9 @@ def index_admin(request):
     # Convertir esa fecha a una cadena en formato ISO 8601
     fecha_en_cadena = hace_6_meses.isoformat()
     
+    
     ventas_web = Venta.objects.filter(condicion='online', fecha_venta__gte=fecha_en_cadena).aggregate(total=Sum('precio_total'))['total']
+        
     
     litros_en_tanque = Contenido.objects.aggregate(total_litros=Sum('cantidad'))
     total_litros_tanque = litros_en_tanque ['total_litros']
@@ -737,6 +752,7 @@ class RegistrarEtiquetadoView(LoginRequiredMixin, FormView):
             print("Form o formset inválido")
             if not insumos_formset.is_valid():
                 print("Errores en el formset:", insumos_formset.errors)
+                print('errores en el form: ', form.errors)
             # Ajuste aquí: pasar insumos_formset al contexto cuando sea inválido.
             return self.render_to_response(self.get_context_data(form=form, insumos_formset=insumos_formset))
 

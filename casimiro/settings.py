@@ -12,15 +12,15 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 # See https://docs.djangoproject.com/en/4.2/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = os.environ.get('SECRET_KEY')
+SECRET_KEY = '6yoJ9DXoCy9wTE648nV0tW2Atm43WptdR3ueQHQxr5y8TEKvNKY'
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True#'RENDER' not in os.environ
+DEBUG = True #'RENDER' not in os.environ
 
 
 
 ALLOWED_HOSTS = [
-    'casimiro-project.onrender.com'
+    '127.0.0.1',
 ]
 
 RENDER_EXTERNAL_HOSTNAME = os.environ.get('RENDER_EXTERNAL_HOSTNAME')
@@ -30,7 +30,7 @@ if RENDER_EXTERNAL_HOSTNAME:
 APPEND_SLASH=False
 
 CSRF_TRUSTED_ORIGINS = [
-    'https://casimiro-project.onrender.com',
+    'http://localhost',
 ]
 
 
@@ -95,19 +95,16 @@ WSGI_APPLICATION = 'casimiro.wsgi.application'
 # https://docs.djangoproject.com/en/4.2/ref/settings/#databases
 
 DATABASES = {
-    #'default': {
-    #    'ENGINE': 'django.db.backends.postgresql_psycopg2',
-    #    'NAME': 'casimiro',
-    #    'USER': 'postgres',
-    #    'PASSWORD': '123',
-    #    'HOST': 'localhost',
-    #    'PORT': '',
-    #}
+    'default': {
+        'ENGINE': 'django.db.backends.postgresql_psycopg2',
+        'NAME': 'vineyard_admin',
+        'USER': 'postgres',
+        'PASSWORD': '123',
+        'HOST': 'localhost',
+       'PORT': '',
+    }
     
-    'default':dj_database_url.config(
-        default='postgres://casimiro_user:9yH9rSyJMvaY0AuhgCSoepYIkZ50Dc8q@dpg-cntldqcf7o1s73e8qkkg-a/casimiro',
-        
-    )
+    
 }
 
 
